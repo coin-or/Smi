@@ -113,6 +113,7 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 		this->nels_ += node->getNumElements();
 	}
 
+
 	int scen = smiTree_.addPathtoLeaf(anc,branch,node_vec);
 
 	// add probability to all scenario nodes in path
@@ -135,6 +136,70 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 	return scen;
 
 }
+SmiScenarioIndex 
+SmiScnModel::generateScenario(SmiCoreData *core, 
+				CoinPackedMatrix *matrix,
+				CoinPackedVector *v_dclo, CoinPackedVector *v_dcup,
+				CoinPackedVector *v_dobj,
+				CoinPackedVector *v_drlo, CoinPackedVector *v_drup,				
+				vector<int> labels, double prob,
+				SmiCoreCombineRule *r)
+				throw(CoinError)
+{
+
+	// this code assumes that full path data (incl root node data)
+	// is passed in.
+
+	vector<SmiScnNode *> node_vec;
+
+	node_vec.reserve(core->getNumStages());
+
+
+	// TODO: what to do about duplicate matrix entries?
+	// ...can't do the following because eliminates zero entries...
+	// matrix->eliminateDuplicates(0.0);
+
+	int t;
+	for (t=0; t<core->getNumStages(); t++)
+	{
+		// generate new data node
+		SmiNodeData *node = new SmiNodeData(t,core,matrix,
+			v_dclo,v_dcup,v_dobj,v_drlo,v_drup);
+		node->setCoreCombineRule(r);
+		// generate new tree node
+		SmiScnNode *tnode = new SmiScnNode(node);
+		node_vec.push_back(tnode);
+		
+		this->ncol_ += core->getNumCols(t);
+		this->nrow_ += core->getNumRows(t);
+		this->nels_ += node->getNumElements();
+	}
+
+	SmiTreeNode<SmiScnNode *> *node = smiTree_.find(labels);
+	int scen = smiTree_.addPathtoLeaf(node->scenario(),node->depth(),node_vec);
+	smiTree_.setChildLabels(node,labels);
+
+	// add probability to all scenario nodes in path
+	SmiTreeNode<SmiScnNode *> *child = smiTree_.getLeaf(scen);
+	SmiTreeNode<SmiScnNode *> *parent = child->getParent();
+	SmiTreeNode<SmiScnNode *> *root = smiTree_.getRoot();
+
+	while (child != root)
+	{
+		SmiScnNode *tnode = child->getDataPtr();
+		tnode->addProb(prob);
+		tnode->setParent(parent->getDataPtr());
+		child = parent;
+		parent = child->getParent();
+	}
+	root->getDataPtr()->addProb(prob);
+
+	this->totalProb_+=prob;
+
+	return scen;
+
+}
+
 
 
 
@@ -317,94 +382,102 @@ void replaceFirstWithSecond(CoinPackedVector &dfirst, const CoinPackedVector &ds
 
 void
 SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *smiDD)
+
 {
 	SmiCoreData *core=smiDD->getCore();
-
+	
 	int nindp = smiDD->getNumRV();
 	assert(nindp > 0);
-
+	
 	int ns=1;
 	double dp=1.0;
-
+	
 	CoinPackedMatrix matrix ;
-	CoinPackedVector dclo ;
-	CoinPackedVector dcup ;
-	CoinPackedVector dobj ;
-	CoinPackedVector drlo ;
-	CoinPackedVector drup ;
-
-	dclo.setTestForDuplicateIndex(true);
-	dcup.setTestForDuplicateIndex(true);
-	dobj.setTestForDuplicateIndex(true);
-	drlo.setTestForDuplicateIndex(true);
-	drup.setTestForDuplicateIndex(true);
+	CoinPackedVector cpv_dclo ;
+	CoinPackedVector cpv_dcup ;
+	CoinPackedVector cpv_dobj ;
+	CoinPackedVector cpv_drlo ;
+	CoinPackedVector cpv_drup ;
+	
+	cpv_dclo.setTestForDuplicateIndex(true);
+	cpv_dcup.setTestForDuplicateIndex(true);
+	cpv_dobj.setTestForDuplicateIndex(true);
+	cpv_drlo.setTestForDuplicateIndex(true);
+	cpv_drup.setTestForDuplicateIndex(true);
 	
 	// initialize data for first scenario
 	vector<int> indx(nindp);
 	vector<int> nsamp(nindp);
+	vector<int> label(core->getNumStages()-1);
+	vector<int>::iterator iLabel;
+	
+	for (iLabel=label.begin(); iLabel<label.end(); ++iLabel)
+		*iLabel=0;
 	
 	int jj;
 	for (jj=0;jj<nindp;jj++) {
 		SmiDiscreteRV *smiRV = smiDD->getDiscreteRV(jj);
+		
 		indx[jj] = 0;
 		nsamp[jj] = smiRV->getNumEvents();
 		ns *= nsamp[jj];
 		dp *= smiRV->getEventProb(indx[jj]);
 		
 		
-		dclo.append(smiRV->getEventColLower(indx[jj]));
+		cpv_dclo.append(smiRV->getEventColLower(indx[jj]));
 		
-		dcup.append(smiRV->getEventColUpper(indx[jj]));
+		cpv_dcup.append(smiRV->getEventColUpper(indx[jj]));
 		
-		dobj.append(smiRV->getEventObjective(indx[jj]));
+		cpv_dobj.append(smiRV->getEventObjective(indx[jj]));
 		
-		drlo.append(smiRV->getEventRowLower(indx[jj]));
+		cpv_drlo.append(smiRV->getEventRowLower(indx[jj]));
 		
-		drup.append(smiRV->getEventRowUpper(indx[jj]));
+		cpv_drup.append(smiRV->getEventRowUpper(indx[jj]));
 		
-		//TODO test this code
+		//TODO test smiModel code
 		CoinPackedMatrix m = smiRV->getEventMatrix(indx[jj]);
 		assert(!m.isColOrdered());
 		if (matrix.getNumElements())
 		{
-			for (int j=0; j<m.getNumCols(); ++j)
+			for (int i=0; i<m.getNumRows(); ++i)
 			{
-				CoinPackedVector col=m.getVector(j);
-				CoinPackedVector ccol=matrix.getVector(j);
-				for (int i=m.getVectorFirst(j); i<m.getVectorLast(j); ++i)
+				CoinPackedVector row=m.getVector(i);
+				CoinPackedVector rrow=matrix.getVector(i);
+				for (int j=m.getVectorFirst(i); j<m.getVectorLast(j); ++j)
 				{
 					
-					assert(ccol[i] == 0.0);//tests duplicate index
-					matrix.modifyCoefficient(i,j,col[i],true);
+					assert(rrow[j] == 0.0);//tests duplicate index
+					matrix.modifyCoefficient(i,j,row[j],true);
 				}
 			}
 		}
 		else
 			matrix = m;
 		
-
+		
     }
 	
 	// first scenario
 	int anc = 0;
 	int branch = 1;
-	int	is = this->generateScenario(core,&matrix,&dclo,&dcup,&dobj,
-									&drlo,&drup,branch,anc,dp,smiDD->getCombineWithCoreRule());
-
+	int	is = this->generateScenario(core,&matrix,&cpv_dclo,&cpv_dcup,&cpv_dobj,
+		&cpv_drlo,&cpv_drup,branch,anc,dp);
+	
+	
 	SmiTreeNode<SmiScnNode *> *root = this->smiTree_.getRoot();
-	this->smiTree_.setChildLabels(root,indx);
-
+	this->smiTree_.setChildLabels(root,label);
+	
 	/* sample space increment initialized to 1 */
     int *incr = (int *) malloc( nindp*sizeof(int) );
     for (jj=0;jj<nindp;jj++) incr[jj] = 1;
-		
+	
 	/***** ...main loop to generate scenarios from discrete random variables
-		For each scenario index ii:
-        If the sample size nsamp[jj] divides the scenario index ii,
-		reverse the increment direction incr[jj]
-		and increase the random variable index jj by 1.
-        Increment the jj'th random variable by incr[jj]
-		and generate new sample data.
+	For each scenario index ii:
+	If the sample size nsamp[jj] divides the scenario index ii,
+	reverse the increment direction incr[jj]
+	and increase the random variable index jj by 1.
+	Increment the jj'th random variable by incr[jj]
+	and generate new sample data.
     ***** */
 	
     for (int iss=1;iss<ns;iss++) {
@@ -414,63 +487,61 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 			incr[jj] = -incr[jj];
 			jj++;
 		}
-
+		
 		SmiDiscreteRV *smiRV = smiDD->getDiscreteRV(jj);
-
+		
 		dp /= smiRV->getEventProb(indx[jj]);
 		indx[jj] += incr[jj];
 		dp *= smiRV->getEventProb(indx[jj]);
-
+		
+		
 		// set data
 		//TODO -- should we declare NULL entries to have 0 entries?  
-		//This would eliminate these tests
-		replaceFirstWithSecond(dclo,smiRV->getEventColLower(indx[jj]));
-
+		//this would eliminate these tests
+		replaceFirstWithSecond(cpv_dclo,smiRV->getEventColLower(indx[jj]));
 		
-		replaceFirstWithSecond(dcup,smiRV->getEventColUpper(indx[jj]));
 		
-		replaceFirstWithSecond(dobj,smiRV->getEventObjective(indx[jj]));
+		replaceFirstWithSecond(cpv_dcup,smiRV->getEventColUpper(indx[jj]));
 		
-		replaceFirstWithSecond(drlo,smiRV->getEventRowLower(indx[jj]));
+		replaceFirstWithSecond(cpv_dobj,smiRV->getEventObjective(indx[jj]));
 		
-		replaceFirstWithSecond(drup,smiRV->getEventRowUpper(indx[jj]));
+		replaceFirstWithSecond(cpv_drlo,smiRV->getEventRowLower(indx[jj]));
+		
+		
+		replaceFirstWithSecond(cpv_drup,smiRV->getEventRowUpper(indx[jj]));
+		
+		
 		//TODO test this code
 		CoinPackedMatrix m = smiRV->getEventMatrix(indx[jj]);
 		assert(!m.isColOrdered());
 		if (matrix.getNumElements())
 		{
-			for (int j=0; j<m.getNumCols(); ++j)
+			for (int i=0; i<m.getNumRows(); ++i)
 			{
-				CoinPackedVector col=m.getVector(j);
-				CoinPackedVector ccol=matrix.getVector(j);
-				for (int i=m.getVectorFirst(j); i<m.getVectorLast(j); ++i)
+				CoinPackedVector row=m.getVector(i);
+				CoinPackedVector rrow=matrix.getVector(i);
+				for (int j=m.getVectorFirst(i); j<m.getVectorLast(j); ++j)
 				{
-					
-					assert(ccol[i] == 0.0);//tests duplicate index
-					matrix.modifyCoefficient(i,j,col[i],true);
+					matrix.modifyCoefficient(i,j,row[j],true);
 				}
 			}
 		}
 		else
-			matrix = m;
-		
+			matrix = m;		
 		
 		// find ancestor node
-		SmiTreeNode<SmiScnNode *> *tnode = this->smiTree_.find(indx);
+		SmiTreeNode<SmiScnNode *> *tnode = this->smiTree_.find(label);
 		
-		// add scenario
-		anc = tnode->scenario();
-		branch = tnode->depth()+1;
-	    is = this->generateScenario(core,&matrix,&dclo,&dcup,&dobj,
-									&drlo,&drup,branch,anc,dp,smiDD->getCombineWithCoreRule());
-
-		this->smiTree_.setChildLabels(tnode,indx);
+		is = this->generateScenario(core,&matrix,&cpv_dclo,&cpv_dcup,&cpv_dobj,
+			&cpv_drlo,&cpv_drup,branch,anc,dp);
+		
+		this->smiTree_.setChildLabels(tnode,label);
+		
 	}
-
+	
 	delete incr;
 }
 
-		
 
 
 

@@ -81,11 +81,11 @@ public:
 	/// generate scenarios from discrete distribution
 	void processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s);
 
-	/** generate scenario replacing core values
+	/** generate scenario with ancestor/branch node identification
 		
 		Core argument must be supplied. 
-		Data values replace corresponding core values, if found, 
-		or creates them if not. 
+		Data values combine with corresponding core values, 
+		if found, or creates them if not. 
 		
 		Scenario nodes need to have same dimensions as core nodes.
 		
@@ -95,6 +95,31 @@ public:
 		identify the branching node according to the Stochastic MPS
 		standard.
 		
+	*/
+	SmiScenarioIndex generateScenario(SmiCoreData *core, 
+		CoinPackedMatrix *matrix,
+		CoinPackedVector *dclo, CoinPackedVector *dcup,
+		CoinPackedVector *dobj,
+		CoinPackedVector *drlo, CoinPackedVector *drup,
+		vector<int>labels, double prob,
+		SmiCoreCombineRule *r = SmiCoreCombineReplace::Instance())
+		throw(CoinError);
+
+	/** generate scenario with labels information
+		
+		Core argument must be supplied. 
+		Data values combine with corresponding core values, 
+		if found, or creates them if not. 
+		
+		Scenario nodes need to have same dimensions as core nodes.
+		
+		Data field arguments can be NULL, or empty. 
+
+		Labels are passed as vector<int> array.
+		Adds new path using labels to find branching node.
+	    The depth (root to leaf) of new path is labels.size(). 
+
+				
 	*/
 	SmiScenarioIndex generateScenario(SmiCoreData *core, 
 				CoinPackedMatrix *matrix,

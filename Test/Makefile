@@ -18,6 +18,9 @@ include ${MakefileDir}/Makefile.location
 
 default: unitTest
 
-unitTest clean : % :
+libdepend:
+	(cd $(CoinDir)/Osi/OsiClp && ${MAKE} install)
+
+unitTest clean : % : libdepend
 	(cd .. && ${MAKE} install)
 	${MAKE} -f Makefile.test $*

@@ -1,7 +1,7 @@
 # Select optimization (-O or -g). -O will be automatically bumped up to the 
 # highest level of optimization the compiler supports. If want something in
 # between then specify the exact level you want, e.g., -O1 or -O2
-OptLevel := -g
+OptLevel := -O
 
 # The location of the customized Makefiles
 export CoinDir = $(shell cd ../..; pwd)
@@ -12,10 +12,10 @@ include ${MakefileDir}/Makefile.location
 TESTSRC :=
 TESTSRC += unitTest.cpp
 
-export IncDir  := ${SmiIncDir}  ${OsiIncDir} ${CoinIncDir} ${ClpIncDir} ${OsiClpIncDir}
-export LibDir  := ${SmiLibDir}  ${OsiLibDir} ${CoinLibDir} ${ClpLibDir} ${OsiClpLibDir}
+export IncDir  := ${SmiIncDir}  ${ClpIncDir} ${OsiClpIncDir} ${OsiIncDir} ${CoinIncDir} 
+export LibDir  := ${SmiLibDir}  ${ClpLibDir} ${OsiClpLibDir} ${OsiLibDir} ${CoinLibDir} 
 export LibName := ${SmiLibName} ${OsiClpLibName} ${OsiLibName} ${ClpLibName} ${CoinLibName}
-export Define  := ${SmiDefine}  ${CglDefine}  ${OsiDefine} ${CoinDefine} ${ClpDefine} ${OsiClpDefine}
+export Define  := ${SmiDefine}  ${ClpDefine} ${OsiClpDefine} ${OsiDefine} ${CoinDefine} 
 
 ##############################################################################
 # You should not need to edit below this line.
@@ -68,16 +68,22 @@ default: unitTest
 
 ###############################################################################
 
-unitTest: $(TARGETDIR)/unitTest
+ifeq ($(findstring CYGWIN,${UNAME}),CYGWIN)
+    EXE := .exe 
+else
+    EXE :=
+endif
 
-$(TARGETDIR)/unitTest : $(TESTOBJ)
+unitTest: $(TARGETDIR)/unitTest$(EXE)
+
+$(TARGETDIR)/unitTest$(EXE) : $(TESTOBJ)
 	@rm -rf Junk
 	@echo ""
 	@echo Creating unitTest
 	@mkdir -p $(TARGETDIR)
 	@rm -f $@
 	$(CXX) $(CXXFLAGS) -o $@ $(TESTOBJ) $(LDFLAGS) $(SYSLD) -lm
-	${CP} $@ ..
+	${CP} $@ .
 
 ###############################################################################
 

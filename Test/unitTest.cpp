@@ -1057,8 +1057,9 @@ void SmiScnModelDiscreteUnitTest()
 	assert(smiDD->getNumRV() == nindp);
 
 	// this is cut-pasted from 	
-	//smiModel->processDiscreteDistributionIntoScenarios(smiDD);
+smiModel->processDiscreteDistributionIntoScenarios(smiDD);
 
+	if (0)
 	{
 	SmiCoreData *core=smiDD->getCore();
 
@@ -1453,7 +1454,7 @@ int main()
 {
   
 
-	testingMessage( "Testing SmiTreeNode \n");
+	testingMessage( "YYY Testing SmiTreeNode \n");
 	SmiTreeNodeUnitTest();
 
 	testingMessage( "Testing SmiScenarioTree\n" );
