@@ -311,7 +311,7 @@ SmiSmpsCardReader::nextSmpsField (  )
   // find next non blank character
   char *next = position_;
 
-  static char *blanks = " \t";
+  static const char *blanks = (const char *) " \t";
   char valstr[MAX_FIELD_LENGTH],*after;
   
   while ( next != eol_ ) {

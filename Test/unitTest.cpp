@@ -72,25 +72,36 @@ SmiScenarioTreeUnitTest()
 	ppath4[1]= ii2; label4[1]=*ii2;
 	ppath4[2]= ii4; label4[2]=*ii4;
 
-	vector<int *> ppath5(1, ii5);
+	vector<int *> ppath5(3);
+	ppath5[0] = ppath4[0];
+	ppath5[1] = ppath4[1];
+	ppath5[2] = ii5;
 	vector<int> label5(3);
 	label5[0] = label4[0];
 	label5[1] = label4[1];
 	label5[2] = *ii5;
 
-	vector<int *> ppath6(2);
+	vector<int *> ppath6(3);
+	ppath6[0] = ppath5[4];
 	vector<int> label6(3);
 	label6[0] = label5[0];
-	ppath6[0]= ii3; label6[1] = *ii3;
-	ppath6[1]= ii6; label6[2] = *ii6;
+	ppath6[1]= ii3; label6[1] = *ii3;
+	ppath6[2]= ii6; label6[2] = *ii6;
 
-	vector<int *> ppath7(1, ii7);
+	vector<int *> ppath7(3);
+	ppath7[0] = ppath6[0];
+	ppath7[1] = ppath6[1];
+	ppath7[2] = ii7;
+
 	vector<int> label7(3);
 	label7[0] = label6[0];
 	label7[1] = label6[1];
 	label7[2] = *ii7;
 
-	vector<int *> ppath8(1, ii8);
+	vector<int *> ppath8(3);
+	ppath8[0] = ppath6[0];
+	ppath8[1] = ppath6[1];
+	ppath8[2] = ii8;
 	vector<int> label8(3);
 	label8[0] = label6[0];
 	label8[1] = label6[1];
@@ -275,18 +286,18 @@ SmiTreeNodeUnitTest()
 // Display message on stdout and stderr
 void testingMessage( const char * const msg )
 {
-  std::cerr <<msg;
-  //cout <<endl <<"*****************************************"
-  //     <<endl <<msg <<endl;
+//  std::cerr <<msg;
+  cout <<endl <<"*****************************************"
+       <<endl <<msg <<endl;
 }
 
 
-void SmiScnModelUnitTest()
+void SmiScnSmpsIOUnitTest()
 {
 	{
 		// test SMPS files app0110R
 		SmiScnModel smi;	
-		smi.readSmps("app0110R");		
+		smi.readSmps("../../Mps/Stochastic/app0110R");		
 		OsiClpSolverInterface *clp = new OsiClpSolverInterface();
 		smi.setOsiSolverHandle(*clp);	
 		OsiSolverInterface *osiStoch = smi.loadOsiSolverData();
@@ -305,16 +316,20 @@ void SmiScnModelUnitTest()
 		// test SMPS files from Watson test suite (Cambridge, UK)
 		
 		SmiScnModel smi;
-		smi.readSmps("wat_10_C_32");
+		smi.readSmps("../../Mps/Stochastic/wat_10_C_32");
 		OsiClpSolverInterface *clp = new OsiClpSolverInterface();
 		smi.setOsiSolverHandle(*clp);	
-		OsiSolverInterface *osiStoch = smi.loadOsiSolverData();		
+		OsiSolverInterface *osiStoch = smi.loadOsiSolverData();
+		osiStoch->setHintParam(OsiDoPresolveInInitial,true);
+		osiStoch->setHintParam(OsiDoScale,true);
+		osiStoch->setHintParam(OsiDoCrash,true);
 		osiStoch->initialSolve();		
 		assert(fabs(osiStoch->getObjValue()+2622.062) < 0.01);
 		printf(" *** Successfully tested SMPS interfaces on wat_10_32_C.\n");
 	}
-	
-
+}	
+void SmiScnModelUnitTest()
+{
 	// exhaustive test of direct interfaces
 	
     /* Model dimensions */
@@ -756,6 +771,10 @@ void SmiScnModelUnitTest()
 	smiModel->loadOsiSolverData();
 	// get Osi pointer
 	OsiSolverInterface *smiOsi = smiModel->getOsiSolverInterface();
+	// set some parameters
+	smiOsi->setHintParam(OsiDoPresolveInInitial,true);
+	smiOsi->setHintParam(OsiDoScale,true);
+	smiOsi->setHintParam(OsiDoCrash,true);
 	// solve using Osi Solver
 	smiOsi->initialSolve();
 	// test optimal value
@@ -814,6 +833,9 @@ int main()
 
 	testingMessage( "Testing SmiScenarioTree\n" );
 	SmiScenarioTreeUnitTest();
+
+	testingMessage( "Testing SmiScnSmpsIO\n" );
+	SmiScnSmpsIOUnitTest();
 
 	testingMessage( "Testing SmiScnModel\n" );
 	SmiScnModelUnitTest();

@@ -41,14 +41,17 @@ public:
 	SmiTreeNode<T>  *getSibling(){ return sibling_;}
 
 	SmiTreeNode<T>  *getChildByLabel(int n){
+		/*
+		//AJK debug code
 		child_label_map::iterator begpos = child_labels_.begin();
 	    child_label_map::iterator endpos = child_labels_.end();
 		while(begpos!=endpos)
 		{
-			printf(" found label %d \n",begpos->first);
+			(" found label %d \n",begpos->first);
 			++begpos;
 		}
-		child_label_map::iterator pos = child_labels_.find(n);
+		*/
+		typename child_label_map::iterator pos = child_labels_.find(n);
 		if (pos!=child_labels_.end())
 			return pos->second;
 		else
@@ -66,7 +69,7 @@ public:
 		if (label==-1) label=nchild_;
 		child_labels_.insert(make_pair(label,c));
 		//debug code
-		child_label_map::iterator pos = child_labels_.find(label);
+		typename child_label_map::iterator pos = child_labels_.find(label);
 		assert (pos!=child_labels_.end());
 		//
 		c->parent_     = this;
@@ -210,7 +213,7 @@ public:
 	{
 		assert(label.size()>0);
 		SmiTreeNode<T> *n = root_,*next;
-		int i=1;
+		unsigned int i=1;
 		while ((i<label.size()) && (next=n->getChildByLabel(label[i])))
 		{
 			++i;
@@ -223,7 +226,7 @@ public:
 	/** Get vector of node data for given scenario */
 	vector<T> &getScenario(int scenario)
 	{
-		assert (scenario < leaf_.size());
+		assert (scenario < (int) leaf_.size());
 		SmiTreeNode<T> * n = leaf_[scenario];
 
 //		if ( n->getDataPtr()==scen_data[n->depth()] ) return scen_data;
@@ -247,7 +250,9 @@ public:
 //---------------------------------------------------------------------------
   /**@name Tree modification members */
   //@{
-    /** Add path from node id'd by scenario and stage.
+    /** Add new path from branching node to leaf.
+	    The branching node is the one belonging to "brscenario" at depth "stage".
+		Length of incoming "pathdata" vector is leaf->depth() - stage.
 	    Responsibility for memory management of SmiTreeNodeData elements
 		is assigned to SmiScenarioTree.
 		SmiTreeNodeData elements must be created with "new" operator.
@@ -278,27 +283,28 @@ public:
 		return leaf_.size()-1;
 		
 	}
-	/** Add path from node id'd by matching node labels.
+	/** Add new path from branching node to leaf.
+	    The branching node is the one that has the longest match with incoming label vector.
+		Length of incoming "pathdata" vector is leaf->depth().
 	    Responsibility for memory management of SmiTreeNodeData elements
 		is assigned to SmiScenarioTree.
 		SmiTreeNodeData elements must be created with "new" operator.
 	*/
 	int addPathtoLeaf(vector<int> &label, vector<T> &pathdata)
 	{
-		SmiTreeNode<T> *parent = NULL;		
+		SmiTreeNode<T> *parent = NULL;
+		assert(label.size() == pathdata.size());
 		if (leaf_.size())
 			parent = &find(label);
 		int stage=0;
 		if (parent)
 			stage=parent->depth()+1;
 
-		for (int i=0 ; i < pathdata.size(); i++)
+		for (unsigned int i=stage ; i < pathdata.size(); i++)
 		{	
 			if (parent)
 			{
-				//has label
-				//printf(" put label %d at depth %d\n ",label[i+stage],parent->depth());
-				parent = parent->addChild(pathdata[i],label[i+stage]);
+				parent = parent->addChild(pathdata[i],label[i]);
 			}
 			else
 			{
