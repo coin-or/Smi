@@ -1,4 +1,4 @@
-#include "SmiScnOsiModel.hpp"
+#include "SmiScnModel.hpp"
 #include "CoinPackedMatrix.hpp"
 #include "OsiSolverInterface.hpp"
 #include "CoinHelperFunctions.hpp"
@@ -7,7 +7,7 @@
 
 using namespace std;
 
-SmiScnOsiModel::~SmiScnOsiModel()
+SmiScnModel::~SmiScnModel()
 {
 	delete osiStoch_;
 	
@@ -15,12 +15,30 @@ SmiScnOsiModel::~SmiScnOsiModel()
 	{
 		delete core_vec_[i];
 	}
+
+	if (drlo_)
+		delete drlo_;
+	
+	if (drup_)
+		delete drup_;
+	
+	if (dclo_)
+		delete dclo_;
+	
+	if (dcup_)
+		delete dcup_;
+
+	if (dobj_)
+		delete dobj_;
+
+	if (matrix_)
+		delete matrix_;
 	
 
 }
 
 SmiScenarioIndex 
-SmiScnOsiModel::genScenarioReplaceCoreValues(SmiCoreIndex ic, 
+SmiScnModel::genScenarioReplaceCoreValues(SmiCoreIndex ic, 
 				CoinPackedMatrix *matrix,
 				CoinPackedVector *v_dclo, CoinPackedVector *v_dcup,
 				CoinPackedVector *v_dobj,
@@ -28,8 +46,8 @@ SmiScnOsiModel::genScenarioReplaceCoreValues(SmiCoreIndex ic,
 				SmiStageIndex branch, SmiScenarioIndex anc, double prob)
 {
 	
-	SmiScnOsiCoreModel *core = core_vec_[ic];
-	vector<SmiScnOsiTreeNode *> node_vec;
+	SmiCoreData *core = core_vec_[ic];
+	vector<SmiScnNode *> node_vec;
 
 	node_vec.reserve(core->getNumStages());
 
@@ -41,8 +59,8 @@ SmiScnOsiModel::genScenarioReplaceCoreValues(SmiCoreIndex ic,
 		branch = 0;
 
 		// generate root node
-		SmiScnOsiNode *node = core->getNode(0);
-		SmiScnOsiTreeNode *tnode = new SmiScnOsiTreeNode(node);
+		SmiNodeData *node = core->getNode(0);
+		SmiScnNode *tnode = new SmiScnNode(node);
 		node_vec.push_back(tnode);
 		this->ncol_ = core->getNumCols(0);
 		this->nrow_ = core->getNumRows(0);
@@ -62,10 +80,10 @@ SmiScnOsiModel::genScenarioReplaceCoreValues(SmiCoreIndex ic,
 	for (int t=branch+1; t<core->getNumStages(); t++)
 	{
 		// generate new data node
-		SmiScnOsiNode *node = new SmiScnOsiNode(t,core,matrix,
+		SmiNodeData *node = new SmiNodeData(t,core,matrix,
 			v_dclo,v_dcup,v_dobj,v_drlo,v_drup);
 		// generate new tree node
-		SmiScnOsiTreeNode *tnode = new SmiScnOsiTreeNode(node);
+		SmiScnNode *tnode = new SmiScnNode(node);
 		node_vec.push_back(tnode);
 		
 		this->ncol_ += core->getNumCols(t);
@@ -76,13 +94,13 @@ SmiScnOsiModel::genScenarioReplaceCoreValues(SmiCoreIndex ic,
 	scen_ = smiTree_.addPathtoLeaf(anc,branch,node_vec);
 
 	// add probability to all scenario nodes
-	SmiTreeNode<SmiScnOsiTreeNode *> *child = smiTree_.getLeaf(scen_);
-	SmiTreeNode<SmiScnOsiTreeNode *> *parent = child->getParent();
-	SmiTreeNode<SmiScnOsiTreeNode *> *root = smiTree_.getRoot();
+	SmiTreeNode<SmiScnNode *> *child = smiTree_.getLeaf(scen_);
+	SmiTreeNode<SmiScnNode *> *parent = child->getParent();
+	SmiTreeNode<SmiScnNode *> *root = smiTree_.getRoot();
 
 	while (child != root)
 	{
-		SmiScnOsiTreeNode *tnode = child->getDataPtr();
+		SmiScnNode *tnode = child->getDataPtr();
 		tnode->addProb(prob);
 		tnode->setParent(parent->getDataPtr());
 		child = parent;
@@ -98,12 +116,12 @@ SmiScnOsiModel::genScenarioReplaceCoreValues(SmiCoreIndex ic,
 
 
 SmiCoreIndex 
-SmiScnOsiModel::setCore(OsiSolverInterface *osi, int nstage, 
+SmiScnModel::setCore(OsiSolverInterface *osi, int nstage, 
 		SmiStageIndex *cstage, SmiStageIndex *rstage)
 		
 {
 
-	SmiScnOsiCoreModel *core = new SmiScnOsiCoreModel(osi,nstage,cstage,rstage);
+	SmiCoreData *core = new SmiCoreData(osi,nstage,cstage,rstage);
 
 	core_vec_.push_back(core);
 	return core_vec_.size()-1;
@@ -111,7 +129,7 @@ SmiScnOsiModel::setCore(OsiSolverInterface *osi, int nstage,
 
  
 OsiSolverInterface *
-SmiScnOsiModel::loadOsiSolverData()
+SmiScnModel::loadOsiSolverData()
 {
 	osiStoch_->reset();
 
@@ -123,14 +141,14 @@ SmiScnOsiModel::loadOsiSolverData()
 	this->drup_ = new double[this->nrow_];
 	// initialize row-ordered matrix with no extragaps or extramajors
 	CoinPackedMatrix *matrix = new CoinPackedMatrix(false,0,0);
-	matrix->reserve(nrow_,nels_);
+	matrix->reserve(nrow_,4*nels_);
 	this->matrix_=matrix;
 
 	ncol_=0;
 	nrow_=0;
 	
 	// loop to addNodes
-	for_each(smiTree_.treeBegin(),smiTree_.treeEnd(),SmiScnOsiModelAddNode(this));
+	for_each(smiTree_.treeBegin(),smiTree_.treeEnd(),SmiScnModelAddNode(this));
 
 	// pass data to osiStoch
 	osiStoch_->loadProblem(CoinPackedMatrix(*matrix_),dclo_,dcup_,dobj_,drlo_,drup_);
@@ -138,17 +156,6 @@ SmiScnOsiModel::loadOsiSolverData()
 	return osiStoch_;
 }
 
-void CopyToDouble(double *d, CoinPackedVector *c, int o)
-{
-	if (c)
-	{
-	double *cd = c->getElements();
-	int *ci = c->getIndices();
-	int j=0;
-	while(j < c->getNumElements())
-		d[ci[j]-o] = cd[j++];
-	}
-}
 
 CoinPackedVector * ReplaceWithSecond(CoinPackedVector *cr, CoinPackedVector *nr)
 {	
@@ -203,43 +210,31 @@ CoinPackedVector * ReplaceWithSecond(CoinPackedVector *cr, CoinPackedVector *nr)
 }
 
 void 
-SmiScnOsiModel::addNode(SmiScnOsiTreeNode *tnode)
+SmiScnModel::addNode(SmiScnNode *tnode)
 {
 
-	SmiScnOsiNode *node = tnode->getNode();
+	SmiNodeData *node = tnode->getNode();
 
 	// set offsets for current node
 	tnode->setColOffset(ncol_);
 	tnode->setRowOffset(nrow_);
 
 	// OsiSolverInterface *osi = this->osiStoch_;
-	SmiScnOsiCoreModel *core = node->getCore();
+	SmiCoreData *core = node->getCore();
 
 	// get stage and associated core node
 	int stg = node->getStage();
-	SmiScnOsiNode *cnode = core->getNode(stg);
-	int colStart = core->getColStart(stg);
-	int rowStart = core->getRowStart(stg);
+	SmiNodeData *cnode = core->getNode(stg);
 
-	// copy core vectors
-	CopyToDouble(dclo_+ncol_,cnode->getColLower(),colStart);
-	CopyToDouble(dcup_+ncol_,cnode->getColUpper(),colStart);
-	CopyToDouble(dobj_+ncol_,cnode->getObjCoefficients(),colStart);
-	CopyToDouble(drlo_+nrow_,cnode->getRowLower(),rowStart);
-	CopyToDouble(drup_+nrow_,cnode->getRowUpper(),rowStart);
-	
-	// copy stoch vectors
-	if(stg)
-	{
-		CopyToDouble(dclo_+ncol_,node->getColLower(),colStart);
-		CopyToDouble(dcup_+ncol_,node->getColUpper(),colStart);
-		CopyToDouble(dobj_+ncol_,node->getObjCoefficients(),colStart);
-		CopyToDouble(drlo_+nrow_,node->getRowLower(),rowStart);
-		CopyToDouble(drup_+nrow_,node->getRowUpper(),rowStart);
-	}
+	node->copyColLower(dclo_+ncol_);
+	node->copyColUpper(dcup_+ncol_);
+	node->copyObjCoefficients(dobj_+ncol_);
+	node->copyRowLower(drlo_+nrow_);
+	node->copyRowUpper(drup_+nrow_);
 	
 	// multiply obj coeffs by node probability and normalize
 	double prob = tnode->getProb()/this->totalProb_;
+	tnode->setModelProb(prob);
 
 	for(int j=ncol_; j<ncol_+core->getNumCols(stg); ++j)
 		dobj_[j] *= prob;
@@ -272,7 +267,7 @@ SmiScnOsiModel::addNode(SmiScnOsiTreeNode *tnode)
 			if(coff)
 			{
 				// parent node
-				SmiScnOsiTreeNode *pnode=tnode;
+				SmiScnNode *pnode=tnode;
 				
 				// main loop iterates backwards through indices
 				for (int j=newrow->getNumElements()-1; j>-1;--j)
@@ -308,19 +303,19 @@ SmiScnOsiModel::addNode(SmiScnOsiTreeNode *tnode)
 }
 
 OsiSolverInterface *
-SmiScnOsiModel::getOsiSolverInterface()
+SmiScnModel::getOsiSolverInterface()
 {
 	return osiStoch_;
 }
 
 const double *
-SmiScnOsiModel::getColSolution(int ns)
+SmiScnModel::getColSolution(int ns)
 {
 	return NULL;
 }
 
 const double *
-SmiScnOsiModel::getRowSolution(int ns)
+SmiScnModel::getRowSolution(int ns)
 {
 	return NULL;
 }

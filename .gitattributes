@@ -5,5 +5,5 @@
 Test/Makefile -text svneol=unset#application/octet-stream
 Test/Makefile.test -text svneol=unset#application/octet-stream
 include/SmiScenarioTree.hpp -text svneol=unset#application/octet-stream
-include/SmiScnOsiModel.hpp -text svneol=unset#application/octet-stream
-include/SmiTreeNode.hpp -text svneol=unset#application/octet-stream
+include/SmiScnData.hpp -text svneol=unset#application/octet-stream
+include/SmiScnModel.hpp -text svneol=unset#application/octet-stream
