@@ -9,17 +9,21 @@
 #  pragma warning(disable:4786)
 #endif
 
+// Include files
 #include "SmiScenarioTree.hpp"
 #include "SmiScnData.hpp"
 #include "OsiSolverInterface.hpp"
 #include "CoinPackedVector.hpp"
 
+// STL declarations
 #include <map>
 #include <vector>
-
 using namespace std;
 
+// forward declaration of SmiScnNode
 class SmiScnNode;
+
+
 //#############################################################################
 
 /** SmiScnModel: COIN-SMI Scenario Model Class
@@ -136,21 +140,30 @@ public:
 	void addNode(SmiScnNode *node);
 
 private:
+	// internal clone of user declared OSI
 	OsiSolverInterface * osiStoch_;
+	// model statistics useful for predefining size of structures
 	int nrow_;
 	int ncol_;
 	int nels_;
+	// data pointers used in AddNode
 	double *drlo_; 
 	double *drup_;
 	double *dobj_;
 	double *dclo_; 
 	double *dcup_;
 	CoinPackedMatrix *matrix_;
+	// number of scenarios
 	int scen_;
+	// not sure if this is used
 	int minrow_;
+	// not sure if this is used
 	bool solve_synch_;
+	// total probability of added scenarios; used to normalize probability to one
 	double totalProb_;
+	// vector of core models
 	std::vector<SmiCoreData *> core_vec_;
+	// scenario tree pointer
 	SmiScenarioTree<SmiScnNode *> smiTree_;
 };
 

@@ -1,8 +1,287 @@
+// Copyright (C) 2003, International Business Machines
+// Corporation and others.  All Rights Reserved.
+
+#if defined(_MSC_VER)
+// Turn off compiler warning about long names
+#  pragma warning(disable:4786)
+#endif
+
+#include <cassert>
+#include <iostream>
+
+#include "SmiScenarioTree.hpp"
 #include "SmiScnModel.hpp"
 #include "OsiClpSolverInterface.hpp"
 
+//#############################################################################
 
-int main()
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
+
+void
+SmiScenarioTreeUnitTest()
+{
+
+	int  *i1 = new int(1);
+	int  *i2= new int(12);
+	int  *i3= new int(13);
+	int  *i4= new int(24);
+	int  *i5= new int(25);
+	int  *i6= new int(36);
+	int  *i7= new int(37);
+	int  *i8= new int(38);
+
+	vector<int *> path4(3);
+	path4[0]= i1; 
+	path4[1]= i2; 
+	path4[2]= i4; 
+
+	vector<int *> path5(1, i5);
+	
+	vector<int *> path6(2);
+	path6[0]= i3; 
+	path6[1]= i6; 
+
+	vector<int *> path7(1, i7);
+	
+	vector<int *> path8(1, i8);
+	
+	
+	SmiScenarioTree<int*> s;
+
+	int is1 = s.addPathtoLeaf(0,0,path4);
+	int is2 = s.addPathtoLeaf(is1,1,path5);
+	int is3 = s.addPathtoLeaf(is2,0,path6);
+	int is4 = s.addPathtoLeaf(is3,1,path7);
+	int is5 = s.addPathtoLeaf(is3,1,path8);
+
+	int  *ii1 = new int(1);
+	int  *ii2= new int(12);
+	int  *ii3= new int(13);
+	int  *ii4= new int(24);
+	int  *ii5= new int(25);
+	int  *ii6= new int(36);
+	int  *ii7= new int(37);
+	int  *ii8= new int(38);
+
+	
+	vector<int *> ppath4(3);
+	vector<int> label4(3);
+	ppath4[0]= ii1; label4[0]=*ii1;
+	ppath4[1]= ii2; label4[1]=*ii2;
+	ppath4[2]= ii4; label4[2]=*ii4;
+
+	vector<int *> ppath5(1, ii5);
+	vector<int> label5(3);
+	label5[0] = label4[0];
+	label5[1] = label4[1];
+	label5[2] = *ii5;
+
+	vector<int *> ppath6(2);
+	vector<int> label6(3);
+	label6[0] = label5[0];
+	ppath6[0]= ii3; label6[1] = *ii3;
+	ppath6[1]= ii6; label6[2] = *ii6;
+
+	vector<int *> ppath7(1, ii7);
+	vector<int> label7(3);
+	label7[0] = label6[0];
+	label7[1] = label6[1];
+	label7[2] = *ii7;
+
+	vector<int *> ppath8(1, ii8);
+	vector<int> label8(3);
+	label8[0] = label6[0];
+	label8[1] = label6[1];
+	label8[2] = *ii8;
+
+	// tree s1 is identical to s just uses labels to id nodes 
+	SmiScenarioTree<int*> s1;
+	int is11 = s1.addPathtoLeaf(label4,ppath4);
+	int is12 = s1.addPathtoLeaf(label5,ppath5);
+	int is13 = s1.addPathtoLeaf(label6,ppath6);
+	int is14 = s1.addPathtoLeaf(label7,ppath7);
+	int is15 = s1.addPathtoLeaf(label8,ppath8);
+
+
+	vector<int *> vec1 = s.getScenario(is1);
+	assert( vec1[0] == i1 );
+	assert( vec1[1] == i2 );
+	assert( vec1[2] == i4 );
+
+	vector<int *> vec11 = s1.getScenario(is11);
+	assert( vec11[0] == ii1 );
+	assert( vec11[1] == ii2 );
+	assert( vec11[2] == ii4 );
+
+	vector<int *>::iterator vbeg = s.scenBegin(is1);
+	vector<int *>::iterator vend = s.scenEnd(is1);
+	assert( *vbeg++ == i1 );
+	assert( *vbeg++ == i2 );
+	assert( *vbeg++ == i4 );
+	assert( vbeg == vend );
+
+	vector<int *>::iterator vbeg1 = s1.scenBegin(is11);
+	vector<int *>::iterator vend1 = s1.scenEnd(is11);
+	assert( *vbeg1++ == ii1 );
+	assert( *vbeg1++ == ii2 );
+	assert( *vbeg1++ == ii4 );
+	assert( vbeg1 == vend1 );
+
+	
+	vector<int *> vec2 = s.getScenario(is2);
+	assert( vec2[0] == i1 );
+	assert( vec2[1] == i2 );
+	assert( vec2[2] == i5 );
+
+		
+	vector<int *> vec12 = s1.getScenario(is12);
+	assert( vec12[0] == ii1 );
+	assert( vec12[1] == ii2 );
+	assert( vec12[2] == ii5 );
+
+	vector<int *> vec3 = s.getScenario(is3);
+	assert( vec3[0] == i1 );
+	assert( vec3[1] == i3 );
+	assert( vec3[2] == i6 );
+
+	vector<int *> vec13 = s1.getScenario(is13);
+	assert( vec13[0] == ii1 );
+	assert( vec13[1] == ii3 );
+	assert( vec13[2] == ii6 );
+
+	vector<int *> vec4 = s.getScenario(is4);
+	assert( vec4[0] == i1 );
+	assert( vec4[1] == i3 );
+	assert( vec4[2] == i7 );
+
+	
+	vector<int *> vec14 = s1.getScenario(is14);
+	assert( vec14[0] == ii1 );
+	assert( vec14[1] == ii3 );
+	assert( vec14[2] == ii7 );
+
+	vector<int *> vec5 = s.getScenario(is5);
+	assert( vec5[0] == i1 );
+	assert( vec5[1] == i3 );
+	assert( vec5[2] == i8 );
+
+	
+	vector<int *> vec15 = s1.getScenario(is15);
+	assert( vec15[0] == ii1 );
+	assert( vec15[1] == ii3 );
+	assert( vec15[2] == ii8 );
+
+	vector<int*>::iterator i;
+	i=s.treeBegin();
+	assert(*i==i1);
+	i++;
+	assert(*i==i2);
+	i = s.treeEnd();
+	i--;
+	assert(*i==i8);
+
+	vector<int*>::iterator ii;
+	ii=s1.treeBegin();
+	assert(*ii==ii1);
+	ii++;
+	assert(*ii==ii2);
+	ii = s1.treeEnd();
+	ii--;
+	assert(*ii==ii8);
+
+	vbeg = s.scenBegin(is1);
+	vend = s.scenEnd(is1);
+	assert( *vbeg++ == i1 );
+	assert( *vbeg++ == i2 );
+	assert( *vbeg++ == i4 );
+	assert( vbeg == vend );
+
+	vbeg1 = s1.scenBegin(is11);
+	vend1 = s1.scenEnd(is11);
+	assert( *vbeg1++ == ii1 );
+	assert( *vbeg1++ == ii2 );
+	assert( *vbeg1++ == ii4 );
+	assert( vbeg1 == vend1 );
+
+}
+
+void
+SmiTreeNodeUnitTest()
+{
+
+	int  *i1 = new int(1);
+	int  *i2= new int(12);
+	int  *i3= new int(13);
+	int  *i4= new int(24);
+	int  *i5= new int(25);
+	int  *i6= new int(36);
+	int  *i7= new int(37);
+	int  *i8= new int(38);
+
+	SmiTreeNode<int *> *n1 = new SmiTreeNode<int *>(i1);
+
+	SmiTreeNode<int *> *n2 = n1->addChild(i2);
+	SmiTreeNode<int *> *n3 = n1->addChild(i3);
+	SmiTreeNode<int *> *n4 = n2->addChild(i4);
+	SmiTreeNode<int *> *n5 = n2->addChild(i5);
+	SmiTreeNode<int *> *n6 = n3->addChild(i6);
+	SmiTreeNode<int *> *n7 = n3->addChild(i7);
+	SmiTreeNode<int *> *n8 = n3->addChild(i8);
+
+	assert( n1->depth() == 0 );
+	assert( n2->depth() == 1 );
+	assert( n3->depth() == 1 );
+	assert( n4->depth() == 2 );
+	assert( n5->depth() == 2 );
+	assert( n6->depth() == 2 );
+	assert( n7->depth() == 2 );
+	assert( n8->depth() == 2 );
+
+	// parents point to last children
+	assert( n1->getChild() == n3 );
+	assert( n3->getChild() == n8 );
+
+	// siblings
+	assert( n3->hasSibling() );
+	assert( n3->getSibling() == n2 );
+	assert( !n2->hasSibling() );
+
+	// sibling and cousin pointers are a linked list
+	// for same level nodes
+	assert( n8->hasSibling() );
+	assert( n8->getSibling() == n7 );
+	assert( n7->hasSibling() );
+	assert( n7->getSibling() == n6 );
+	assert( !n6->hasSibling());
+
+	assert( n6->getParent()->getSibling()  == n2 );
+	assert( n2->getChild() == n5 );
+	assert( n5->hasSibling() );
+	assert( n5->getSibling() == n4 );
+	// last element of same level list
+	assert( !n4->hasSibling());
+
+	vector<SmiTreeNode<int *> *> vec1 = n1->getChildren();
+	assert (vec1[0] == n2 );
+	assert (vec1[1] == n3 );
+
+}
+
+
+
+ 
+// Display message on stdout and stderr
+void testingMessage( const char * const msg )
+{
+  std::cerr <<msg;
+  //cout <<endl <<"*****************************************"
+  //     <<endl <<msg <<endl;
+}
+
+
+void SmiScnModelUnitTest()
 {
 	{
 		// test SMPS files app0110R
@@ -522,9 +801,26 @@ int main()
 
 	assert(fabs(smiOsi->getObjValue()-objSum) < 0.01);
 
-	printf(" *** Successfully tested getSolution and tree traversal.\n");
+	printf(" *** Completed all tests for SmiScnModel.\n");
 
-	printf(" *** Completed all tests for Smi.\n");
+}
 
-	return 0;
+int main()
+{
+  
+
+	testingMessage( "Testing SmiTreeNode \n");
+	SmiTreeNodeUnitTest();
+
+	testingMessage( "Testing SmiScenarioTree\n" );
+	SmiScenarioTreeUnitTest();
+
+	testingMessage( "Testing SmiScnModel\n" );
+	SmiScnModelUnitTest();
+
+
+	testingMessage( "*** Done! *** \n");
+	
+
+  return 0;
 }

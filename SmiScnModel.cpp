@@ -111,7 +111,7 @@ SmiScnModel::genScenarioReplaceCoreValues(SmiCoreIndex ic,
 
 	scen_ = smiTree_.addPathtoLeaf(anc,branch,node_vec);
 
-	// add probability to all scenario nodes
+	// add probability to all scenario nodes in path
 	SmiTreeNode<SmiScnNode *> *child = smiTree_.getLeaf(scen_);
 	SmiTreeNode<SmiScnNode *> *parent = child->getParent();
 	SmiTreeNode<SmiScnNode *> *root = smiTree_.getRoot();

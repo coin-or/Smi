@@ -10,6 +10,7 @@
 */
 #include <list>
 #include <vector>
+#include <map>
 #include <iostream>
 #include <assert.h>
 
@@ -22,11 +23,14 @@ using namespace std;
 	Template class instance is a pointer to an object that
 	must be created with "new" operator.
 */
-	
+
+
 template <class T> 
 class SmiTreeNode  {
    friend void SmiTreeNodeUnitTest();
 public:
+
+	typedef map<int,SmiTreeNode<T>*> child_label_map;
 
 	bool hasParent() { return (parent_!=NULL); }
 	bool hasChild()  { return (child_!=NULL);  }
@@ -36,12 +40,35 @@ public:
 	SmiTreeNode<T>  *getChild()  { return child_;  }
 	SmiTreeNode<T>  *getSibling(){ return sibling_;}
 
+	SmiTreeNode<T>  *getChildByLabel(int n){
+		child_label_map::iterator begpos = child_labels_.begin();
+	    child_label_map::iterator endpos = child_labels_.end();
+		while(begpos!=endpos)
+		{
+			printf(" found label %d \n",begpos->first);
+			++begpos;
+		}
+		child_label_map::iterator pos = child_labels_.find(n);
+		if (pos!=child_labels_.end())
+			return pos->second;
+		else
+			return NULL;
+	}
+
+
 	int depth() { return depth_; }
 	int numChildren() { return nchild_; }
 	
-	SmiTreeNode<T> * addChild(T cd)
+
+	SmiTreeNode<T> * addChild(T cd, int label=-1)
 	{
 		SmiTreeNode<T> *c = new SmiTreeNode(cd);
+		if (label==-1) label=nchild_;
+		child_labels_.insert(make_pair(label,c));
+		//debug code
+		child_label_map::iterator pos = child_labels_.find(label);
+		assert (pos!=child_labels_.end());
+		//
 		c->parent_     = this;
 		c->depth_      = depth_ + 1;
 		c->sibling_    = child_;
@@ -110,6 +137,7 @@ private:
 	int nchild_;
 	int depth_;
 	T ptr_;
+	child_label_map child_labels_;
 
 };
 
@@ -177,6 +205,21 @@ public:
 		return *n;
 	}
 
+	/** Get node identified by longest match to array of labels */
+	SmiTreeNode<T> &find(vector<int> &label)
+	{
+		assert(label.size()>0);
+		SmiTreeNode<T> *n = root_,*next;
+		int i=1;
+		while ((i<label.size()) && (next=n->getChildByLabel(label[i])))
+		{
+			++i;
+			n=next;
+		}
+		return *n;
+	}
+
+
 	/** Get vector of node data for given scenario */
 	vector<T> &getScenario(int scenario)
 	{
@@ -184,6 +227,10 @@ public:
 		SmiTreeNode<T> * n = leaf_[scenario];
 
 //		if ( n->getDataPtr()==scen_data[n->depth()] ) return scen_data;
+
+		int ns=n->depth()+1-scen_data.size();
+		for (int j=0; j<ns;j++)
+			scen_data.push_back(n->getDataPtr());
 
 		int i=n->depth()+1;
 		while(i>0)
@@ -200,7 +247,7 @@ public:
 //---------------------------------------------------------------------------
   /**@name Tree modification members */
   //@{
-    /** Add path to leaf.
+    /** Add path from node id'd by scenario and stage.
 	    Responsibility for memory management of SmiTreeNodeData elements
 		is assigned to SmiScenarioTree.
 		SmiTreeNodeData elements must be created with "new" operator.
@@ -213,24 +260,60 @@ public:
 		for ( unsigned int i = 0; i < pathdata.size(); i++)
 		{	
 			if (parent)
+			{
+				// no label
 				parent = parent->addChild(pathdata[i]);
+			}
 			else
 			{
 				parent = root_ = new SmiTreeNode<T>(pathdata[0]);
 			}
+			// add data to full node_data array
 			node_data.push_back(pathdata[i]);
-			if (i+stage < scen_data.size())
-				scen_data[i+stage] = pathdata[i];
-			else
-				scen_data.push_back(pathdata[i+stage]);
 		}
 		if (pathdata.size())
 		{
-			leaf_.push_back(parent);
-			
+			leaf_.push_back(parent);			
+		}
+		return leaf_.size()-1;
+		
+	}
+	/** Add path from node id'd by matching node labels.
+	    Responsibility for memory management of SmiTreeNodeData elements
+		is assigned to SmiScenarioTree.
+		SmiTreeNodeData elements must be created with "new" operator.
+	*/
+	int addPathtoLeaf(vector<int> &label, vector<T> &pathdata)
+	{
+		SmiTreeNode<T> *parent = NULL;		
+		if (leaf_.size())
+			parent = &find(label);
+		int stage=0;
+		if (parent)
+			stage=parent->depth()+1;
+
+		for (int i=0 ; i < pathdata.size(); i++)
+		{	
+			if (parent)
+			{
+				//has label
+				//printf(" put label %d at depth %d\n ",label[i+stage],parent->depth());
+				parent = parent->addChild(pathdata[i],label[i+stage]);
+			}
+			else
+			{
+				parent = root_ = new SmiTreeNode<T>(pathdata[0]);
+			}
+			// add data to full node_data array
+			node_data.push_back(pathdata[i]);
+		}
+		if (pathdata.size())
+		{
+			leaf_.push_back(parent);			
 		}
 		return leaf_.size()-1;
 	}
+
   //@}
 
 //--------------------------------------------------------------------------
