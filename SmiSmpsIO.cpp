@@ -299,11 +299,6 @@ SmiSmpsIO::readStochFile(SmiScnModel *smi,SmiCoreData *core, const char *c, cons
 //#############################################################################
 //  nextSmpsField
 
-// function defs from CoinMpsIO
-char * nextBlankOr( char *image );
-void strcpyAndCompress ( char *to, const char *from );
-double osi_strtod(char * ptr, char ** output) ;
-
 
 SmiSectionType
 SmiSmpsCardReader::nextSmpsField (  )
@@ -417,7 +412,7 @@ SmiSmpsCardReader::nextSmpsField (  )
 				  }
 				  strcpy(valstr,next);
 
-				  value_ = osi_strtod(valstr,&after);
+				  value_ = osi_strtod(valstr,&after,0);
 				  // see if error
 				  assert(after>valstr);
 
@@ -450,7 +445,7 @@ SmiSmpsCardReader::nextSmpsField (  )
 				  }
 				  strcpy(valstr,next);
 
-				  value_ = osi_strtod(valstr,&after);
+				  value_ = osi_strtod(valstr,&after,0);
 				  // see if error
 				  assert(after>valstr);
 				  
@@ -542,7 +537,7 @@ SmiSmpsCardReader::nextSmpsField (  )
 				  }
 				  strcpy(valstr,next);
 				  
-				  value_ = osi_strtod(valstr,&after);
+				  value_ = osi_strtod(valstr,&after,0);
 				  // see if error
 				  assert(after>valstr);
 
