@@ -27,6 +27,7 @@ enum SmiSectionType { SMI_NO_SECTION, SMI_NAME_SECTION,
 					  SMI_TIME_SECTION, SMI_SCENARIOS_SECTION, 
 					  SMI_UNKNOWN_SECTION
 };
+#if 1
 const static char *section[] = {
   "", "NAME", "ENDATA", " ", "PERIODS", "SCENARIOS", " "
 };
@@ -34,6 +35,7 @@ const static char *section[] = {
 const static char *smpsType[] = {
 	"SC","  ",""
 };
+#endif
 
 enum SmiSmpsType { SMI_SC_CARD, SMI_COLUMN_CARD, SMI_TIME_UNORDERED_CORE_TYPE, 
 	SMI_TIME_ORDERED_CORE_TYPE,SMI_UNKNOWN_MPS_TYPE

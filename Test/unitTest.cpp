@@ -8,7 +8,8 @@ int main()
 		// test SMPS files app0110R
 		SmiScnModel smi;	
 		smi.readSmps("app0110R");		
-		smi.setOsiSolverHandle(OsiClpSolverInterface());	
+		OsiClpSolverInterface *clp = new OsiClpSolverInterface();
+		smi.setOsiSolverHandle(*clp);	
 		OsiSolverInterface *osiStoch = smi.loadOsiSolverData();
 		
 		int nrows = osiStoch->getNumRows();
@@ -26,7 +27,8 @@ int main()
 		
 		SmiScnModel smi;
 		smi.readSmps("wat_10_C_32");
-		smi.setOsiSolverHandle(OsiClpSolverInterface());				
+		OsiClpSolverInterface *clp = new OsiClpSolverInterface();
+		smi.setOsiSolverHandle(*clp);	
 		OsiSolverInterface *osiStoch = smi.loadOsiSolverData();		
 		osiStoch->initialSolve();		
 		assert(fabs(osiStoch->getObjValue()+2622.062) < 0.01);
@@ -135,9 +137,8 @@ int main()
 
 
 	OsiClpSolverInterface *osiClp1 = new OsiClpSolverInterface();
-	OsiSolverInterface *osi1 = osiClp1->clone(false);
 
-	smiModel->setOsiSolverHandle(OsiClpSolverInterface());
+	smiModel->setOsiSolverHandle(*osiClp1);
 	
 	/* scramble LP entries */
 	mrow = (int*)malloc(nels*sizeof(int));
@@ -484,7 +485,6 @@ int main()
 	printf(" *** Successfully tested direct interfaces.\n");
 	// test solutions
 	const double *dsoln = smiOsi->getColSolution();
-	const double *ddobj = smiOsi->getObjCoefficients();
 	double objSum = 0.0;
 
 	/* The canonical way to traverse the tree:

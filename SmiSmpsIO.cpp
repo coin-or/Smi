@@ -93,7 +93,8 @@ SmiSmpsIO::readTimeFile(SmiScnModel *smi, const char *c, const char *ext)
 				
 				periodMap_.insert(make_pair(smpsCardReader_->periodName(),nstag_+1));
 				
-				for(int i=colStart;i<colEnd;++i)
+				int i;
+				for(i=colStart;i<colEnd;++i)
 					cstag_[i]=nstag_;
 				for(i=rowStart;i<rowEnd;++i)
 					rstag_[i]=nstag_;
@@ -108,8 +109,9 @@ SmiSmpsIO::readTimeFile(SmiScnModel *smi, const char *c, const char *ext)
 		if ( smpsCardReader_->whichSmpsSection() == SMI_ENDATA_SECTION
 			&& smpsCardReader_->whichSmpsType() == SMI_TIME_ORDERED_CORE_TYPE)
 		{
+			int i;
 
-			for(int i=colStart;i<this->getNumCols();++i)
+			for(i=colStart;i<this->getNumCols();++i)
 				cstag_[i]=nstag_;
 			for(i=rowStart;i<this->getNumRows();++i)
 				rstag_[i]=nstag_;
@@ -176,9 +178,9 @@ SmiSmpsIO::readStochFile(SmiScnModel *smi, const char *c, const char *ext)
 	{
 		if (smpsCardReader_->nextSmpsField() == SMI_SCENARIOS_SECTION) // SCENARIOS card
 		{
-			double prob;
-			int scen=0,anc;
-			int branch;
+			double prob=0.0;
+			int scen=0,anc=0;
+			int branch=0;
 			CoinPackedVector drlo,drup,dclo,dcup,dobj;
 			CoinPackedMatrix *matrix = new CoinPackedMatrix(false,0.25,0.25);
 			assert(!matrix->isColOrdered());
