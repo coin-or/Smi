@@ -14,7 +14,7 @@ TESTSRC += unitTest.cpp
 
 export IncDir  := ${SmiIncDir}  ${OsiIncDir} ${CoinIncDir} ${ClpIncDir} ${OsiClpIncDir}
 export LibDir  := ${SmiLibDir}  ${OsiLibDir} ${CoinLibDir} ${ClpLibDir} ${OsiClpLibDir}
-export LibName := ${SmiLibName} ${OsiLibName} ${CoinLibName} ${ClpLibName} ${OsiClpLibName}
+export LibName := ${SmiLibName} ${OsiClpLibName} ${OsiLibName} ${ClpLibName} ${CoinLibName}
 export Define  := ${SmiDefine}  ${CglDefine}  ${OsiDefine} ${CoinDefine} ${ClpDefine} ${OsiClpDefine}
 
 ##############################################################################

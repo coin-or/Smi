@@ -26,21 +26,21 @@ public:
 
 
 	/** begin */
-	vector<T>::iterator treeBegin(){ return node_data.begin(); }
+	typename vector<T>::iterator treeBegin(){ return node_data.begin(); }
 	/** end */
-	vector<T>::iterator treeEnd(){ return node_data.end();}
+	typename vector<T>::iterator treeEnd(){ return node_data.end();}
 	/** whole tree */
 	vector<T> &wholeTree(){ return node_data;}
 
 	/** scenario iterators
 	TODO: native code for these iterators that does not
 	depend on copying. */
-	vector<T>::iterator scenBegin(int s){
+	typename vector<T>::iterator scenBegin(int s){
 		getScenario(s);
 		return scen_data.begin();
 	}
 
-	vector<T>::iterator scenEnd(int s){
+	typename vector<T>::iterator scenEnd(int s){
 		getScenario(s);
 		return scen_data.begin()+leaf_[s]->depth()+1;
 	}
@@ -59,7 +59,7 @@ public:
 	SmiTreeNode<T> *getLeaf(int scn) { return leaf_[scn];}
 
 	/** Get node identified by scenario/stage.	*/
-	SmiTreeNode<T> &find(int scenario, int stage)
+	SmiTreeNode<T> &find(unsigned int scenario, int stage)
 	{
 		assert (scenario < leaf_.size());		
 		SmiTreeNode<T> * n = leaf_[scenario];
@@ -102,7 +102,7 @@ public:
 		SmiTreeNode<T> *parent = NULL;		
 		if (leaf_.size())
 			parent = &find(brscenario,stage);
-		for ( int i = 0; i < pathdata.size(); i++)
+		for ( unsigned int i = 0; i < pathdata.size(); i++)
 		{	
 			if (parent)
 				parent = parent->addChild(pathdata[i]);

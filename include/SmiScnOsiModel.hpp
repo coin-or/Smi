@@ -173,7 +173,7 @@ public:
 
 	// constructor 
 	SmiScnOsiModel(): 
-		solve_synch_(false),scen_(-1),totalProb_(0)
+		scen_(-1),solve_synch_(false),totalProb_(0)
 	{ }
 
 	// destructor

@@ -212,7 +212,7 @@ SmiScnOsiModel::addNode(SmiScnOsiTreeNode *tnode)
 	tnode->setColOffset(ncol_);
 	tnode->setRowOffset(nrow_);
 
-	OsiSolverInterface *osi = this->osiStoch_;
+	// OsiSolverInterface *osi = this->osiStoch_;
 	SmiScnOsiCoreModel *core = node->getCore();
 
 	// get stage and associated core node

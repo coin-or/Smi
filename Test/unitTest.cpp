@@ -60,7 +60,7 @@ int main()
     double *drup,cdrup[]={ 10.0, 19.0, 25.0, 15.0,  0.0, 7.0, 0.0, 8.0, 90.0 };
 	
     /* Stages */
-    int nstg=2;
+    //int nstg=2;
     int n_first_stg_rows=4;
 	int n_second_stg_rows=4;
     int n_first_stg_cols=17;
@@ -93,7 +93,7 @@ int main()
 
     /* local variables */
     int ns=1,ii,iii,jj,*indx,*incr;
-    double dp=1.0,dd;
+    double dp=1.0;
 
     for (ii=0;ii<nindp;ii++) ns *= nsamp[ii];     /* Compute number of scenarios */
 
@@ -282,7 +282,7 @@ int main()
 
 	// get matrix
 	const CoinPackedMatrix *stochmat = smiOsi1->getMatrixByRow();
-	for (t=0;t<3;t++)
+	for (int t=0;t<3;t++)
 	{
 		double elt1,elt2;
 		int ic;
@@ -384,6 +384,7 @@ else
 		
 		// get matrix
 		const CoinPackedMatrix *stochmat = smiOsi1->getMatrixByRow();
+		int t;
 		for (t=1;t<3;t++)
 		{
 			double elt1,elt2;
