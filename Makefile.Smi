@@ -10,7 +10,9 @@ OptLevel := -O2
 LIBNAME := Smi
 
 LIBSRC := 
-LIBSRC += SmiModel.cpp
+LIBSRC += SmiScnOsiModel.cpp
+LIBSRC += SmiScnOsiCoreModel.cpp
+LIBSRC += SmiScnOsiNode.cpp
 
 ##############################################################################
 # You should not need to edit below this line.

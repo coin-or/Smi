@@ -1,6 +1,5 @@
 #include "SmiScnOsiModel.hpp"
 #include "OsiClpSolverInterface.hpp"
-//#include "scn_c_api.h"
 
 #define INF 1.0e31
 #define COLUMNS 0
@@ -104,8 +103,7 @@ int main()
 	// initialize SmiModel
 	SmiScnOsiModel *smiModel = new SmiScnOsiModel();
 
-//	OsiClpSolverInterface osiClp;
-//	OsiSolverInterface *osi = osiClp.clone(false);
+
 	OsiClpSolverInterface *osiClp1 = new OsiClpSolverInterface();
 	OsiSolverInterface *osi1 = osiClp1->clone(false);
 
@@ -362,7 +360,12 @@ int main()
 		// genScenario
 		is = smiModel->genScenarioReplaceCoreValues(ic,cpm_mat,NULL,NULL,NULL,
 			&cpv_rlo,&cpv_rup,0,0,dp);	
-		
+
+
+if (is > 3)
+printf(" Added scenario %d.\n",is);
+else
+{		
 		// test scenario
 		
 		// load problem data into OsiSolver
@@ -428,11 +431,10 @@ int main()
 		nStochRow = smiOsi1->getNumRows();
 
 		printf(" *** Successfully tested scenario %d.\n",is);
-		
+}	
 	}
 	
 	// solve with decomp solver
-//	smiModel->decompSolve();
 
 	// load problem data into OsiSolver
 	smiModel->loadOsiSolverData();

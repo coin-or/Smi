@@ -12,10 +12,10 @@ include ${MakefileDir}/Makefile.location
 TESTSRC :=
 TESTSRC += unitTest.cpp
 
-export IncDir  := ${OslSeIncDir} ${SmiIncDir}  ${OsiIncDir} ${CoinIncDir} ${ClpIncDir} ${OsiClpIncDir}
-export LibDir  := ${OslSeLibDir} ${SmiLibDir}  ${OsiLibDir} ${CoinLibDir} ${ClpLibDir} ${OsiClpLibDir}
-export LibName := ${OslSeLibName} ${SmiLibName} ${OsiLibName} ${CoinLibName} ${ClpLibName} ${OsiClpLibName}
-export Define  := ${OslSeDefine}${SmiDefine}  ${CglDefine}  ${OsiDefine} ${CoinDefine} ${ClpDefine} ${OsiClpDefine}
+export IncDir  := ${SmiIncDir}  ${OsiIncDir} ${CoinIncDir} ${ClpIncDir} ${OsiClpIncDir}
+export LibDir  := ${SmiLibDir}  ${OsiLibDir} ${CoinLibDir} ${ClpLibDir} ${OsiClpLibDir}
+export LibName := ${SmiLibName} ${OsiLibName} ${CoinLibName} ${ClpLibName} ${OsiClpLibName}
+export Define  := ${SmiDefine}  ${CglDefine}  ${OsiDefine} ${CoinDefine} ${ClpDefine} ${OsiClpDefine}
 
 ##############################################################################
 # You should not need to edit below this line.

@@ -2,9 +2,6 @@ Prerequisites for installation:
 - at the moment on (*)nix platforms you must use g++ 2.95.2 or higher.
 - must use gnu make
 - to make the documentation doxygen must be installed
-- you must install OSL Stochastic Extensions for your platform 
-  from http://www-3.ibm.com/software/data/bi/osl/
-  and edit Makefile.locations to identify where these are to be found.
 
 Targets are put in subdirectories, whose name is derived from the
 platform name (as returned by `uname`) and the optimization level
