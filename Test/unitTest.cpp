@@ -188,7 +188,8 @@ int main()
 		assert(rstg[osiCore->getRowExternalIndex(ii)] == 2);
 
 	const CoinPackedMatrix *origCore = ohoh->getMatrixByRow();
-	for (int t=0;t<3;t++)
+  int t;
+	for ( t=0;t<3;t++)
 	{
 		CoinPackedVector *cpvdrlo = osiCore->getRowLower(t);
 		CoinPackedVector *cpvdrup = osiCore->getRowUpper(t);
@@ -282,7 +283,7 @@ int main()
 
 	// get matrix
 	const CoinPackedMatrix *stochmat = smiOsi1->getMatrixByRow();
-	for (int t=0;t<3;t++)
+	for ( t=0;t<3;t++)
 	{
 		double elt1,elt2;
 		int ic;
