@@ -1,13 +1,40 @@
 #include "SmiScnModel.hpp"
 #include "OsiClpSolverInterface.hpp"
 
-#define INF 1.0e31
-#define COLUMNS 0
-#define ROWS    1
-
 
 int main()
 {
+	{
+		// test SMPS files app0110R
+		SmiScnModel smi;	
+		smi.readSmps("app0110R");		
+		smi.setOsiSolverHandle(OsiClpSolverInterface());	
+		OsiSolverInterface *osiStoch = smi.loadOsiSolverData();
+		
+		int nrows = osiStoch->getNumRows();
+		int ncols = osiStoch->getNumCols();
+		assert(nrows==129);
+		assert(ncols==268);
+		
+		osiStoch->initialSolve();		
+		assert(fabs(osiStoch->getObjValue()-44.66666) < 0.0001);
+		printf(" *** Successfully tested SMPS interfaces on app0110R.\n");
+	}
+	
+	{
+		// test SMPS files from Watson test suite (Cambridge, UK)
+		
+		SmiScnModel smi;
+		smi.readSmps("wat_10_C_32");
+		smi.setOsiSolverHandle(OsiClpSolverInterface());				
+		OsiSolverInterface *osiStoch = smi.loadOsiSolverData();		
+		osiStoch->initialSolve();		
+		assert(fabs(osiStoch->getObjValue()+2622.062) < 0.01);
+		printf(" *** Successfully tested SMPS interfaces on wat_10_32_C.\n");
+	}
+	
+
+	// exhaustive test of direct interfaces
 	
     /* Model dimensions */
     int ncol=27, nrow=9, nels=44;
@@ -51,6 +78,9 @@ int main()
     double *dclo,cdclo[]={ 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
 		0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
 		0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0 };
+
+#define INF 1.0e31
+
     double *dcup,cdcup[]={ INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,
 		INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,
 		INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF };
@@ -107,7 +137,7 @@ int main()
 	OsiClpSolverInterface *osiClp1 = new OsiClpSolverInterface();
 	OsiSolverInterface *osi1 = osiClp1->clone(false);
 
-	smiModel->setOsiSolverHandle(osi1);
+	smiModel->setOsiSolverHandle(OsiClpSolverInterface());
 	
 	/* scramble LP entries */
 	mrow = (int*)malloc(nels*sizeof(int));
@@ -263,8 +293,10 @@ int main()
     }
 	
 	// first scenario
+	int anc = 0;
+	int branch = 1;
 	int	is = smiModel->genScenarioReplaceCoreValues(ic,cpm_mat,NULL,NULL,NULL,
-									&cpv_rlo,&cpv_rup,0,0,dp);	
+									&cpv_rlo,&cpv_rup,branch,anc,dp);	
 	
 
 	// test first scenario
@@ -328,7 +360,7 @@ int main()
 		}		
 	}
 
-	printf(" *** Successfully tested scenario %d.\n",is);
+	printf(" *** Successfully tested problem with scenario %d.\n",is);
 
 	
 	/***** ...main loop to generate scenarios from discrete random variables
@@ -364,12 +396,10 @@ int main()
 		
 		// genScenario
 		is = smiModel->genScenarioReplaceCoreValues(ic,cpm_mat,NULL,NULL,NULL,
-			&cpv_rlo,&cpv_rup,0,0,dp);	
+			&cpv_rlo,&cpv_rup,branch,anc,dp);	
 		
 		
-		if (is > 3)
-			printf(" Added scenario %d.\n",is);
-		else
+		if (is < 3)
 		{		
 			// test scenario
 			
@@ -436,7 +466,7 @@ int main()
 			nStochCol = smiOsi1->getNumCols();
 			nStochRow = smiOsi1->getNumRows();
 			
-			printf(" *** Successfully tested scenario %d.\n",is);
+			printf(" *** Successfully tested problem with scenario %d.\n",is);
 		}	
 	}
 	
@@ -451,6 +481,7 @@ int main()
 	// test optimal value
     assert(fabs(smiOsi->getObjValue()-1566.042)<0.01);
 
+	printf(" *** Successfully tested direct interfaces.\n");
 	// test solutions
 	const double *dsoln = smiOsi->getColSolution();
 	const double *ddobj = smiOsi->getObjCoefficients();
@@ -490,5 +521,10 @@ int main()
 	}
 
 	assert(fabs(smiOsi->getObjValue()-objSum) < 0.01);
+
+	printf(" *** Successfully tested getSolution and tree traversal.\n");
+
+	printf(" *** Completed all tests for Smi.\n");
+
 	return 0;
 }

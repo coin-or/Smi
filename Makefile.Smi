@@ -12,6 +12,7 @@ LIBNAME := Smi
 LIBSRC := 
 LIBSRC += SmiScnModel.cpp
 LIBSRC += SmiScnData.cpp
+LIBSRC += SmiSmpsIO.cpp
 
 ##############################################################################
 # You should not need to edit below this line.

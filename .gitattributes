@@ -7,3 +7,4 @@ Test/Makefile.test -text svneol=unset#application/octet-stream
 include/SmiScenarioTree.hpp -text svneol=unset#application/octet-stream
 include/SmiScnData.hpp -text svneol=unset#application/octet-stream
 include/SmiScnModel.hpp -text svneol=unset#application/octet-stream
+include/SmiSmpsIO.hpp -text svneol=unset#application/octet-stream

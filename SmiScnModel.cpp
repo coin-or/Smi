@@ -1,4 +1,5 @@
 #include "SmiScnModel.hpp"
+#include "SmiSmpsIO.hpp"
 #include "CoinPackedMatrix.hpp"
 #include "OsiSolverInterface.hpp"
 #include "CoinHelperFunctions.hpp"
@@ -59,7 +60,10 @@ SmiScnModel::genScenarioReplaceCoreValues(SmiCoreIndex ic,
 				CoinPackedVector *v_drlo, CoinPackedVector *v_drup,				
 				SmiStageIndex branch, SmiScenarioIndex anc, double prob)
 {
-	
+
+	// this coding takes branch to be the node that the scenario branches *from*
+	--branch;
+
 	SmiCoreData *core = core_vec_[ic];
 	vector<SmiScnNode *> node_vec;
 
@@ -334,3 +338,20 @@ SmiScnModel::getRowSolution(int ns)
 	return NULL;
 }
 
+int
+SmiScnModel::readSmps(const char *c)
+{
+
+	SmiSmpsIO smiSmpsIO;
+
+	if (smiSmpsIO.readMps(c,"core")<0)
+		return -1;
+	if (smiSmpsIO.readTimeFile(this,c,"time")<0)
+		return -1;
+	if (smiSmpsIO.readStochFile(this,c,"stoch")<0)
+		return -1;
+
+	return 0;
+
+
+}

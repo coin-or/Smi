@@ -19,6 +19,140 @@
 
 using namespace std;
 
+class SmiScnNode;
+//#############################################################################
+
+/** SmiScnModel: COIN-SMI Scenario Model Class
+	
+	Concrete class for generating scenario stochastic linear programs.
+
+	This class implements the Scenarios format of the Stochastic MPS
+	modeling system (TODO: web pointer).  Core data and Scenarios data
+	can be passed using COIN/OSI structures, or can be read from SMPS
+	formatted files.
+
+	Typical driver fragment looks like this
+	\code
+	SmiScnModel smi;
+	smi.readSmps("app0110R");
+	smi.setOsiSolverHandle(OsiClpSolverInterface());
+	OsiSolverInterface *osiStoch = smi.loadOsiSolverData();
+	osiStoch->initialSolve();
+	\encode
+
+	The setOsiSolverHandle method allows the user to pass in any OSI
+	compatible solver.
+
+  */
+class SmiScnModel
+{
+	
+public:
+
+    /**@name Read SMPS files.
+
+		There should be three files: {name}.[core, time, stoch].
+		If you have different extension conventions, then you can
+		hack the method yourself.
+		The files can be compressed. The object that reads the files is
+		derived from CoinMpsIO.
+	*/
+	int readSmps(const char *name);
+
+
+	/**@name Direct methods.
+		
+		Direct methods require the user to create instances of Core files
+		and Scenarios.
+		Currently, the dimension of the core file nodes determines the
+		dimension of the scenario nodes, but this is something that 
+		could easily be changed.
+	*/
+
+//@{
+	/// set core model from Osi data
+	SmiCoreIndex setCore(OsiSolverInterface *osi, int nstage, 
+				SmiStageIndex *cstage, SmiStageIndex *rstage);
+	/// roll your own core model
+	SmiCoreIndex setCore(SmiCoreData *s)
+	{core_vec_.push_back(s);	return core_vec_.size()-1; }
+
+	/// get core model 
+	SmiCoreData *getCore(SmiCoreIndex i){ return core_vec_[i]; }
+
+	/** generate scenario replacing core values
+		
+		Core argument must be supplied. 
+		Data values replace corresponding core values, if found, 
+		or creates them if not. 
+		
+		Scenario nodes need to have same dimensions as core nodes.
+		
+		Data field arguments can be NULL, or empty. 
+		
+		branch, anc, arguments must be supplied.  These
+		identify the branching node according to the Stochastic MPS
+		standard.
+		
+	*/
+	SmiScenarioIndex genScenarioReplaceCoreValues(SmiCoreIndex core, 
+				CoinPackedMatrix *matrix,
+				CoinPackedVector *dclo, CoinPackedVector *dcup,
+				CoinPackedVector *dobj,
+				CoinPackedVector *drlo, CoinPackedVector *drup,
+				SmiStageIndex branch, SmiScenarioIndex anc, double prob);
+//@}
+		
+	// get scenario problem data
+	SmiScenarioIndex getNumScenarios(){ return scen_;}
+	double getScenarioProb(SmiScenarioIndex ns);
+	SmiScnNode * getLeafNode(SmiScenarioIndex i){ return smiTree_.getLeaf(i)->getDataPtr(); }
+	SmiScnNode * getRootNode(){ return smiTree_.getRoot()->getDataPtr(); }
+
+
+	// getXXX by scenario
+	double getObjectiveValue(SmiScenarioIndex ns);
+	const double *getColSolution(SmiScenarioIndex ns);
+	const double *getRowSolution(SmiScenarioIndex ns);
+
+	// OsiSolverInterface
+	void setOsiSolverHandle(OsiSolverInterface &osi)
+	{
+		osiStoch_ = osi.clone(false);
+	}
+	OsiSolverInterface * getOsiSolverInterface();
+
+	// load det equiv model into osi and return handle
+	OsiSolverInterface * loadOsiSolverData();
+
+	// constructor 
+	SmiScnModel(): 
+		scen_(-1),solve_synch_(false),totalProb_(0)
+	{ }
+
+	// destructor
+	~SmiScnModel();
+
+	void addNode(SmiScnNode *node);
+
+private:
+	OsiSolverInterface * osiStoch_;
+	int nrow_;
+	int ncol_;
+	int nels_;
+	double *drlo_; 
+	double *drup_;
+	double *dobj_;
+	double *dclo_; 
+	double *dcup_;
+	CoinPackedMatrix *matrix_;
+	int scen_;
+	int minrow_;
+	bool solve_synch_;
+	double totalProb_;
+	std::vector<SmiCoreData *> core_vec_;
+	SmiScenarioTree<SmiScnNode *> smiTree_;
+};
 
 class SmiScnNode
 {
@@ -53,80 +187,6 @@ private:
 	double mdl_prob_;
 	int coffset_;
 	int roffset_;
-};
-
-class SmiScnModel
-{
-
-public:
-
-	// set core model from Osi data
-	SmiCoreIndex setCore(OsiSolverInterface *osi, int nstage, 
-				SmiStageIndex *cstage, SmiStageIndex *rstage);
-
-	// generate scenario 
-	SmiScenarioIndex genScenarioReplaceCoreValues(SmiCoreIndex core, 
-				CoinPackedMatrix *matrix,
-				CoinPackedVector *dclo, CoinPackedVector *dcup,
-				CoinPackedVector *dobj,
-				CoinPackedVector *drlo, CoinPackedVector *drup,
-				SmiStageIndex branch, SmiScenarioIndex anc, double prob);
-
-		
-	// get scenario problem data
-	SmiScenarioIndex getNumScenarios(){ return scen_;}
-	double getScenarioProb(SmiScenarioIndex ns);
-	SmiScnNode * getLeafNode(SmiScenarioIndex i){ return smiTree_.getLeaf(i)->getDataPtr(); }
-	SmiScnNode * getRootNode(){ return smiTree_.getRoot()->getDataPtr(); }
-
-
-	// getXXX by scenario
-	double getObjectiveValue(SmiScenarioIndex ns);
-	const double *getColSolution(SmiScenarioIndex ns);
-	const double *getRowSolution(SmiScenarioIndex ns);
-
-	// methods implented by OSLSE
-	void writeSMPS(const char *c,const char *t, const char* s);
-	void readSMPS(const char *c,const char *t, const char* s);
-
-	// OsiSolverInterface
-	void setOsiSolverHandle(OsiSolverInterface *osi)
-	{
-		osiStoch_ = osi->clone(false);
-//		osiStoch_->reset();
-	}
-	OsiSolverInterface * getOsiSolverInterface();
-
-	// load det equiv model into osi and return handle
-	OsiSolverInterface * loadOsiSolverData();
-
-	// constructor 
-	SmiScnModel(): 
-		scen_(-1),solve_synch_(false),totalProb_(0)
-	{ }
-
-	// destructor
-	~SmiScnModel();
-
-	void addNode(SmiScnNode *node);
-
-private:
-	OsiSolverInterface * osiStoch_;
-	int nrow_;
-	int ncol_;
-	int nels_;
-	double *drlo_; 
-	double *drup_;
-	double *dobj_;
-	double *dclo_; 
-	double *dcup_;
-	CoinPackedMatrix *matrix_;
-	int scen_;
-	int minrow_;
-	bool solve_synch_;
-	double totalProb_;
-	std::vector<SmiCoreData *> core_vec_;
-	SmiScenarioTree<SmiScnNode *> smiTree_;
 };
 
 // function object for addnode loop

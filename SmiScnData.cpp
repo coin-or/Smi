@@ -9,9 +9,68 @@ using namespace std;
 
 SmiCoreData::SmiCoreData(OsiSolverInterface *osi,int nstag,int *cstag,int *rstag)
 {
+	int nrow = osi->getNumRows();
+	int ncol = osi->getNumCols();
+	CoinPackedVector *drlo = new CoinPackedVector(nrow,osi->getRowLower());
+	CoinPackedVector *drup = new CoinPackedVector(nrow,osi->getRowUpper());
+	CoinPackedVector *dclo = new CoinPackedVector(ncol,osi->getColLower()); 
+	CoinPackedVector *dcup = new CoinPackedVector(ncol,osi->getColUpper());
+	CoinPackedVector *dobj = new CoinPackedVector(ncol,osi->getObjCoefficients());
+
+	CoinPackedMatrix *matrix = new CoinPackedMatrix(*osi->getMatrixByRow());
+	matrix->eliminateDuplicates(0.0);
+
+	gutsOfConstructor(nrow,ncol,nstag,cstag,rstag,matrix,dclo,dcup,dobj,drlo,drup);
+	
+		delete matrix;
+		delete drlo;
+		delete drup;
+		delete dclo;
+		delete dcup;
+		delete dobj;
+
+
+
+}
+
+SmiCoreData::SmiCoreData(CoinMpsIO *osi,int nstag,int *cstag,int *rstag)
+{
+	int nrow = osi->getNumRows();
+	int ncol = osi->getNumCols();
+	CoinPackedVector *drlo = new CoinPackedVector(nrow,osi->getRowLower());
+	CoinPackedVector *drup = new CoinPackedVector(nrow,osi->getRowUpper());
+	CoinPackedVector *dclo = new CoinPackedVector(ncol,osi->getColLower()); 
+	CoinPackedVector *dcup = new CoinPackedVector(ncol,osi->getColUpper());
+	CoinPackedVector *dobj = new CoinPackedVector(ncol,osi->getObjCoefficients());
+
+	CoinPackedMatrix *matrix = new CoinPackedMatrix(*osi->getMatrixByRow());
+	matrix->eliminateDuplicates(0.0);
+
+	gutsOfConstructor(nrow,ncol,nstag,cstag,rstag,matrix,dclo,dcup,dobj,drlo,drup);
+	
+		delete matrix;
+		delete drlo;
+		delete drup;
+		delete dclo;
+		delete dcup;
+		delete dobj;
+
+
+
+}
+void
+SmiCoreData::gutsOfConstructor(int nrow,int ncol,int nstag,
+							   int *cstag,int *rstag,
+							   CoinPackedMatrix *matrix,
+							   CoinPackedVector *dclo,
+							   CoinPackedVector *dcup,
+							   CoinPackedVector *dobj,
+							   CoinPackedVector *drlo,
+							   CoinPackedVector *drup)
+{
 	int i;
-	nrow_ = osi->getNumRows();
-	ncol_ = osi->getNumCols();
+	nrow_ = nrow;
+	ncol_ = ncol;
 
 	// store number stages
 	nstag_ = nstag;
@@ -96,14 +155,6 @@ SmiCoreData::SmiCoreData(OsiSolverInterface *osi,int nstag,int *cstag,int *rstag
 	this->nodes_.reserve(nstag_);
 
 		// TODO: specialize this interface for core nodes
-	CoinPackedVector *drlo = new CoinPackedVector(nrow_,osi->getRowLower());
-	CoinPackedVector *drup = new CoinPackedVector(nrow_,osi->getRowUpper());
-	CoinPackedVector *dclo = new CoinPackedVector(ncol_,osi->getColLower()); 
-	CoinPackedVector *dcup = new CoinPackedVector(ncol_,osi->getColUpper());
-	CoinPackedVector *dobj = new CoinPackedVector(ncol_,osi->getObjCoefficients());
-
-	CoinPackedMatrix *matrix = new CoinPackedMatrix(*osi->getMatrixByRow());
-	matrix->eliminateDuplicates(0.0);
 
 
 	for (i=0;i<nstag_;i++)
@@ -119,13 +170,6 @@ SmiCoreData::SmiCoreData(OsiSolverInterface *osi,int nstag,int *cstag,int *rstag
 	}
 
 	
-		delete matrix;
-		delete drlo;
-		delete drup;
-		delete dclo;
-		delete dcup;
-		delete dobj;
-
 
 }
 
@@ -189,7 +233,7 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 	int ncol = core->getNumCols(stg_);
 
 		
-	if (matrix)
+	if (matrix && nels_>0)
 	{
 		// should already be done but no harm checking
 		assert(!matrix->isColOrdered());
@@ -229,7 +273,7 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 	const int *ind;
 	const double *elt;
 
-	if (dclo)
+	if (dclo && dclo->getNumElements())
 	{
 		this->dclo_ = new CoinPackedVector(false);
 		dclo_->reserve(ncol);
@@ -246,7 +290,7 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 	else
 		dclo_ = NULL;
 	
-	if (dcup)
+	if (dcup && dcup->getNumElements())
 	{
 		this->dcup_ = new CoinPackedVector(false);
 		dcup_->reserve(ncol);
@@ -262,7 +306,7 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 	else
 		dcup_ = NULL;
 	
-	if (dobj)
+	if (dobj && dobj->getNumElements())
 	{
 		this->dobj_ = new CoinPackedVector(false);
 		dobj_->reserve(ncol);
@@ -278,7 +322,7 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 	else
 		dobj_ = NULL;
 	
-	if (drlo)
+	if (drlo && drlo->getNumElements())
 	{
 		this->drlo_ = new CoinPackedVector(false);
 		drlo_->reserve(nrow);
@@ -295,7 +339,7 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 		drlo_ = NULL;
 
 				
-	if (drup)
+	if (drup && drup->getNumElements())
 	{
 		this->drup_ = new CoinPackedVector(false);
 		drlo_->reserve(nrow);

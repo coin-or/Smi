@@ -11,6 +11,7 @@
 
 #include "OsiSolverInterface.hpp"
 #include "CoinPackedVector.hpp"
+#include "CoinMpsIO.hpp"
 
 #include <map>
 #include <vector>
@@ -102,7 +103,18 @@ public:
 
 	inline SmiNodeData * getNode(SmiStageIndex t){return nodes_[t];}
 	SmiCoreData(OsiSolverInterface *osi, int nstag, int *cstag, int *rstag);
+	SmiCoreData(CoinMpsIO *cMps, int nstag, int *cstag, int *rstag);
 	~SmiCoreData();
+
+private:
+	void gutsOfConstructor(int nrow,int ncol,int nstag,
+							   int *cstag,int *rstag,
+							   CoinPackedMatrix *matrix,
+							   CoinPackedVector *dclo,
+							   CoinPackedVector *dcup,
+							   CoinPackedVector *dobj,
+							   CoinPackedVector *drlo,
+							   CoinPackedVector *drup);
 private:
 	int nrow_;
 	int ncol_;
