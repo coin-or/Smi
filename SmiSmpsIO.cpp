@@ -13,6 +13,15 @@
 #include "CoinMessage.hpp"
 
 
+#if 1
+const static char *section[] = {
+  "", "NAME", "ENDATA", " ", "PERIODS", "SCENARIOS", " "
+};
+
+const static char *smpsType[] = {
+	"SC","  ",""
+};
+#endif
 
 
 //#############################################################################
