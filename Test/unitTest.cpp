@@ -412,7 +412,7 @@ void SmiScnModelScenarioUnitTest()
 		0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
 		0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0 };
 
-#define INF 1.0e31
+#define INF COIN_DBL_MAX
 
     double *dcup,cdcup[]={ INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,
 		INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,
@@ -919,7 +919,7 @@ void SmiScnModelDiscreteUnitTest()
 		0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
 		0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0 };
 
-#define INF 1.0e31
+#define INF COIN_DBL_MAX
 
     double *dcup,cdcup[]={ INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,
 		INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,
