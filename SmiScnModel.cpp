@@ -7,6 +7,20 @@
 
 using namespace std;
 
+
+int 
+SmiScnNode::getCoreColIndex(int i)
+{
+	SmiCoreData *core = node_->getCore();
+	return core->getColExternalIndex(i-coffset_+core->getColStart(node_->getStage()));
+}
+
+int 
+SmiScnNode::getCoreRowIndex(int i){
+	SmiCoreData *core = node_->getCore();
+	return core->getRowExternalIndex(i-roffset_+core->getRowStart(node_->getStage()));
+}
+
 SmiScnModel::~SmiScnModel()
 {
 	delete osiStoch_;
@@ -277,7 +291,7 @@ SmiScnModel::addNode(SmiScnNode *tnode)
 					{
 						jlo = core->getColStart(--t);
 						pnode=pnode->getParent();
-						coff = pnode->getColOffset()-jlo;
+						coff = pnode->getColStart()-jlo;
 					}
 					
 					// add offset to index

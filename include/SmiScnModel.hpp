@@ -24,8 +24,10 @@ class SmiScnNode
 {
 	friend class SmiScnModel;
 public:
-	inline int  getColOffset() {return coffset_;}	
-	inline int  getRowOffset() {return roffset_;}
+	int getCoreColIndex(int i);
+	int getCoreRowIndex(int i);
+	inline int  getColStart() {return coffset_;}	
+	inline int  getRowStart() {return roffset_;}
 	inline int getNumCols(){ return node_->getCore()->getNumCols(node_->getStage());}
 	inline int getNumRows(){ return node_->getCore()->getNumRows(node_->getStage());}
 	inline double getModelProb(){return mdl_prob_;}

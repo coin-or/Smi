@@ -475,18 +475,13 @@ int main()
 	
 		while (node != NULL)
 		{
-			// column offset into OSI model
-			int coff = node->getColOffset();
 
-			// node probability
-			double nodeprob = node->getModelProb();
-
-			for(int j=0; j<node->getNumCols(); ++j)
+			// getColStart returns the starting index of node in OSI model
+			for(int j=node->getColStart(); j<node->getColStart()+node->getNumCols(); ++j)
 			{
-				// the objective values are multiplied by node prob,
-				// so we divide it out.
-				scenSum += ddobj[coff+j]*dsoln[coff+j]/nodeprob;
-				
+				// getCoreColIndex returns the corresponding Core index
+				// in the original (user's) ordering
+				scenSum += dobj[node->getCoreColIndex(j)]*dsoln[j];				
 			}			
 			// get parent of node
 			node = node->getParent();
