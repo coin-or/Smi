@@ -1,1 +1,7 @@
 * text=auto !eol
+/INSTALL -text svneol=unset#application/octet-stream
+/Makefile -text svneol=unset#application/octet-stream
+/Makefile.Smi -text svneol=unset#application/octet-stream
+Test/Makefile -text svneol=unset#application/octet-stream
+Test/Makefile.test -text svneol=unset#application/octet-stream
+include/SmiModel.hpp -text svneol=unset#application/octet-stream
