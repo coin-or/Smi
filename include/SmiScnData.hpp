@@ -12,6 +12,8 @@
 #include "OsiSolverInterface.hpp"
 #include "CoinPackedVector.hpp"
 #include "CoinMpsIO.hpp"
+#include "SmiCoreCombineRule.hpp"
+#include "SmiLinearData.hpp"
 
 #include <map>
 #include <vector>
@@ -25,17 +27,11 @@ typedef int SmiStageIndex;
 
 class SmiCoreData;
 
-class SmiNodeData
+class SmiNodeData : public SmiLinearData
 {
 public:
 	typedef map<int,CoinPackedVector *> SmiRowMap;
 	void setCoreNode();
-	inline  CoinPackedVector * getRowLower(){return drlo_;}
-	inline  CoinPackedVector * getRowUpper(){return drup_;}
-	inline  CoinPackedVector * getColLower(){return dclo_;}
-	inline  CoinPackedVector * getColUpper(){return dcup_;}
-	inline  CoinPackedVector * getObjCoefficients(){return dobj_;}
-
 	CoinPackedVector * getRow(int i) { 
 		SmiRowMap::iterator r=rowMap.find(i); 
 		if (r!=rowMap.end()) return r->second; 
@@ -44,12 +40,16 @@ public:
 	inline int getStage() { return stg_;}
 	inline  int getNumElements(){ return nels_; }
 
+	inline void setCoreCombineRule(SmiCoreCombineRule *r){combineRule_=r;}
+	inline SmiCoreCombineRule * getCoreCombineRule() { return combineRule_;}
+
 	void copyRowLower(double * drlo);
 	void copyRowUpper(double * drup);
 	void copyColLower(double * dclo);
 	void copyColUpper(double * dcup);
-	void copyObjCoefficients(double * dobj);
+	void copyObjective(double * dobj);
 
+	CoinPackedVector * combineWithCoreRow(CoinPackedVector *cr, CoinPackedVector *nr);
 
 	SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 				 const CoinPackedMatrix *const matrix,
@@ -59,22 +59,17 @@ public:
 				 CoinPackedVector *drlo, 
 				 CoinPackedVector *drup);
 	~SmiNodeData();
+
+protected:
+	void combineWithCoreDoubleArray(double *d_out, const CoinPackedVector &cpv, int o);
+
 private:
 	SmiStageIndex stg_;
 	SmiRowMap rowMap;
 	int nels_;
-	CoinPackedVector *drlo_; 
-	CoinPackedVector *drup_;
-	CoinPackedVector *dobj_;
-	CoinPackedVector *dclo_; 
-	CoinPackedVector *dcup_;
-	double *cdrlo_; 
-	double *cdrup_;
-	double *cdobj_;
-	double *cdclo_; 
-	double *cdcup_;
 	SmiCoreData *core_;
 	bool isCoreNode_;
+	SmiCoreCombineRule *combineRule_;
 };
 
 
@@ -95,11 +90,17 @@ public:
 	inline int getRowExternalIndex(int i){ return rowIn2Ex_[i];}
 	inline int getColExternalIndex(int i){ return colIn2Ex_[i];}
 	inline CoinPackedVector * getMatrixRow(SmiStageIndex t, int i){ return nodes_[t]->getRow(i);}
-	inline CoinPackedVector *getRowLower(SmiStageIndex t){return nodes_[t]->getRowLower();}
-	inline CoinPackedVector *getRowUpper(SmiStageIndex t){return nodes_[t]->getRowUpper();}
-	inline CoinPackedVector *getColLower(SmiStageIndex t){return nodes_[t]->getColLower();}
-	inline CoinPackedVector *getColUpper(SmiStageIndex t){return nodes_[t]->getColUpper();}
-	inline CoinPackedVector *getObjCoefficients(SmiStageIndex t){return nodes_[t]->getObjCoefficients();}
+	inline const CoinPackedVector &getRowLower(SmiStageIndex t){return nodes_[t]->getRowLower();}
+	inline const CoinPackedVector &getRowUpper(SmiStageIndex t){return nodes_[t]->getRowUpper();}
+	inline const CoinPackedVector &getColLower(SmiStageIndex t){return nodes_[t]->getColLower();}
+	inline const CoinPackedVector &getColUpper(SmiStageIndex t){return nodes_[t]->getColUpper();}
+	inline const CoinPackedVector &getObjCoefficients(SmiStageIndex t){return nodes_[t]->getObjective();}
+
+	void copyRowLower(double * drlo,SmiStageIndex t );
+	void copyRowUpper(double * drup,SmiStageIndex t);
+	void copyColLower(double * dclo,SmiStageIndex t);
+	void copyColUpper(double * dcup,SmiStageIndex t);
+	void copyObjective(double * dobj,SmiStageIndex t);
 
 	inline SmiNodeData * getNode(SmiStageIndex t){return nodes_[t];}
 	SmiCoreData(OsiSolverInterface *osi, int nstag, int *cstag, int *rstag);
@@ -129,6 +130,11 @@ private:
 	int *rowEx2In_;
 	int *colIn2Ex_;
 	int *rowIn2Ex_;
+	double **cdrlo_; 
+	double **cdrup_;
+	double **cdobj_;
+	double **cdclo_; 
+	double **cdcup_;
 	vector<SmiNodeData*> nodes_;
 };
 

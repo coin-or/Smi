@@ -10,6 +10,7 @@
 #endif
 
 // Include files
+#include "SmiDiscreteDistribution.hpp"
 #include "SmiScenarioTree.hpp"
 #include "SmiScnData.hpp"
 #include "OsiSolverInterface.hpp"
@@ -50,7 +51,7 @@ class SmiScnNode;
   */
 class SmiScnModel
 {
-	
+	friend void SmiScnModelDiscreteUnitTest();	
 public:
 
     /**@name Read SMPS files.
@@ -66,23 +67,19 @@ public:
 
 	/**@name Direct methods.
 		
-		Direct methods require the user to create instances of Core files
-		and Scenarios.
-		Currently, the dimension of the core file nodes determines the
+		Direct methods require the user to create instances of 
+		Core data and Scenario data.
+		Currently, the dimension of the core nodes determines the
 		dimension of the scenario nodes, but this is something that 
 		could easily be changed.
 	*/
 
 //@{
-	/// set core model from Osi data
-	SmiCoreIndex setCore(OsiSolverInterface *osi, int nstage, 
-				SmiStageIndex *cstage, SmiStageIndex *rstage);
-	/// roll your own core model
-	SmiCoreIndex setCore(SmiCoreData *s)
-	{core_vec_.push_back(s);	return core_vec_.size()-1; }
 
-	/// get core model 
-	SmiCoreData *getCore(SmiCoreIndex i){ return core_vec_[i]; }
+
+
+	/// generate scenarios from discrete distribution
+	void processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s);
 
 	/** generate scenario replacing core values
 		
@@ -99,16 +96,18 @@ public:
 		standard.
 		
 	*/
-	SmiScenarioIndex genScenarioReplaceCoreValues(SmiCoreIndex core, 
+	SmiScenarioIndex generateScenario(SmiCoreData *core, 
 				CoinPackedMatrix *matrix,
 				CoinPackedVector *dclo, CoinPackedVector *dcup,
 				CoinPackedVector *dobj,
 				CoinPackedVector *drlo, CoinPackedVector *drup,
-				SmiStageIndex branch, SmiScenarioIndex anc, double prob);
+				SmiStageIndex branch, SmiScenarioIndex anc, double prob,
+				SmiCoreCombineRule *r = SmiCoreCombineReplace::Instance())
+				throw(CoinError);
 //@}
 		
 	// get scenario problem data
-	SmiScenarioIndex getNumScenarios(){ return scen_;}
+	SmiScenarioIndex getNumScenarios(){ return smiTree_.getNumScenarios();}
 	double getScenarioProb(SmiScenarioIndex ns);
 	SmiScnNode * getLeafNode(SmiScenarioIndex i){ return smiTree_.getLeaf(i)->getDataPtr(); }
 	SmiScnNode * getRootNode(){ return smiTree_.getRoot()->getDataPtr(); }
@@ -131,7 +130,7 @@ public:
 
 	// constructor 
 	SmiScnModel(): 
-		scen_(-1),solve_synch_(false),totalProb_(0)
+		solve_synch_(false),totalProb_(0),core_(NULL)
 	{ }
 
 	// destructor
@@ -154,15 +153,15 @@ private:
 	double *dcup_;
 	CoinPackedMatrix *matrix_;
 	// number of scenarios
-	int scen_;
+//	int scen_;
 	// not sure if this is used
 	int minrow_;
 	// not sure if this is used
 	bool solve_synch_;
 	// total probability of added scenarios; used to normalize probability to one
 	double totalProb_;
-	// vector of core models
-	std::vector<SmiCoreData *> core_vec_;
+	//core model --- used for discrete distributions
+	SmiCoreData * core_;
 	// scenario tree pointer
 	SmiScenarioTree<SmiScnNode *> smiTree_;
 };
@@ -173,6 +172,8 @@ class SmiScnNode
 public:
 	int getCoreColIndex(int i);
 	int getCoreRowIndex(int i);
+	inline void setScenarioIndex(SmiScenarioIndex i){ scen_=i;}
+    inline SmiScenarioIndex getScenarioIndex() {return scen_;}
 	inline int  getColStart() {return coffset_;}	
 	inline int  getRowStart() {return roffset_;}
 	inline int getNumCols(){ return node_->getCore()->getNumCols(node_->getStage());}
@@ -200,6 +201,7 @@ private:
 	double mdl_prob_;
 	int coffset_;
 	int roffset_;
+	SmiScenarioIndex scen_;
 };
 
 // function object for addnode loop

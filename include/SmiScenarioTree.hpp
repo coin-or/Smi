@@ -3,6 +3,11 @@
 #ifndef SmiScenarioTree_H
 #define SmiScenarioTree_H
 
+#if defined(_MSC_VER)
+// Turn off compiler warning about long names
+#  pragma warning(disable:4786)
+#endif
+
 /** Scenario Tree
 
   This class is used for storing and accessing scenario trees.
@@ -40,14 +45,17 @@ public:
 	SmiTreeNode<T>  *getChild()  { return child_;  }
 	SmiTreeNode<T>  *getSibling(){ return sibling_;}
 
+	void setLastChildLabel(int label) { child_labels_.insert(make_pair(label,this->getChild()));}
+
 	SmiTreeNode<T>  *getChildByLabel(int n){
+		
 		/*
 		//AJK debug code
 		child_label_map::iterator begpos = child_labels_.begin();
 	    child_label_map::iterator endpos = child_labels_.end();
 		while(begpos!=endpos)
 		{
-			(" found label %d \n",begpos->first);
+			printf(" found label %d \n",begpos->first);
 			++begpos;
 		}
 		*/
@@ -61,20 +69,18 @@ public:
 
 	int depth() { return depth_; }
 	int numChildren() { return nchild_; }
+	int scenario() {return scen_; }
+	void setScenario(int s) {scen_=s; }
 	
 
-	SmiTreeNode<T> * addChild(T cd, int label=-1)
+	SmiTreeNode<T> * addChild(T cd, int scenario)
 	{
 		SmiTreeNode<T> *c = new SmiTreeNode(cd);
-		if (label==-1) label=nchild_;
-		child_labels_.insert(make_pair(label,c));
-		//debug code
-		typename child_label_map::iterator pos = child_labels_.find(label);
-		assert (pos!=child_labels_.end());
-		//
+	
 		c->parent_     = this;
 		c->depth_      = depth_ + 1;
 		c->sibling_    = child_;
+		c->scen_       = scenario;
 		nchild_++;
 		child_ = c;
 		return c;
@@ -103,6 +109,7 @@ public:
 	sibling_= NULL;
 	nchild_ = 0;
 	depth_ = 0;
+	scen_ = -1;
    }
 
    /// Constructor from P
@@ -113,15 +120,18 @@ public:
 	nchild_ = 0;
 	depth_ = 0;
 	ptr_ = p;
+	scen_ = -1;
    }
 
    /// Destructor 
+   
    ~SmiTreeNode()
    {
-	   delete sibling_;
-	   delete child_;
+	   //delete sibling_;
+	   //delete child_;
 	   delete ptr_ ;
    }
+ 
    //@}
 
 protected:
@@ -137,6 +147,7 @@ private:
 	SmiTreeNode<T>  *parent_;
 	SmiTreeNode<T>  *child_;
 	SmiTreeNode<T>  *sibling_;
+	int scen_;
 	int nchild_;
 	int depth_;
 	T ptr_;
@@ -198,28 +209,35 @@ public:
 	SmiTreeNode<T> *getLeaf(int scn) { return leaf_[scn];}
 
 	/** Get node identified by scenario/stage.	*/
-	SmiTreeNode<T> &find(unsigned int scenario, int stage)
+	SmiTreeNode<T> *find(unsigned int scenario, int stage)
 	{
 		assert (scenario < leaf_.size());		
 		SmiTreeNode<T> * n = leaf_[scenario];
 		assert (stage < n->depth() + 1);
 		while (stage < n->depth())
 			n = n->getParent();
-		return *n;
+		return n;
 	}
 
+	/** get number of scenarios */
+	int getNumScenarios()
+	{
+		return leaf_.size();
+	}
+
+
 	/** Get node identified by longest match to array of labels */
-	SmiTreeNode<T> &find(vector<int> &label)
+	SmiTreeNode<T> *find(vector<int> &label)
 	{
 		assert(label.size()>0);
 		SmiTreeNode<T> *n = root_,*next;
-		unsigned int i=1;
+		unsigned int i=0;
 		while ((i<label.size()) && (next=n->getChildByLabel(label[i])))
 		{
 			++i;
 			n=next;
 		}
-		return *n;
+		return n;
 	}
 
 
@@ -257,21 +275,24 @@ public:
 		is assigned to SmiScenarioTree.
 		SmiTreeNodeData elements must be created with "new" operator.
 	*/
-	int addPathtoLeaf(int brscenario, int stage, vector<T> &pathdata)
+	int addPathtoLeaf(int brscenario, int stage, vector<T> &pathdata, unsigned int start=0)
 	{
-		SmiTreeNode<T> *parent = NULL;		
-		if (leaf_.size())
-			parent = &find(brscenario,stage);
-		for ( unsigned int i = 0; i < pathdata.size(); i++)
+		SmiTreeNode<T> *parent = NULL;
+		int scenario=leaf_.size();
+		if (scenario)
+			parent = find(brscenario,stage);
+			
+
+		for (unsigned int i=start; i<pathdata.size(); ++i)
 		{	
 			if (parent)
 			{
-				// no label
-				parent = parent->addChild(pathdata[i]);
+				parent = parent->addChild(pathdata[i],scenario);
 			}
 			else
 			{
 				parent = root_ = new SmiTreeNode<T>(pathdata[0]);
+				root_->setScenario(scenario);
 			}
 			// add data to full node_data array
 			node_data.push_back(pathdata[i]);
@@ -283,32 +304,46 @@ public:
 		return leaf_.size()-1;
 		
 	}
-	/** Add new path from branching node to leaf.
-	    The branching node is the one that has the longest match with incoming label vector.
-		Length of incoming "pathdata" vector is leaf->depth().
+  
+	/** Set child labels */
+	void setChildLabels(SmiTreeNode<T> *n, vector<int> labels)
+	{
+		int t = n->depth();
+		while(n->hasChild())
+		{
+			n->setLastChildLabel(labels[++t]);
+			n = n->getChild();
+		}
+	}
+
+
+    /** Add new path using labels to find branching node.
+	    The length of the incoming path is leaf.depth().
 	    Responsibility for memory management of SmiTreeNodeData elements
 		is assigned to SmiScenarioTree.
 		SmiTreeNodeData elements must be created with "new" operator.
 	*/
-	int addPathtoLeaf(vector<int> &label, vector<T> &pathdata)
+	int addPathtoLeaf(vector<int>labels, vector<T> &pathdata)
 	{
 		SmiTreeNode<T> *parent = NULL;
-		assert(label.size() == pathdata.size());
-		if (leaf_.size())
-			parent = &find(label);
-		int stage=0;
-		if (parent)
-			stage=parent->depth()+1;
+		int scenario=leaf_.size();
+		if (scenario)
+			parent = find(labels);
+			
+		unsigned int i=0;
+		if (parent) i=parent->depth()+1;
 
-		for (unsigned int i=stage ; i < pathdata.size(); i++)
+		for (; i<pathdata.size(); ++i)
 		{	
 			if (parent)
 			{
-				parent = parent->addChild(pathdata[i],label[i]);
+				parent = parent->addChild(pathdata[i],scenario);
+				
 			}
 			else
 			{
 				parent = root_ = new SmiTreeNode<T>(pathdata[0]);
+				root_->setScenario(scenario);
 			}
 			// add data to full node_data array
 			node_data.push_back(pathdata[i]);
@@ -318,10 +353,9 @@ public:
 			leaf_.push_back(parent);			
 		}
 		return leaf_.size()-1;
+		
 	}
-
   //@}
-
 //--------------------------------------------------------------------------
    /**@name Constructors, destructors and major modifying methods*/
    //@{
@@ -329,7 +363,8 @@ public:
 	SmiScenarioTree<T>(): leaf_(0),root_(NULL) {};
 
    /// Destructor 
-   virtual ~SmiScenarioTree<T>() {delete root_;}
+//   virtual ~SmiScenarioTree<T>() {delete root_;}
+	virtual ~SmiScenarioTree<T>() {};
    //@}
 
 private:

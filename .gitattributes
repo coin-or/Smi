@@ -4,6 +4,9 @@
 /Makefile.Smi -text svneol=unset#application/octet-stream
 Test/Makefile -text svneol=unset#application/octet-stream
 Test/Makefile.test -text svneol=unset#application/octet-stream
+include/SmiCoreCombineRule.hpp -text svneol=unset#application/octet-stream
+include/SmiDiscreteDistribution.hpp -text svneol=unset#application/octet-stream
+include/SmiLinearData.hpp -text svneol=unset#application/octet-stream
 include/SmiScenarioTree.hpp -text svneol=unset#application/octet-stream
 include/SmiScnData.hpp -text svneol=unset#application/octet-stream
 include/SmiScnModel.hpp -text svneol=unset#application/octet-stream

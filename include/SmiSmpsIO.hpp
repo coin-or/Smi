@@ -28,8 +28,9 @@ enum SmiSectionType { SMI_NO_SECTION, SMI_NAME_SECTION,
 					  SMI_UNKNOWN_SECTION
 };
 
-enum SmiSmpsType { SMI_SC_CARD, SMI_COLUMN_CARD, SMI_TIME_UNORDERED_CORE_TYPE, 
-	SMI_TIME_ORDERED_CORE_TYPE,SMI_UNKNOWN_MPS_TYPE
+enum SmiSmpsType { SMI_SC_CARD, SMI_COLUMN_CARD, SMI_DISCRETE_DIST, SMI_SMPS_COMBINE_ADD, 
+	SMI_SMPS_COMBINE_REPLACE, SMI_SMPS_COMBINE_UNKNOWN, SMI_UNKNOWN_MPS_TYPE,
+	SMI_TIME_UNORDERED_CORE_TYPE, SMI_TIME_ORDERED_CORE_TYPE
 };
 
 class SmiSmpsCardReader:
@@ -44,6 +45,10 @@ public:
 	  inline const char *periodName (  ) const {return periodName_;};
 	  inline const char *scenarioNew (  ) const {return columnName_;};
 	  inline const char *scenarioAnc (  ) const {return rowName_;};
+
+	  inline void setCoreCombineRule(SmiCoreCombineRule *r){combineRule_=r;}
+	  inline SmiCoreCombineRule *getCoreCombineRule() { return combineRule_;}
+
 	  /// Constructor expects file to be open 
 	  /// This one takes gzFile if fp null
 	  SmiSmpsCardReader( FILE * fp, gzFile gzfp, CoinMpsIO * reader ):CoinMpsCardReader (fp, gzfp,reader ){}
@@ -55,14 +60,15 @@ private:
 	float fvalue_;
 	SmiSectionType smiSection_;
 	SmiSmpsType smiSmpsType_;
+	SmiCoreCombineRule *combineRule_;
 };
 
 class SmiSmpsIO: 
 public CoinMpsIO
 {
 public:
-	int readTimeFile(SmiScnModel *smi,const char *c,const char *ext="time");
-	int readStochFile(SmiScnModel *smi,const char *c,const char *ext="stoch");
+	SmiCoreData * readTimeFile(SmiScnModel *smi,const char *c,const char *ext="time");
+	int readStochFile(SmiScnModel *smi,SmiCoreData *core, const char *c,const char *ext="stoch");
 	inline int getNumStages(){ return nstag_;}
 	inline int *getColumnStages(){ return cstag_;}
 	inline int *getRowStages(){ return rstag_;}	

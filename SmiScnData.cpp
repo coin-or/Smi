@@ -157,6 +157,12 @@ SmiCoreData::gutsOfConstructor(int nrow,int ncol,int nstag,
 		// TODO: specialize this interface for core nodes
 
 
+	cdclo_ = new double*[nstag_];
+	cdcup_ = new double*[nstag_];
+	cdobj_ = new double*[nstag_];
+	cdrlo_ = new double*[nstag_];
+	cdrup_ = new double*[nstag_];
+
 	for (i=0;i<nstag_;i++)
 	{
 	
@@ -167,10 +173,43 @@ SmiCoreData::gutsOfConstructor(int nrow,int ncol,int nstag,
 
 		nodes_.push_back(node);
 
+		int nrow=this->getNumRows(i);
+		int ncol=this->getNumCols(i);
+		int irow=this->getRowStart(i);
+		int icol=this->getColStart(i);
+
+		cdrlo_[i]=node->getRowLower().denseVector(nrow+irow)+irow;
+		cdrup_[i]=node->getRowUpper().denseVector(nrow+irow)+irow;
+		cdclo_[i]=node->getColLower().denseVector(ncol+icol)+icol;
+		cdcup_[i]=node->getColUpper().denseVector(ncol+icol)+icol;
+		cdobj_[i]=node->getObjective().denseVector(ncol+icol)+icol;
+		
 	}
 
 	
 
+}
+
+void SmiCoreData::copyRowLower(double * d,SmiStageIndex t )
+{	
+	CoinDisjointCopyN(cdrlo_[t],this->getNumRows(t),d);
+}
+	
+void SmiCoreData::copyRowUpper(double * d,SmiStageIndex t)
+{	
+	CoinDisjointCopyN(cdrup_[t],this->getNumRows(t),d);
+}
+void SmiCoreData::copyColLower(double * d,SmiStageIndex t)
+{	
+	CoinDisjointCopyN(cdclo_[t],this->getNumCols(t),d);
+}
+void SmiCoreData::copyColUpper(double * d,SmiStageIndex t)
+{	
+	CoinDisjointCopyN(cdcup_[t],this->getNumCols(t),d);
+}
+void SmiCoreData::copyObjective(double * d,SmiStageIndex t)
+{	
+	CoinDisjointCopyN(cdobj_[t],this->getNumCols(t),d);
 }
 
 SmiCoreData::~SmiCoreData()
@@ -185,20 +224,36 @@ SmiCoreData::~SmiCoreData()
 	delete rowEx2In_;
 	delete colIn2Ex_;
 	delete rowIn2Ex_;
+
+	for(int t=0; t<this->getNumStages(); ++t)
+	{
+		int irow=this->getRowStart(t);
+		int icol=this->getColStart(t);
+		cdrlo_[t]-=irow;
+		cdrup_[t]-=irow;
+		cdclo_[t]-=icol;
+		cdcup_[t]-=icol;
+		cdobj_[t]-=icol;
+		delete cdrlo_[t];
+		delete cdrup_[t];
+		delete cdclo_[t];
+		delete cdcup_[t];
+		delete cdobj_[t];
+	}
+	
+	delete cdrlo_;
+	delete cdrup_;
+	delete cdclo_;
+	delete cdcup_;
+	delete cdobj_;
+
+
 }
 
 void 
 SmiNodeData::setCoreNode()
 {
-
 	isCoreNode_=true;
-
-	cdclo_ = dclo_->denseVector(core_->getNumCols())+core_->getColStart(stg_);
-	cdcup_ = dcup_->denseVector(core_->getNumCols())+core_->getColStart(stg_);
-	cdobj_ = dobj_->denseVector(core_->getNumCols())+core_->getColStart(stg_);
-	cdrlo_ = drlo_->denseVector(core_->getNumRows())+core_->getRowStart(stg_);
-	cdrup_ = drup_->denseVector(core_->getNumRows())+core_->getRowStart(stg_);
-
 }
 
 #include <vector>
@@ -214,15 +269,10 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 				 CoinPackedVector *dcup,
 				 CoinPackedVector *dobj,
 				 CoinPackedVector *drlo, 
-				 CoinPackedVector *drup )
+				 CoinPackedVector *drup)
 {
 	// initialize specialized core node info
 	isCoreNode_ = false;
-	cdrlo_= NULL; 
-	cdrup_= NULL;
-	cdobj_= NULL;
-	cdclo_= NULL; 
-	cdcup_= NULL;
 
 	core_ = core;
 	stg_ = stg;
@@ -275,8 +325,8 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 
 	if (dclo && dclo->getNumElements())
 	{
-		this->dclo_ = new CoinPackedVector(false);
-		dclo_->reserve(ncol);
+		//this->dclo_ = new CoinPackedVector(false);
+		this->getMutableColLower().reserve(ncol);
 		ind = dclo->getIndices();
 		elt = dclo->getElements();
 		// TODO: is this a fast way to do this?
@@ -284,198 +334,120 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 		{
 			int icol = ind[i];
 			if ( core->getColStage(icol) == stg)
-				this->dclo_->insert(core->getColInternalIndex(icol),elt[i]);
+				this->getMutableColLower().insert(core->getColInternalIndex(icol),elt[i]);
 		}
 	}
-	else
-		dclo_ = NULL;
+
 	
 	if (dcup && dcup->getNumElements())
 	{
-		this->dcup_ = new CoinPackedVector(false);
-		dcup_->reserve(ncol);
+		//this->dcup_ = new CoinPackedVector(false);
+		this->getMutableColUpper().reserve(ncol);
 		ind = dcup->getIndices();
 		elt = dcup->getElements();
 		for (i=0; i<dcup->getNumElements(); i++)
 		{
 			int icol = ind[i];
 			if ( core->getColStage(icol) == stg)
-				this->dcup_->insert(core->getColInternalIndex(icol),elt[i]);
+				this->getMutableColUpper().insert(core->getColInternalIndex(icol),elt[i]);
 		}
 	}	
-	else
-		dcup_ = NULL;
+
 	
 	if (dobj && dobj->getNumElements())
 	{
-		this->dobj_ = new CoinPackedVector(false);
-		dobj_->reserve(ncol);
+		//this->dobj_ = new CoinPackedVector(false);
+		this->getMutableObjective().reserve(ncol);
 		ind = dobj->getIndices();
 		elt = dobj->getElements();
 		for (i=0; i<dobj->getNumElements(); i++)
 		{
 			int icol = ind[i];
 			if ( core->getColStage(icol) == stg)
-				this->dobj_->insert(core->getColInternalIndex(icol),elt[i]);
+				this->getMutableObjective().insert(core->getColInternalIndex(icol),elt[i]);
 		}
 	}	
-	else
-		dobj_ = NULL;
+
 	
 	if (drlo && drlo->getNumElements())
 	{
-		this->drlo_ = new CoinPackedVector(false);
-		drlo_->reserve(nrow);
+		//this->drlo_ = new CoinPackedVector(false);
+		this->getMutableRowLower().reserve(nrow);
 		ind = drlo->getIndices();
 		elt = drlo->getElements();
 		for (i=0; i<drlo->getNumElements(); i++)
 		{
 			int icol = ind[i];
 			if ( core->getRowStage(icol) == stg)
-				this->drlo_->insert(core->getRowInternalIndex(icol),elt[i]);
+				this->getMutableRowLower().insert(core->getRowInternalIndex(icol),elt[i]);
 		}
 	}
-	else
-		drlo_ = NULL;
+
 
 				
 	if (drup && drup->getNumElements())
 	{
-		this->drup_ = new CoinPackedVector(false);
-		drlo_->reserve(nrow);
+		//this->drup_ = new CoinPackedVector(false);
+
+		this->getMutableRowUpper().reserve(nrow);
 		ind = drup->getIndices();
 		elt = drup->getElements();
 		for (i=0; i<drup->getNumElements(); i++)
 		{
 			int icol = ind[i];
 			if ( core->getRowStage(icol) == stg)
-				this->drup_->insert(core->getRowInternalIndex(icol),elt[i]);
+				this->getMutableRowUpper().insert(core->getRowInternalIndex(icol),elt[i]);
 		}
 	}
-	else
-		drup_ = NULL;
 }
 
-void NodeCopyToDouble(double *d, CoinPackedVector *cpv, int o)
-{	
-	double *cd = cpv->getElements();
-	int *ci = cpv->getIndices();
-	int j=0;
-	while(j < cpv->getNumElements())
-		d[ci[j]-o] = cd[j++];
+
+CoinPackedVector * SmiNodeData::combineWithCoreRow(CoinPackedVector *cr, CoinPackedVector *nr)
+{
+	return getCoreCombineRule()->Process(cr,nr);
+}
+
+void SmiNodeData::combineWithCoreDoubleArray(double *d_out, const CoinPackedVector &cpv, int o)
+{
+	if (!isCoreNode_)
+		getCoreCombineRule()->Process(d_out,o,cpv);
 }
 
 void SmiNodeData::copyRowLower(double * drlo)
 {
-	if (isCoreNode_)
-	{
-		CoinDisjointCopyN(cdrlo_,core_->getNumRows(stg_),drlo);
-	}
-	else
-	{
-		SmiNodeData *cnode = core_->getNode(stg_);
-		cnode->copyRowLower(drlo);
-		if (drlo_)
-			NodeCopyToDouble(drlo,drlo_,core_->getRowStart(stg_));
-	}
+	int t=getStage();
+	getCore()->copyRowLower(drlo,t);
+	combineWithCoreDoubleArray(drlo,getRowLower(),getCore()->getRowStart(t));	
 }
 
-void SmiNodeData::copyRowUpper(double * drup){
-	if (isCoreNode_)
-	{
-		CoinDisjointCopyN(cdrup_,core_->getNumRows(stg_),drup);
-	}
-	else
-	{
-		SmiNodeData *cnode = core_->getNode(stg_);
-		cnode->copyRowUpper(drup);
-		if (drup_)
-			NodeCopyToDouble(drup,drup_,core_->getRowStart(stg_));
-	}
+void SmiNodeData::copyRowUpper(double * d){
+	int t=getStage();
+	getCore()->copyRowUpper(d,t);
+	combineWithCoreDoubleArray(d,getRowUpper(),getCore()->getRowStart(t));
 }
 
-void SmiNodeData::copyColLower(double * dclo){
-	if (isCoreNode_)
-	{
-		CoinDisjointCopyN(cdclo_,core_->getNumCols(stg_),dclo);
-	}
-	else
-	{
-		SmiNodeData *cnode = core_->getNode(stg_);
-		cnode->copyColLower(dclo);
-		if (dclo_)
-			NodeCopyToDouble(dclo,dclo_,core_->getColStart(stg_));
-	}
+void SmiNodeData::copyColLower(double * d){
+	int t=getStage();
+	getCore()->copyColLower(d,t);
+	combineWithCoreDoubleArray(d,getColLower(),getCore()->getColStart(t));
 }
 
-void SmiNodeData::copyColUpper(double * dcup){
-	if (isCoreNode_)
-	{
-		CoinDisjointCopyN(cdcup_,core_->getNumCols(stg_),dcup);
-	}
-	else
-	{
-		SmiNodeData *cnode = core_->getNode(stg_);
-		cnode->copyColUpper(dcup);
-		if (dcup_)
-			NodeCopyToDouble(dcup,dcup_,core_->getColStart(stg_));
-	}
+void SmiNodeData::copyColUpper(double * d){
+	int t=getStage();
+	getCore()->copyColUpper(d,t);
+	combineWithCoreDoubleArray(d,getColUpper(),getCore()->getColStart(t));
 }
 
-void SmiNodeData::copyObjCoefficients(double * dobj){
-	if (isCoreNode_)
-	{
-		CoinDisjointCopyN(cdobj_,core_->getNumCols(stg_),dobj);
-	}
-	else
-	{
-		SmiNodeData *cnode = core_->getNode(stg_);
-		cnode->copyObjCoefficients(dobj);
-		if (dobj_)
-			NodeCopyToDouble(dobj,dobj_,core_->getColStart(stg_));
-	}
+void SmiNodeData::copyObjective(double * d){
+	int t=getStage();
+	getCore()->copyObjective(d,t);
+	combineWithCoreDoubleArray(d,getObjective(),getCore()->getColStart(t));
 }
 
 
 SmiNodeData::~SmiNodeData()
 {
 
-	if (dclo_)
-		delete dclo_;
-	if (dcup_)
-		delete dcup_;
-	if (dobj_)
-		delete dobj_;
-	if (drlo_)
-		delete drlo_;
-	if (drup_)
-		delete drup_;
-
-	if (cdclo_)
-	{
-		cdclo_ -= core_->getColStart(stg_);
-		delete cdclo_;
-	}
-	if (cdcup_)
-	{
-		cdcup_ -= core_->getColStart(stg_);
-		delete cdcup_;
-	}
-	if (cdobj_)
-	{
-		cdobj_ -= core_->getColStart(stg_);
-		delete cdobj_;
-	}
-	if (cdrlo_)
-	{
-		cdrlo_ -= core_->getRowStart(stg_);
-		delete cdrlo_;
-	}
-	if (cdrup_)
-	{
-		cdrup_ -= core_->getRowStart(stg_);
-		delete cdrup_;
-	}
-
+	
 }
 

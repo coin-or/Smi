@@ -13,6 +13,7 @@ LIBSRC :=
 LIBSRC += SmiScnModel.cpp
 LIBSRC += SmiScnData.cpp
 LIBSRC += SmiSmpsIO.cpp
+LIBSRC += SmiCoreCombineRule.cpp
 
 ##############################################################################
 # You should not need to edit below this line.

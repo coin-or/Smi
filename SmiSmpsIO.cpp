@@ -11,6 +11,7 @@
 
 #include "CoinMpsIO.hpp"
 #include "CoinMessage.hpp"
+#include "CoinError.hpp"
 
 
 #if 1
@@ -19,14 +20,14 @@ const static char *section[] = {
 };
 
 const static char *smpsType[] = {
-	"SC","  ",""
+	"SC","  ","DISCRETE","ADD","REPLACE",""
 };
 #endif
 
 
 //#############################################################################
 
-int
+SmiCoreData *
 SmiSmpsIO::readTimeFile(SmiScnModel *smi, const char *c, const char *ext)
 {
 
@@ -34,7 +35,7 @@ SmiSmpsIO::readTimeFile(SmiScnModel *smi, const char *c, const char *ext)
 	gzFile gzfp=NULL;
 	int returnCode = this->dealWithFileName(c,ext,fp,gzfp);
 	if (returnCode<0){
-		return -1;
+		return NULL;
 	}
 	else if (returnCode>0) {
 //		delete cardReader_;
@@ -60,7 +61,7 @@ SmiSmpsIO::readTimeFile(SmiScnModel *smi, const char *c, const char *ext)
 			handler_->message(COIN_MPS_BADFILE2,messages_)<<CoinMessageEol;
 		
 #endif
-		return -2;
+		return NULL;
 	} else if ( smpsCardReader_->whichSection (  ) != COIN_EOF_SECTION ) {
 		// save name of section
 		free(problemName_);
@@ -68,7 +69,7 @@ SmiSmpsIO::readTimeFile(SmiScnModel *smi, const char *c, const char *ext)
 	} else {
 		handler_->message(COIN_MPS_EOF,messages_)<<fileName_
 			<<CoinMessageEol;
-		return -3;
+		return NULL;
 	}
 
 	if (iftime)
@@ -76,7 +77,7 @@ SmiSmpsIO::readTimeFile(SmiScnModel *smi, const char *c, const char *ext)
 		int rowEnd, rowStart = 0;
 		int colEnd, colStart = 0;
 		if (	smpsCardReader_->nextSmpsField() != SMI_TIME_SECTION ) // PERIODS card
-			return -1;
+			return NULL;
 	
 		if (	smpsCardReader_->nextSmpsField() == SMI_TIME_SECTION ) // first period
 		{
@@ -86,11 +87,11 @@ SmiSmpsIO::readTimeFile(SmiScnModel *smi, const char *c, const char *ext)
 			periodMap_.insert(make_pair(smpsCardReader_->periodName(),nstag_));
 		}
 		else
-			return -1;
+			return NULL;
 
 		// don't handle the unordered case yet
 		if (smpsCardReader_->whichSmpsType() != SMI_TIME_ORDERED_CORE_TYPE)
-			return -1;
+			return NULL;
 
 		while( smpsCardReader_->nextSmpsField (  ) == SMI_TIME_SECTION ) 
 		{
@@ -112,7 +113,7 @@ SmiSmpsIO::readTimeFile(SmiScnModel *smi, const char *c, const char *ext)
 				rowStart = rowEnd;
 			}
 			else
-				return -1;
+				return NULL;
 		}
 		
 		if ( smpsCardReader_->whichSmpsSection() == SMI_ENDATA_SECTION
@@ -126,22 +127,22 @@ SmiSmpsIO::readTimeFile(SmiScnModel *smi, const char *c, const char *ext)
 				rstag_[i]=nstag_;
 		}
 		else
-			return -1;
+			return NULL;
 
 	}
 
 
 	SmiCoreData *smiCoreData = new SmiCoreData(this,nstag_+1,cstag_,rstag_);
-	smi->setCore(smiCoreData);
-	return 0;
+	return smiCoreData;
+
 }
 
 //#############################################################################
 
 int
-SmiSmpsIO::readStochFile(SmiScnModel *smi, const char *c, const char *ext)
+SmiSmpsIO::readStochFile(SmiScnModel *smi,SmiCoreData *core, const char *c, const char *ext)
 {
-
+	
 	FILE *fp=NULL;
 	gzFile gzfp=NULL;
 	int returnCode = this->dealWithFileName(c,ext,fp,gzfp);
@@ -194,8 +195,8 @@ SmiSmpsIO::readStochFile(SmiScnModel *smi, const char *c, const char *ext)
 			CoinPackedMatrix *matrix = new CoinPackedMatrix(false,0.25,0.25);
 			assert(!matrix->isColOrdered());
 
-			int nrow = smi->getCore(0)->getNumRows();
-			int ncol = smi->getCore(0)->getNumCols();
+			int nrow = core->getNumRows();
+			int ncol = core->getNumCols();
 			matrix->setDimensions(nrow,ncol);
 
 			while( smpsCardReader_->nextSmpsField (  ) == SMI_SCENARIOS_SECTION ) 
@@ -205,7 +206,7 @@ SmiSmpsIO::readStochFile(SmiScnModel *smi, const char *c, const char *ext)
 					if (scen)
 					{
 						
-						smi->genScenarioReplaceCoreValues(0,matrix,&dclo,&dcup,&dobj,&drlo,&drup,branch,anc,prob);
+						smi->generateScenario(core,matrix,&dclo,&dcup,&dobj,&drlo,&drup,branch,anc,prob,smpsCardReader_->getCoreCombineRule() );
 						matrix->clear();
 						dclo.clear();
 						dcup.clear();
@@ -277,7 +278,7 @@ SmiSmpsIO::readStochFile(SmiScnModel *smi, const char *c, const char *ext)
 					if (scen)
 					{
 						
-						smi->genScenarioReplaceCoreValues(0,matrix,&dclo,&dcup,&dobj,&drlo,&drup,branch,anc,prob);
+						smi->generateScenario(core,matrix,&dclo,&dcup,&dobj,&drlo,&drup,branch,anc,prob,smpsCardReader_->getCoreCombineRule() );
 						
 					}
 				}
@@ -467,11 +468,13 @@ SmiSmpsCardReader::nextSmpsField (  )
 		  return smiSection_;
 
 	  } else if ( card_[0] != '*' ) {
-		  // not a comment
+		  // not a comment, might be a section
 		  int i;
 		  
 		  handler_->message(COIN_MPS_LINE,messages_)<<cardNumber_
 			  <<card_<<CoinMessageEol;
+
+		  // find the section, if there is one
 		  for ( i = SMI_NAME_SECTION; i < SMI_UNKNOWN_SECTION; i++ ) {
 			  if ( !strncmp ( card_, section[i], strlen ( section[i] ) ) ) {
 				  break;
@@ -480,6 +483,47 @@ SmiSmpsCardReader::nextSmpsField (  )
 		  position_ = card_;
 		  eol_ = card_;
 		  smiSection_ = ( SmiSectionType ) i;
+
+		  // if its a scenario card, need to process some more info
+		  if (smiSection_ == SMI_SCENARIOS_SECTION)
+		  {
+			  next = strtok(position_,blanks);
+			  
+			  if (!(next = strtok(NULL,blanks)))
+			  {
+				  smiSmpsType_ = SMI_UNKNOWN_MPS_TYPE;
+				  break;
+			  }
+			  // find the section, if there is one
+			  // next card should be DISCRETE
+			  if (!(next = strtok(NULL,blanks)))
+			  {
+				  smiSmpsType_ = SMI_UNKNOWN_MPS_TYPE;
+				  break;
+			  }
+			  // find the section, if there is one
+			  
+			  for ( i = SMI_SMPS_COMBINE_ADD; i < SMI_SMPS_COMBINE_UNKNOWN; i++ ) {
+				  if ( !strncmp ( next, smpsType[i], strlen ( section[i] ) ) ) {
+					  break;
+				  }
+			  }
+			  
+			  switch(i)
+			  {
+			  case SMI_SMPS_COMBINE_ADD:
+				  this->setCoreCombineRule(SmiCoreCombineAdd::Instance());
+				  break;
+			  case SMI_SMPS_COMBINE_REPLACE:
+				  this->setCoreCombineRule(SmiCoreCombineReplace::Instance());
+				  break;
+			  default:
+				  this->setCoreCombineRule(SmiCoreCombineReplace::Instance());
+				  // MESSAGE
+				  printf(" Smps: setting default core combine rule to Replace\n");
+			  }
+			  
+		  }
 		  return smiSection_;
 	  } else {
 		  // comment
