@@ -32,7 +32,7 @@ using namespace std;
 
 template <class T> 
 class SmiTreeNode  {
-   friend void SmiTreeNodeUnitTest();
+   //friend void SmiTreeNodeUnitTest();
 public:
 
 	typedef map<int,SmiTreeNode<T>*> child_label_map;
@@ -167,7 +167,7 @@ SmiTreeNodeUnitTest();
 
 template<class T>
 class SmiScenarioTree  {
-   friend void SmiScenarioTreeUnitTest();
+   //friend void SmiScenarioTreeUnitTest();
 public:
 
 //---------------------------------------------------------------------------
