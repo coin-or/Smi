@@ -306,7 +306,6 @@ SmiTreeNodeUnitTest()
 	vector<SmiTreeNode<int *> *> vec1 = n1->getChildren();
 	assert (vec1[0] == n2 );
 	assert (vec1[1] == n3 );
-
 }
 
 
@@ -866,7 +865,18 @@ void SmiScnModelScenarioUnitTest()
 
 //	fclose(fp);
 	assert(fabs(smiOsi->getObjValue()-objSum) < 0.01);
-
+        free (incr);
+        free (indx);
+	free( mrow) ;
+	free( mcol) ;
+	free( drlo) ;
+	free( drup) ;
+	free( rstg) ;
+	free( dclo) ;
+	free( dcup) ;
+	free( dobj) ;
+	free( cstg) ;
+        delete smiModel;
 }
 
 //forward declarations
@@ -1383,6 +1393,13 @@ smiModel->processDiscreteDistributionIntoScenarios(smiDD);
 	}
 
 	delete incr;
+	free( drlo) ;
+	free( drup) ;
+	free( rstg) ;
+	free( dclo) ;
+	free( dcup) ;
+	free( dobj) ;
+	free( cstg) ;
 }
 
 	
@@ -1447,7 +1464,7 @@ smiModel->processDiscreteDistributionIntoScenarios(smiDD);
 	assert(fabs(smiOsi->getObjValue()-objSum) < 0.01);
 
 	printf(" *** Completed all tests for SmiScnModel.\n");
-
+        delete smiModel;
 }
 
 int main()

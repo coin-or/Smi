@@ -33,19 +33,19 @@ SmiScnModel::~SmiScnModel()
 		delete core_;
 	
 	if (drlo_)
-		delete drlo_;
+		delete [] drlo_;
 	
 	if (drup_)
-		delete drup_;
+		delete [] drup_;
 	
 	if (dclo_)
-		delete dclo_;
+		delete [] dclo_;
 	
 	if (dcup_)
-		delete dcup_;
+		delete [] dcup_;
 
 	if (dobj_)
-		delete dobj_;
+		delete [] dobj_;
 
 	if (matrix_)
 		delete matrix_;
@@ -465,6 +465,25 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 	
 	
 	SmiTreeNode<SmiScnNode *> *root = this->smiTree_.getRoot();
+        {
+          printf("start depth of root is %d and size of label is %d\n",
+                 root->depth(),label.size());
+          SmiTreeNode<SmiScnNode *> *n = root;
+          int t = n->depth();
+          //t--; // ??? so works
+          while(n->hasChild())
+            {
+              //n->setLastChildLabel(labels[++t]);
+              ++t;
+              printf("value of t %d\n",t);
+              if (t<label.size()) {
+                n = n->getChild();
+              } else {
+                printf("ouch\n");
+                break;
+              }
+            }
+        }
 	this->smiTree_.setChildLabels(root,label);
 	
 	/* sample space increment initialized to 1 */
@@ -539,7 +558,7 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 		
 	}
 	
-	delete incr;
+	free (incr);
 }
 
 
