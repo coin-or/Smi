@@ -31,16 +31,14 @@ SmiCoreData *
 SmiSmpsIO::readTimeFile(SmiScnModel *smi, const char *c, const char *ext)
 {
 
-	FILE *fp=NULL;
-	gzFile gzfp=NULL;
-	int returnCode = this->dealWithFileName(c,ext,fp,gzfp);
-	if (returnCode<0){
-		return NULL;
-	}
-	else if (returnCode>0) {
-//		delete cardReader_;
-		smpsCardReader_ = new SmiSmpsCardReader ( fp , gzfp, this);
-	}
+        CoinFileInput *input = 0;
+        int returnCode = dealWithFileName(c,ext,input);
+        if (returnCode<0) {
+          return NULL;
+        } else if (returnCode>0) {
+          // delete cardReader_;
+          smpsCardReader_ = new SmiSmpsCardReader ( input, this);
+        }
 	
 	smpsCardReader_->readToNextSection();
 	if ( smpsCardReader_->whichSection (  ) == COIN_NAME_SECTION ) {
@@ -143,16 +141,14 @@ int
 SmiSmpsIO::readStochFile(SmiScnModel *smi,SmiCoreData *core, const char *c, const char *ext)
 {
 	
-	FILE *fp=NULL;
-	gzFile gzfp=NULL;
-	int returnCode = this->dealWithFileName(c,ext,fp,gzfp);
-	if (returnCode<0){
-		return -1;
-	}
-	else if (returnCode>0) {
-		delete smpsCardReader_;
-		smpsCardReader_ = new SmiSmpsCardReader ( fp , gzfp, this);
-	}
+        CoinFileInput *input = 0;
+        int returnCode = dealWithFileName(c,ext,input);
+        if (returnCode<0) {
+          return -1;
+        } else if (returnCode>0) {
+          delete smpsCardReader_;
+          smpsCardReader_ = new SmiSmpsCardReader ( input, this);
+        }
 	
 	smpsCardReader_->readToNextSection();
 	if ( smpsCardReader_->whichSection (  ) == COIN_NAME_SECTION ) {

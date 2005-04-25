@@ -10,6 +10,7 @@
 #endif
 
 #include "CoinMpsIO.hpp"
+#include "CoinFileIO.hpp"
 #include "SmiScnModel.hpp"
 #include "SmiScnData.hpp"
 #include "SmiScenarioTree.hpp"
@@ -51,7 +52,7 @@ public:
 
 	  /// Constructor expects file to be open 
 	  /// This one takes gzFile if fp null
-	  SmiSmpsCardReader( FILE * fp, gzFile gzfp, CoinMpsIO * reader ):CoinMpsCardReader (fp, gzfp,reader ){}
+	  SmiSmpsCardReader( CoinFileInput *input, CoinMpsIO * reader ):CoinMpsCardReader (input,reader ){}
 
 	  ~SmiSmpsCardReader(){}
 private:
