@@ -61,9 +61,14 @@ public:
 		hack the method yourself.
 		The files can be compressed. The object that reads the files is
 		derived from CoinMpsIO.
-	*/
-	int readSmps(const char *name);
+		
+		  The optional argument SmiCoreCombineRule allows user to pass in
+		a class to override the default methods to combine core and stochastic data.
 
+	*/
+	int readSmps(const char *name, SmiCoreCombineRule *r=NULL);
+
+	SmiCoreData * getCore() {return core_;}
 
 	/**@name Direct methods.
 		
@@ -129,6 +134,20 @@ public:
 				SmiStageIndex branch, SmiScenarioIndex anc, double prob,
 				SmiCoreCombineRule *r = SmiCoreCombineReplace::Instance())
 				throw(CoinError);
+
+	/**@name loadOsiSolverData
+		
+		Loads deterministic equivalent model into internal osi data structures
+		and return handle.
+
+		Note: this uses a callback class SmiCoreCombineRule to decide how to combine
+		the core and stochastic data. The user can override the default
+		methods when the scenario is generated (see SmiScnModel::generateScenario)
+		or when SMPS files are processed (see SmiScnModel::readSmps).
+
+    */
+	OsiSolverInterface * loadOsiSolverData();
+
 //@}
 		
 	// get scenario problem data
@@ -150,8 +169,6 @@ public:
 	}
 	OsiSolverInterface * getOsiSolverInterface();
 
-	// load det equiv model into osi and return handle
-	OsiSolverInterface * loadOsiSolverData();
 
 	// constructor 
 	SmiScnModel(): 

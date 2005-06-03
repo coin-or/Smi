@@ -353,10 +353,13 @@ SmiScnModel::getRowSolution(int ns)
 }
 
 int
-SmiScnModel::readSmps(const char *c)
+SmiScnModel::readSmps(const char *c, SmiCoreCombineRule *r)
 {
 
 	SmiSmpsIO smiSmpsIO;
+
+	if (r != NULL)
+		smiSmpsIO.setCoreCombineRule(r);
 
 	if (smiSmpsIO.readMps(c,"core")<0)
 		return -1;

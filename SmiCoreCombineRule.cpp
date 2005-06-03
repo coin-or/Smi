@@ -19,7 +19,7 @@ SmiCoreCombineReplace* SmiCoreCombineReplace::Instance()
 	return _instance;
 }
 
-CoinPackedVector *  SmiCoreCombineReplace::Process(CoinPackedVector *cr,CoinPackedVector *nr)
+CoinPackedVector *  SmiCoreCombineReplace::Process(CoinPackedVector *cr,CoinPackedVector *nr, char *type)
 {	
 	
 	
@@ -71,7 +71,7 @@ CoinPackedVector *  SmiCoreCombineReplace::Process(CoinPackedVector *cr,CoinPack
 	
 }
 
-void SmiCoreCombineReplace::Process(double *d, int o, const CoinPackedVector &cpv)
+void SmiCoreCombineReplace::Process(double *d, int o, const CoinPackedVector &cpv, char *type)
 {
 	const double *cd = cpv.getElements();
 	const int *ci = cpv.getIndices();
@@ -95,7 +95,7 @@ SmiCoreCombineAdd* SmiCoreCombineAdd::Instance()
 	return _instance;
 }
 
-CoinPackedVector *SmiCoreCombineAdd::Process(CoinPackedVector *cr,CoinPackedVector *nr)
+CoinPackedVector *SmiCoreCombineAdd::Process(CoinPackedVector *cr,CoinPackedVector *nr, char *type)
 {
 	CoinPackedVector *newrow=NULL;
 
@@ -118,7 +118,7 @@ CoinPackedVector *SmiCoreCombineAdd::Process(CoinPackedVector *cr,CoinPackedVect
 	return newrow;
 }
 
-void SmiCoreCombineAdd::Process(double *d1, int o1, const CoinPackedVector &cpv2)
+void SmiCoreCombineAdd::Process(double *d1, int o1, const CoinPackedVector &cpv2, char *type)
 {
 	const double *cd = cpv2.getElements();
 	const int *ci = cpv2.getIndices();

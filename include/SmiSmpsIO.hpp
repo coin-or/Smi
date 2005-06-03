@@ -47,12 +47,13 @@ public:
 	  inline const char *scenarioNew (  ) const {return columnName_;};
 	  inline const char *scenarioAnc (  ) const {return rowName_;};
 
-	  inline void setCoreCombineRule(SmiCoreCombineRule *r){combineRule_=r;}
+	  inline void setCoreCombineRule(SmiCoreCombineRule *r){combineRule_=r;combineRuleSet=true;}
 	  inline SmiCoreCombineRule *getCoreCombineRule() { return combineRule_;}
 
 	  /// Constructor expects file to be open 
 	  /// This one takes gzFile if fp null
-	  SmiSmpsCardReader( CoinFileInput *input, CoinMpsIO * reader ):CoinMpsCardReader (input,reader ){}
+	  SmiSmpsCardReader( CoinFileInput *input, CoinMpsIO * reader ):CoinMpsCardReader (input,reader ),
+		combineRuleSet(false){}
 
 	  ~SmiSmpsCardReader(){}
 private:
@@ -62,6 +63,7 @@ private:
 	SmiSectionType smiSection_;
 	SmiSmpsType smiSmpsType_;
 	SmiCoreCombineRule *combineRule_;
+	bool combineRuleSet;
 };
 
 class SmiSmpsIO: 
@@ -70,11 +72,14 @@ public CoinMpsIO
 public:
 	SmiCoreData * readTimeFile(SmiScnModel *smi,const char *c,const char *ext="time");
 	int readStochFile(SmiScnModel *smi,SmiCoreData *core, const char *c,const char *ext="stoch");
+    
+	inline void setCoreCombineRule(SmiCoreCombineRule *r){combineRule_=r; combineRuleSet=true;}
+    inline SmiCoreCombineRule *getCoreCombineRule() { return combineRule_;}
 	inline int getNumStages(){ return nstag_;}
 	inline int *getColumnStages(){ return cstag_;}
 	inline int *getRowStages(){ return rstag_;}	
 public:
-	SmiSmpsIO():CoinMpsIO(),nstag_(0),cstag_(NULL),rstag_(NULL),iftime(false){}
+	SmiSmpsIO():CoinMpsIO(),nstag_(0),cstag_(NULL),rstag_(NULL),iftime(false),combineRuleSet(false){}
 	~SmiSmpsIO(){delete [] cstag_;delete[] rstag_;}
 private:
 	int nstag_;
@@ -85,6 +90,8 @@ private:
 	StringIntMap scenarioMap_;
 	bool iftime,ifstoch;
 	SmiSmpsCardReader *smpsCardReader_;
+	SmiCoreCombineRule *combineRule_;
+	bool combineRuleSet;
 	
 };
 

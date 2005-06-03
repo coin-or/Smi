@@ -21,6 +21,7 @@
 #endif // _MSC_VER > 1000
 
 #include "CoinPackedVector.hpp"
+#include <string>
 
 //////////////////////////////////////////////////////////////////////
 // SmiCoreCombineRule
@@ -29,8 +30,8 @@
 class SmiCoreCombineRule  
 {
 public:
-	virtual void Process(double *d1, int o1, const CoinPackedVector &cpv2)=0;
-	virtual CoinPackedVector * Process(CoinPackedVector *cpv1, CoinPackedVector *cpv2)=0;
+	virtual void Process(double *d1, int o1, const CoinPackedVector &cpv2, char *type=0)=0;
+	virtual CoinPackedVector * Process(CoinPackedVector *cpv1, CoinPackedVector *cpv2, char *type=0)=0;
 	virtual ~SmiCoreCombineRule(){};
 };
 
@@ -42,8 +43,8 @@ class SmiCoreCombineReplace : public SmiCoreCombineRule
 {
 public:
 	static SmiCoreCombineReplace * Instance();
-	virtual void Process(double *d1, int o1, const CoinPackedVector &cpv2);
-	virtual CoinPackedVector * Process(CoinPackedVector *cpv1, CoinPackedVector *cpv2);
+	virtual void Process(double *d1, int o1, const CoinPackedVector &cpv2, char *type=0);
+	virtual CoinPackedVector * Process(CoinPackedVector *cpv1, CoinPackedVector *cpv2, char *type=0);
 protected:
 	SmiCoreCombineReplace(){}
 private:
@@ -58,8 +59,8 @@ class SmiCoreCombineAdd : public SmiCoreCombineRule
 {
 public:
 	static SmiCoreCombineAdd * Instance();
-	virtual void Process(double *d1, int o1, const CoinPackedVector &cpv2);
-	virtual CoinPackedVector * Process(CoinPackedVector *cpv1, CoinPackedVector *cpv2);
+	virtual void Process(double *d1, int o1, const CoinPackedVector &cpv2, char* type=0);
+	virtual CoinPackedVector * Process(CoinPackedVector *cpv1, CoinPackedVector *cpv2, char* type=0);
 protected:
 	SmiCoreCombineAdd(){}
 private:

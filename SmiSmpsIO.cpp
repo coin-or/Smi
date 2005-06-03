@@ -148,6 +148,8 @@ SmiSmpsIO::readStochFile(SmiScnModel *smi,SmiCoreData *core, const char *c, cons
         } else if (returnCode>0) {
           delete smpsCardReader_;
           smpsCardReader_ = new SmiSmpsCardReader ( input, this);
+		  if(combineRuleSet)
+			  smpsCardReader_->setCoreCombineRule(combineRule_);
         }
 	
 	smpsCardReader_->readToNextSection();
@@ -500,6 +502,9 @@ SmiSmpsCardReader::nextSmpsField (  )
 				  }
 			  }
 			  
+			  // set combine rule if it is not already set.
+			  if (!combineRuleSet)
+			  {
 			  switch(i)
 			  {
 			  case SMI_SMPS_COMBINE_ADD:
@@ -512,6 +517,7 @@ SmiSmpsCardReader::nextSmpsField (  )
 				  this->setCoreCombineRule(SmiCoreCombineReplace::Instance());
 				  // MESSAGE
 				  printf(" Smps: setting default core combine rule to Replace\n");
+			  }
 			  }
 			  
 		  }

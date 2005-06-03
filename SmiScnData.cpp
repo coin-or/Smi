@@ -276,7 +276,10 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 
 	core_ = core;
 	stg_ = stg;
-	nels_ = matrix->getNumElements();
+	if (matrix)
+		nels_ = matrix->getNumElements();
+	else
+		nels_ = 0;
 
 	int i;
 	int nrow = core->getNumRows(stg_);
