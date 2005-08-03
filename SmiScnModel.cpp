@@ -27,7 +27,8 @@ SmiScnNode::getCoreRowIndex(int i){
 
 SmiScnModel::~SmiScnModel()
 {
-	delete osiStoch_;
+	if (osiStoch_)
+		delete osiStoch_;
 	
 	if (core_)
 		delete core_;

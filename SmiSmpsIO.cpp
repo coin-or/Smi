@@ -233,7 +233,11 @@ SmiSmpsIO::readStochFile(SmiScnModel *smi,SmiCoreData *core, const char *c, cons
 					
 					if (j<0) // check RHS
 					{
-						assert(!strcmp(smpsCardReader_->columnName(),this->getRhsName()));
+						if (!strcmp(this->getRhsName(),"")) {
+							 free(rhsName_);
+		 					 rhsName_=strdup(smpsCardReader_->columnName());
+						} else
+							assert(!strcmp(smpsCardReader_->columnName(),this->getRhsName()));
 						assert(!(i<0));
 
 						char c=this->getRowSense()[i];
@@ -255,7 +259,7 @@ SmiSmpsIO::readStochFile(SmiScnModel *smi,SmiCoreData *core, const char *c, cons
 							break;
 						}
 					}
-					else if(i<0) // check OBJ
+					else if(i<0 || i==getNumRows()) // check OBJ
 					{
 						assert(!strcmp(smpsCardReader_->rowName(),this->getObjectiveName()));
 						dobj.insert(j,value);
