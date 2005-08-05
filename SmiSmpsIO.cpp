@@ -454,7 +454,8 @@ SmiSmpsCardReader::nextSmpsField (  )
 				  if (!(next = strtok(NULL,blanks)))
 					  position_ = eol_;
 				  else
-					  strcpy(next,periodName_); // store it here until next time
+					  // strcpy(next,periodName_); // store it here until next time
+					  strcpy(periodName_,next); // store it here until next time
 				  break;
 			  default:
 				  assert(smiSmpsType_ == SMI_UNKNOWN_MPS_TYPE);
