@@ -480,7 +480,7 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
               //n->setLastChildLabel(labels[++t]);
               ++t;
               printf("value of t %d\n",t);
-              if (t<label.size()) {
+              if (t< (int) label.size()) {
                 n = n->getChild();
               } else {
                 printf("ouch\n");

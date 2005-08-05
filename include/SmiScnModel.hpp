@@ -172,6 +172,7 @@ public:
 
 	// constructor 
 	SmiScnModel(): 
+		osiStoch_(NULL),
 		drlo_(NULL), drup_(NULL), dobj_(NULL), dclo_(NULL), dcup_(NULL), matrix_(NULL),
 		solve_synch_(false),totalProb_(0),core_(NULL)
 	{ }
