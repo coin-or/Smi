@@ -303,9 +303,10 @@ SmiTreeNodeUnitTest()
 	// last element of same level list
 	assert( !n4->hasSibling());
 
-	vector<SmiTreeNode<int *> *> vec1 = n1->getChildren();
-	assert (vec1[0] == n2 );
-	assert (vec1[1] == n3 );
+	vector<SmiTreeNode<int *> *> *vec1 = n1->getChildren();
+	assert ((*vec1)[0] == n2 );
+	assert ((*vec1)[1] == n3 );
+	delete vec1;
 }
 
 
