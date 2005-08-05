@@ -43,7 +43,7 @@ class SmiScnNode;
 	smi.setOsiSolverHandle(OsiClpSolverInterface());
 	OsiSolverInterface *osiStoch = smi.loadOsiSolverData();
 	osiStoch->initialSolve();
-	\encode
+	\endcode
 
 	The setOsiSolverHandle method allows the user to pass in any OSI
 	compatible solver.
