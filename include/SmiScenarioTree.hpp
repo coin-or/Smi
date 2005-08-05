@@ -90,7 +90,11 @@ public:
 	{
 		SmiTreeNode<T> *pnode = this;
 		int i = this->numChildren();
-		if (i=0) return NULL;
+		if (i==0){
+			vector<SmiTreeNode<T> *> *vec = new vector<SmiTreeNode<T> *>(1);
+			(*vec)[0] = NULL;
+			return *vec;
+		}
 		vector<SmiTreeNode<T> *> *vec = new vector<SmiTreeNode<T> *>(i);
 		(*vec)[--i] = pnode = pnode->getChild();
 		while (i>0)
