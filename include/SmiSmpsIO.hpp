@@ -58,7 +58,7 @@ public:
 	  ~SmiSmpsCardReader(){}
 private:
 	 /// Current third name (for SmpsIO)
-	char periodName_[MAX_FIELD_LENGTH];
+	char periodName_[COIN_MAX_FIELD_LENGTH];
 	float fvalue_;
 	SmiSectionType smiSection_;
 	SmiSmpsType smiSmpsType_;

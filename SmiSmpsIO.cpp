@@ -310,7 +310,7 @@ SmiSmpsCardReader::nextSmpsField (  )
   char *next = position_;
 
   static const char *blanks = (const char *) " \t";
-  char valstr[MAX_FIELD_LENGTH],*after;
+  char valstr[COIN_MAX_FIELD_LENGTH],*after;
   
   while ( next != eol_ ) {
     if ( *next == ' ' || *next == '\t' ) {
