@@ -317,7 +317,7 @@ void SmiScnSmpsIOUnitTest()
 	{
 		// test SMPS files app0110R
 		SmiScnModel smi;	
-		smi.readSmps("../../Mps/Stochastic/app0110R");		
+		smi.readSmps("../../Data/Stochastic/app0110R");		
 		OsiClpSolverInterface *clp = new OsiClpSolverInterface();
 		smi.setOsiSolverHandle(*clp);	
 		OsiSolverInterface *osiStoch = smi.loadOsiSolverData();
@@ -335,7 +335,7 @@ void SmiScnSmpsIOUnitTest()
 	{
 		// test SMPS files app0110 -- ADD scenario values
 		SmiScnModel smi;	
-		smi.readSmps("../../Mps/Stochastic/app0110");		
+		smi.readSmps("../../Data/Stochastic/app0110");		
 		OsiClpSolverInterface *clp = new OsiClpSolverInterface();
 		smi.setOsiSolverHandle(*clp);	
 		OsiSolverInterface *osiStoch = smi.loadOsiSolverData();
@@ -353,7 +353,7 @@ void SmiScnSmpsIOUnitTest()
 		// test SMPS files from Watson test suite (Cambridge, UK)
 		
 		SmiScnModel smi;
-		smi.readSmps("../../Mps/Stochastic/wat_10_C_32");
+		smi.readSmps("../../Data/Stochastic/wat_10_C_32");
 		OsiClpSolverInterface *clp = new OsiClpSolverInterface();
 		smi.setOsiSolverHandle(*clp);	
 		OsiSolverInterface *osiStoch = smi.loadOsiSolverData();

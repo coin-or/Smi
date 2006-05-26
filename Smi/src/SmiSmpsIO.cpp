@@ -9,6 +9,9 @@
 #include <cstdio>
 #include <iostream>
 
+// In CoinUtilsConfig.h the COIN_HAS_ZLIB macro is set (or not)
+#include "CoinUtilsConfig.h"
+
 #include "CoinMpsIO.hpp"
 #include "CoinMessage.hpp"
 #include "CoinError.hpp"
@@ -54,7 +57,7 @@ SmiSmpsIO::readTimeFile(SmiScnModel *smi, const char *c, const char *ext)
 			<<1
 			<<fileName_
 			<<CoinMessageEol;
-#ifdef COIN_USE_ZLIB
+#ifdef COIN_HAS_ZLIB
 		if (!smpsCardReader_->filePointer()) 
 			handler_->message(COIN_MPS_BADFILE2,messages_)<<CoinMessageEol;
 		

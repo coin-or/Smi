@@ -1,13 +1,35 @@
 * text=auto !eol
-/INSTALL -text svneol=unset#application/octet-stream
-/Makefile -text svneol=unset#application/octet-stream
-/Makefile.Smi -text svneol=unset#application/octet-stream
-Test/Makefile -text svneol=unset#application/octet-stream
-Test/Makefile.test -text svneol=unset#application/octet-stream
-include/SmiCoreCombineRule.hpp -text svneol=unset#application/octet-stream
-include/SmiDiscreteDistribution.hpp -text svneol=unset#application/octet-stream
-include/SmiLinearData.hpp -text svneol=unset#application/octet-stream
-include/SmiScenarioTree.hpp -text svneol=unset#application/octet-stream
-include/SmiScnData.hpp -text svneol=unset#application/octet-stream
-include/SmiScnModel.hpp -text svneol=unset#application/octet-stream
-include/SmiSmpsIO.hpp -text svneol=unset#application/octet-stream
+/Externals -text
+/Makefile.am -text
+/Makefile.in -text
+Smi/INSTALL -text svneol=unset#application/octet-stream
+Smi/Makefile.am -text
+Smi/Makefile.in -text
+Smi/configure -text
+Smi/configure.ac -text
+Smi/examples/Makefile.in -text
+Smi/examples/README -text
+Smi/examples/bug.cor -text
+Smi/examples/bug.stoch -text
+Smi/examples/bug.time -text
+Smi/examples/stoch.cpp -text
+Smi/inc/config_smi.h.in -text
+Smi/src/Makefile.am -text
+Smi/src/Makefile.in -text
+Smi/src/SmiCoreCombineRule.hpp -text svneol=unset#application/octet-stream
+Smi/src/SmiDiscreteDistribution.hpp -text svneol=unset#application/octet-stream
+Smi/src/SmiLinearData.hpp -text svneol=unset#application/octet-stream
+Smi/src/SmiScenarioTree.hpp -text svneol=unset#application/octet-stream
+Smi/src/SmiScnData.hpp -text svneol=unset#application/octet-stream
+Smi/src/SmiScnModel.hpp -text svneol=unset#application/octet-stream
+Smi/src/SmiSmpsIO.hpp -text svneol=unset#application/octet-stream
+Smi/test/Makefile.am -text
+Smi/test/Makefile.in -text
+/config.guess -text
+/config.sub -text
+/configure -text
+/configure.ac -text
+/depcomp -text
+/install-sh -text
+/ltmain.sh -text
+/missing -text

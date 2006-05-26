@@ -362,7 +362,7 @@ SmiScnModel::readSmps(const char *c, SmiCoreCombineRule *r)
 	if (r != NULL)
 		smiSmpsIO.setCoreCombineRule(r);
 
-	if (smiSmpsIO.readMps(c,"core")<0)
+	if (smiSmpsIO.readMps(c,"cor")<0)
 		return -1;
 	SmiCoreData *smiCore = smiSmpsIO.readTimeFile(this,c,"time");
 	if (!smiCore)
