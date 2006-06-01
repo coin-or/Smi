@@ -30,7 +30,7 @@ LIBS += $(ADDLIBS)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Cygwin
-CXXFLAGS += \
+AM_CPPFLAGS = \
         -I`$(CYGPATH_W) $(SMISRCDIR)/src` \
         -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
         -I`$(CYGPATH_W) $(OSISRCDIR)/src` \
