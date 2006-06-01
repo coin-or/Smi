@@ -65,7 +65,7 @@ AC_COIN_HAS_PROJECT(Smi)
 #                             Other dependencies                            #
 #############################################################################
 
-AC_COIN_CHECK_READLINE
+AC_COIN_CHECK_GNU_READLINE
 
 ##############################################################################
 #                   VPATH links for example input files                      #
