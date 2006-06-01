@@ -63,8 +63,8 @@ DIST_COMMON = $(am__configure_deps) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/configure $(top_srcdir)/examples/Makefile.in \
 	$(top_srcdir)/inc/config_smi.h.in INSTALL
-@HAVE_EXTERNALS_TRUE@@MAINTAINER_MODE_TRUE@am__append_2 = .Externals-stamp
-@HAVE_EXTERNALS_TRUE@@MAINTAINER_MODE_TRUE@am__append_3 = Externals
+@HAVE_EXTERNALS_TRUE@am__append_2 = Externals
+@HAVE_EXTERNALS_TRUE@am__append_3 = .Externals-stamp
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -75,8 +75,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/inc/config_smi.h
-CONFIG_CLEAN_FILES = examples/Makefile examples/bug.cor \
-	examples/bug.stoch examples/bug.time
+CONFIG_CLEAN_FILES = examples/Makefile
 SOURCES =
 DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
@@ -185,6 +184,7 @@ SMIOBJDIR = @SMIOBJDIR@
 SMISRCDIR = @SMISRCDIR@
 STRIP = @STRIP@
 VERSION = @VERSION@
+VPATH_DISTCLEANFILES = @VPATH_DISTCLEANFILES@
 abs_bin_dir = @abs_bin_dir@
 abs_include_dir = @abs_include_dir@
 abs_lib_dir = @abs_lib_dir@
@@ -247,14 +247,14 @@ SUBDIRS = src $(am__append_1)
 # Here we need include all files that are not mentioned in other Makefiles
 EXTRA_DIST = examples/bug.cor examples/bug.stoch examples/bug.time \
 	examples/Makefile.in examples/README examples/stoch.cpp \
-	$(am__append_3)
+	$(am__append_2)
 
 ########################################################################
 #                         Maintainer Stuff                             #
 ########################################################################
 
 # Files that are generated and should be cleaned with make distclean
-DISTCLEANFILES = $(am__append_2)
+DISTCLEANFILES = $(am__append_3) $(VPATH_DISTCLEANFILES)
 all: all-recursive
 
 .SUFFIXES:
