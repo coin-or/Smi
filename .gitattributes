@@ -1,5 +1,4 @@
 * text=auto !eol
-/Externals -text
 /Makefile.am -text
 /Makefile.in -text
 Smi/INSTALL -text svneol=unset#application/octet-stream
