@@ -15,13 +15,6 @@ Smi/examples/stoch.cpp -text
 Smi/inc/config_smi.h.in -text
 Smi/src/Makefile.am -text
 Smi/src/Makefile.in -text
-Smi/src/SmiCoreCombineRule.hpp -text svneol=unset#application/octet-stream
-Smi/src/SmiDiscreteDistribution.hpp -text svneol=unset#application/octet-stream
-Smi/src/SmiLinearData.hpp -text svneol=unset#application/octet-stream
-Smi/src/SmiScenarioTree.hpp -text svneol=unset#application/octet-stream
-Smi/src/SmiScnData.hpp -text svneol=unset#application/octet-stream
-Smi/src/SmiScnModel.hpp -text svneol=unset#application/octet-stream
-Smi/src/SmiSmpsIO.hpp -text svneol=unset#application/octet-stream
 Smi/test/Makefile.am -text
 Smi/test/Makefile.in -text
 /config.guess -text
