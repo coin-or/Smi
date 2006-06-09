@@ -1,7 +1,7 @@
 * text=auto !eol
+/INSTALL -text svneol=unset#application/octet-stream
 /Makefile.am -text
 /Makefile.in -text
-Smi/INSTALL -text svneol=unset#application/octet-stream
 Smi/Makefile.am -text
 Smi/Makefile.in -text
 Smi/configure -text
