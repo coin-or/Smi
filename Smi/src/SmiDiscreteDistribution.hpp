@@ -52,7 +52,7 @@ public:
 
 	
 	/// constructor requires core data and combine rule
-	SmiDiscreteDistribution(SmiCoreData *c, SmiCoreCombineRule *r=SmiCoreCombineReplace::Instance()) throw(CoinError)
+	SmiDiscreteDistribution(SmiCoreData *c, SmiCoreCombineRule *r=SmiCoreCombineReplace::Instance())
 	{
 		core_=c;
 		this->setCombineWithCoreRule(r);		

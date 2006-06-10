@@ -62,7 +62,6 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 				CoinPackedVector *v_drlo, CoinPackedVector *v_drup,				
 				SmiStageIndex branch, SmiScenarioIndex anc, double prob,
 				SmiCoreCombineRule *r)
-				throw(CoinError)
 {
 
 	// this coding takes branch to be the node that the scenario branches *from*
@@ -145,7 +144,6 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 				CoinPackedVector *v_drlo, CoinPackedVector *v_drup,				
 				vector<int> labels, double prob,
 				SmiCoreCombineRule *r)
-				throw(CoinError)
 {
 
 	// this code assumes that full path data (incl root node data)
@@ -356,25 +354,41 @@ SmiScnModel::getRowSolution(int ns)
 int
 SmiScnModel::readSmps(const char *c, SmiCoreCombineRule *r)
 {
-
+	int i;
 	SmiSmpsIO smiSmpsIO;
 
 	if (r != NULL)
 		smiSmpsIO.setCoreCombineRule(r);
 
-	if (smiSmpsIO.readMps(c,"cor")<0)
+	const char* core_ext[] = {"core", "cor"};
+	for (i = sizeof(core_ext)/sizeof(const char*) - 1; i >= 0; --i) {
+		if (smiSmpsIO.readMps(c,core_ext[i]) >= 0)
+			break;
+	}
+	if (i == -1)
 		return -1;
-	SmiCoreData *smiCore = smiSmpsIO.readTimeFile(this,c,"time");
-	if (!smiCore)
+
+	SmiCoreData *smiCore = NULL;
+	const char* time_ext[] = {"time", "tim"};
+	for (i = sizeof(time_ext)/sizeof(const char*) - 1; i >= 0; --i) {
+		smiCore = smiSmpsIO.readTimeFile(this,c,time_ext[i]);
+		if (smiCore)
+			break;
+	}
+	if (i == -1)
 		return -1;
-	if (smiSmpsIO.readStochFile(this,smiCore,c,"stoch")<0)
+
+	const char* stoch_ext[] = {"stoch", "stoc", "sto"};
+	for (i = sizeof(stoch_ext)/sizeof(const char*) - 1; i >= 0; --i) {
+		if (smiSmpsIO.readStochFile(this,smiCore,c,stoch_ext[i]) >= 0)
+			break;
+	}
+	if (i == -1)
 		return -1;
 
 	return 0;
-
-
 }
-
+  
 void replaceFirstWithSecond(CoinPackedVector &dfirst, const CoinPackedVector &dsecond)
 {
 	double *delt1 = dfirst.getElements();

@@ -66,7 +66,8 @@ public:
 		a class to override the default methods to combine core and stochastic data.
 
 	*/
-	int readSmps(const char *name, SmiCoreCombineRule *r=NULL);
+	int readSmps(const char *name,
+				 SmiCoreCombineRule *r=SmiCoreCombineReplace::Instance());
 
 	SmiCoreData * getCore() {return core_;}
 
@@ -107,8 +108,7 @@ public:
 		CoinPackedVector *dobj,
 		CoinPackedVector *drlo, CoinPackedVector *drup,
 		vector<int>labels, double prob,
-		SmiCoreCombineRule *r = SmiCoreCombineReplace::Instance())
-		throw(CoinError);
+		SmiCoreCombineRule *r = SmiCoreCombineReplace::Instance());
 
 	/** generate scenario with labels information
 		
@@ -132,8 +132,7 @@ public:
 				CoinPackedVector *dobj,
 				CoinPackedVector *drlo, CoinPackedVector *drup,
 				SmiStageIndex branch, SmiScenarioIndex anc, double prob,
-				SmiCoreCombineRule *r = SmiCoreCombineReplace::Instance())
-				throw(CoinError);
+				SmiCoreCombineRule *r = SmiCoreCombineReplace::Instance());
 
 	/**@name loadOsiSolverData
 		
