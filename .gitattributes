@@ -2,6 +2,7 @@
 /INSTALL -text svneol=unset#application/octet-stream
 /Makefile.am -text
 /Makefile.in -text
+Smi/LICENSE -text
 Smi/Makefile.am -text
 Smi/Makefile.in -text
 Smi/configure -text
