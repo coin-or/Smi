@@ -1,5 +1,6 @@
 * text=auto !eol
 /INSTALL -text svneol=unset#application/octet-stream
+/LICENSE -text
 /Makefile.am -text
 /Makefile.in -text
 /README -text
