@@ -367,6 +367,11 @@ void SmiScnSmpsIOUnitTest()
 }	
 void SmiScnModelScenarioUnitTest()
 {
+
+
+	OsiClpSolverInterface *osiClp1 = new OsiClpSolverInterface();
+	double INF = osiClp1->getInfinity();
+
 	// exhaustive test of direct interfaces for scenario generation
 	
     /* Model dimensions */
@@ -411,8 +416,6 @@ void SmiScnModelScenarioUnitTest()
     double *dclo,cdclo[]={ 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
 		0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
 		0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0 };
-
-#define INF COIN_DBL_MAX
 
     double *dcup,cdcup[]={ INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,
 		INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,
@@ -467,7 +470,6 @@ void SmiScnModelScenarioUnitTest()
 	SmiScnModel *smiModel = new SmiScnModel();
 
 
-	OsiClpSolverInterface *osiClp1 = new OsiClpSolverInterface();
 
 	smiModel->setOsiSolverHandle(*osiClp1);
 	
@@ -886,6 +888,9 @@ void SmiScnModelDiscreteUnitTest()
 {
 	// test of direct interfaces for discrete distribution
 	
+	OsiClpSolverInterface *osiClp1 = new OsiClpSolverInterface();
+	double INF=osiClp1->getInfinity();
+
     /* Model dimensions */
     int ncol=27, nrow=9, nels=44;
 	
@@ -930,7 +935,6 @@ void SmiScnModelDiscreteUnitTest()
 		0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
 		0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0 };
 
-#define INF COIN_DBL_MAX
 
     double *dcup,cdcup[]={ INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,
 		INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,
@@ -977,7 +981,6 @@ void SmiScnModelDiscreteUnitTest()
 	SmiScnModel *smiModel = new SmiScnModel();
 
 
-	OsiClpSolverInterface *osiClp1 = new OsiClpSolverInterface();
 
 	smiModel->setOsiSolverHandle(*osiClp1);
 	
@@ -1468,11 +1471,208 @@ smiModel->processDiscreteDistributionIntoScenarios(smiDD);
         delete smiModel;
 }
 
+void ModelBug()
+{
+
+	OsiClpSolverInterface osi;	
+	double INF=osi.getInfinity();
+
+/*
+NAME    BUG
+ROWS
+  N  obj
+  G  C0
+  G  C1
+  G  C2
+  G  C3
+*/
+	int nCoreRows=4;
+	double dCoreRup[] = { INF, INF, INF, INF };
+/*
+COLUMNS
+   x01   obj   1
+   x01   C3    1
+   x01   C1    1
+   x01   C0    1
+   x02   obj   1
+   x02   C2    1
+   x02   C1    1
+   x02   C0    1
+   x03   obj   1
+   x03   C3    1
+   x03   C2    1
+   x03   C0    1
+   x04   obj   0.5
+   x04   C3    1
+   x04   C1    1
+   x05   obj   0.5
+   x05   C2    1
+   x05   C1    1
+   x06   obj   0.5
+   x06   C3    1
+   x06   C2    1
+*/
+	int nCoreCols=6;
+	double dCoreClo[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+	double dCoreCup[] = {INF, INF, INF, INF, INF, INF};
+	double dCoreObj[] = {1.0, 1.0, 1.0, 0.5, 0.5, 0.5};
+
+	//int nCoreElts=15;
+	int iCoreColStarts[] = {0,
+						  3,
+						  6,
+						  9,
+						  11,
+						  13,
+						  15};
+	int iCoreRowIndice[] = {3,1,0,
+						  2,1,0,
+						  3,2,0,
+						  3,1,
+						  2,1,
+						  3,2};
+	double dCoreMatEntries[] = {1.0, 1.0, 1.0,
+							  1.0, 1.0, 1.0,
+							  1.0, 1.0, 1.0,
+							  1.0, 1.0,
+							  1.0, 1.0,
+							  1.0, 1.0 };						
+
+/*
+RHS
+  RHS    C0    0
+  RHS    C1    1
+  RHS    C2    1
+  RHS    C3    1
+ENDATA
+*/
+	double dCoreRlo[] = { 0.0, 1.0, 1.0, 1.0 };
+/*
+-----------------------------------------------------------
+bug.time:
+
+TIME          BUG
+PERIODS       LP
+     x01       C0                      STG01
+     x04       C1                      STG02 
+ENDATA 
+-----------------------------------------------------------
+*/
+	int nCoreStages = 2;
+	int iColStages[] = {0,0,0,1,1,1};
+	int iRowStages[] = {0,1,1,1};
+
+/*
+----------------------------------------------------------
+bug.stoch file:
+
+NAME          BUG
+SCENARIOS     DISCRETE                REPLACE
+  SC SCEN01    ROOT           0.500    STG02
+     RHS       C1             1.000
+     RHS       C2             1.000
+     RHS       C3             0.000
+  SC SCEN02    ROOT           0.500    STG02
+     RHS       C1             0.000
+     RHS       C2             1.000
+     RHS       C3             0.000 
+ENDATA
+*/
+
+	//int nScenarios = 2;
+	int iBranchStage[] = {1,1};
+
+	int iAncestorScn[] = {0,0};
+	double dProbScn[] = {0.5, 0.5};
+	
+	double drlo0[] = {1.0, 1.0, 0.0 };
+	int indices[]  = {1, 2, 3};
+	CoinPackedVector *rlo0 = new CoinPackedVector(3, indices,drlo0);
+	double drlo1[] = {0.0, 1.0, 0.0 };
+	CoinPackedVector *rlo1 = new CoinPackedVector(3, indices,drlo1);
+
+	// generate Core model
+	
+	osi.loadProblem(nCoreCols, nCoreRows,iCoreColStarts,iCoreRowIndice,dCoreMatEntries,dCoreClo,dCoreCup,dCoreObj,
+								dCoreRlo,dCoreRup);
+	SmiCoreData *osiCore = new SmiCoreData(&osi,nCoreStages,iColStages,iRowStages);
+
+	// initialize SmiScnModel
+	SmiScnModel *smiModel = new SmiScnModel();
+
+	// Add Scenarios
+	int	is = smiModel->generateScenario(osiCore,NULL,NULL,NULL,NULL,
+										rlo0,NULL,iBranchStage[0],iAncestorScn[0],dProbScn[0]);
+	
+	is = smiModel->generateScenario(osiCore,NULL,NULL,NULL,NULL,
+										rlo1,NULL,iBranchStage[1],iAncestorScn[1],dProbScn[1]);
+
+	// Set Solver
+	OsiClpSolverInterface osiClp;
+	smiModel->setOsiSolverHandle(osiClp);
+	
+	// Load Scenarios into Deterministic Equivalent
+	smiModel->loadOsiSolverData();
+
+	// Get Det Equiv OSI
+	OsiSolverInterface *osiStoch = smiModel->getOsiSolverInterface();
+
+	// write MPS file
+	osiStoch->writeMps("bug_gen");
+	
+	// Solve
+	osiStoch->initialSolve();
+
+			// print results
+		printf("Solved stochastic program %s\n", "BUG");
+		printf("Number of rows: %d\n",osiStoch->getNumRows());
+		printf("Number of cols: %d\n",osiStoch->getNumCols());
+		printf("Optimal value: %g\n",osiStoch->getObjValue());
+		
+		assert(osiStoch->getObjValue()== 0.5);
+
+}
+
+void SmpsBug()
+{
+		SmiScnModel smi;
+
+		char name[]="bug";
+
+		// read SMPS model from files
+		//	<name>.core, <name>.time, and <name>.stoch
+		// the argument myCombineRule overrides the combine rule specified in the Stoch file
+		smi.readSmps(name);		
+
+		// generate OSI solver object
+		// 	here we use OsiClp
+		OsiClpSolverInterface *clp = new OsiClpSolverInterface();
+
+		// set solver object for SmiScnModel
+		smi.setOsiSolverHandle(*clp);	
+
+		// load solver data
+		// 	this step generates the deterministic equivalent 
+		//	and returns an OsiSolver object 
+		OsiSolverInterface *osiStoch = smi.loadOsiSolverData();
+
+		// solve
+		osiStoch->initialSolve();		
+
+		// print results
+		printf("Solved stochastic program %s\n", name);
+		printf("Number of rows: %d\n",osiStoch->getNumRows());
+		printf("Number of cols: %d\n",osiStoch->getNumCols());
+		printf("Optimal value: %g\n",osiStoch->getObjValue());		
+		assert(osiStoch->getObjValue()== 0.5);
+
+}	
+
 int main()
 {
   
 
-	testingMessage( "YYY Testing SmiTreeNode \n");
+	testingMessage( "Testing SmiTreeNode \n");
 	SmiTreeNodeUnitTest();
 
 	testingMessage( "Testing SmiScenarioTree\n" );
@@ -1487,6 +1687,11 @@ int main()
 	testingMessage( "Testing SmiScnModel Discrete Distribution\n" );
 	SmiScnModelDiscreteUnitTest();
 
+	testingMessage("Model generation for simple model Bug");
+	ModelBug();
+
+	testingMessage("Read SMPS version of simple model Bug");
+	SmpsBug();
 
 	testingMessage( "*** Done! *** \n");
 	
