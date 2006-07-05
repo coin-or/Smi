@@ -10,7 +10,6 @@ Smi/Makefile.in -text
 Smi/configure -text
 Smi/configure.ac -text
 Smi/examples/Makefile.in -text
-Smi/examples/README -text
 Smi/examples/bug.cor -text
 Smi/examples/bug.stoch -text
 Smi/examples/bug.time -text
