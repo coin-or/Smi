@@ -14,13 +14,6 @@
 #include "SmiScnData.hpp"
 #include "OsiClpSolverInterface.hpp"
 
-// Plus infinity
-#ifndef COIN_DBL_MAX
-#define COIN_DBL_MAX DBL_MAX
-#endif
-#define INF COIN_DBL_MAX
-#define SMI_INFINITY COIN_DBL_MAX
-
 
 //forward declarations
 
@@ -28,18 +21,9 @@ void testingMessage(const char * const);
 void SmpsIO(const char* const);
 void ModelScenario(const char* const);
 void ModelDiscrete(const char* const);
-void ModelBug();
-void SmpsBug();
 
 int main()
 {
-
-
-	testingMessage("Model generation for simple model Bug");
-	ModelBug();
-
-	testingMessage("Read SMPS version of simple model Bug");
-	SmpsBug();
 
 	testingMessage( "Model generation using scenario tree construction methods.\n");
 	ModelScenario("Dantzig-Ferguson Aircraft Allocation using Scenarios");
@@ -48,271 +32,12 @@ int main()
 	ModelDiscrete("Dantzig-Ferguson Aircraft Allocation using Discrete Distribution");
 
 	testingMessage( "Model generation using SMPS files for Watson problems.\n" );
-	SmpsIO("../../Mps/Stochastic/wat_10_C_32");		
+	SmpsIO("../../Data/Stochastic/wat_10_C_32");		
 
 	testingMessage( "*** Done! *** \n");
-	
 
-  return 0;
+ 	return 0;
 }
-
-void ModelBug()
-{
-
-/*
-NAME    BUG
-ROWS
-  N  obj
-  G  C0
-  G  C1
-  G  C2
-  G  C3
-*/
-	int nCoreRows=4;
-	double dCoreRup[] = { INF, INF, INF, INF };
-/*
-COLUMNS
-   x01   obj   1
-   x01   C3    1
-   x01   C1    1
-   x01   C0    1
-   x02   obj   1
-   x02   C2    1
-   x02   C1    1
-   x02   C0    1
-   x03   obj   1
-   x03   C3    1
-   x03   C2    1
-   x03   C0    1
-   x04   obj   0.5
-   x04   C3    1
-   x04   C1    1
-   x05   obj   0.5
-   x05   C2    1
-   x05   C1    1
-   x06   obj   0.5
-   x06   C3    1
-   x06   C2    1
-*/
-	int nCoreCols=6;
-	double dCoreClo[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-	double dCoreCup[] = {INF, INF, INF, INF, INF, INF};
-	double dCoreObj[] = {1.0, 1.0, 1.0, 0.5, 0.5, 0.5};
-
-	int nCoreElts=15;
-	int iCoreColStarts[] = {0,
-						  3,
-						  6,
-						  9,
-						  11,
-						  13,
-						  15};
-	int iCoreRowIndice[] = {3,1,0,
-						  2,1,0,
-						  3,2,0,
-						  3,1,
-						  2,1,
-						  3,2};
-	double dCoreMatEntries[] = {1.0, 1.0, 1.0,
-							  1.0, 1.0, 1.0,
-							  1.0, 1.0, 1.0,
-							  1.0, 1.0,
-							  1.0, 1.0,
-							  1.0, 1.0 };						
-
-/*
-RHS
-  RHS    C0    0
-  RHS    C1    1
-  RHS    C2    1
-  RHS    C3    1
-ENDATA
-*/
-	double dCoreRlo[] = { 0.0, 1.0, 1.0, 1.0 };
-/*
------------------------------------------------------------
-bug.time:
-
-TIME          BUG
-PERIODS       LP
-     x01       C0                      STG01
-     x04       C1                      STG02 
-ENDATA 
------------------------------------------------------------
-*/
-	int nCoreStages = 2;
-	int iColStages[] = {0,0,0,1,1,1};
-	int iRowStages[] = {0,1,1,1};
-
-/*
-----------------------------------------------------------
-bug.stoch file:
-
-NAME          BUG
-SCENARIOS     DISCRETE                REPLACE
-  SC SCEN01    ROOT           0.500    STG02
-     RHS       C1             1.000
-     RHS       C2             1.000
-     RHS       C3             0.000
-  SC SCEN02    ROOT           0.500    STG02
-     RHS       C1             0.000
-     RHS       C2             1.000
-     RHS       C3             0.000 
-ENDATA
-*/
-
-	int nScenarios = 2;
-	int iBranchStage[] = {1,1};
-
-	int iAncestorScn[] = {0,0};
-	double dProbScn[] = {0.5, 0.5};
-	
-	double drlo0[] = {1.0, 1.0, 0.0 };
-	int indices[]  = {1, 2, 3};
-	CoinPackedVector *rlo0 = new CoinPackedVector(3, indices,drlo0);
-	double drlo1[] = {0.0, 1.0, 0.0 };
-	CoinPackedVector *rlo1 = new CoinPackedVector(3, indices,drlo1);
-
-	// generate Core model
-	
-	OsiClpSolverInterface osi;	
-	osi.loadProblem(nCoreCols, nCoreRows,iCoreColStarts,iCoreRowIndice,dCoreMatEntries,dCoreClo,dCoreCup,dCoreObj,
-								dCoreRlo,dCoreRup);
-	SmiCoreData *osiCore = new SmiCoreData(&osi,nCoreStages,iColStages,iRowStages);
-
-	// initialize SmiScnModel
-	SmiScnModel *smiModel = new SmiScnModel();
-
-	// Add Scenarios
-	int	is = smiModel->generateScenario(osiCore,NULL,NULL,NULL,NULL,
-										rlo0,NULL,iBranchStage[0],iAncestorScn[0],dProbScn[0]);
-	
-	is = smiModel->generateScenario(osiCore,NULL,NULL,NULL,NULL,
-										rlo1,NULL,iBranchStage[1],iAncestorScn[1],dProbScn[1]);
-
-	// Set Solver
-	OsiClpSolverInterface osiClp;
-	smiModel->setOsiSolverHandle(osiClp);
-	
-	// Load Scenarios into Deterministic Equivalent
-	smiModel->loadOsiSolverData();
-
-	// Solve
-	OsiSolverInterface *osiStoch = smiModel->getOsiSolverInterface();
-	
-	osiStoch->initialSolve();
-
-			// print results
-		printf("Solved stochastic program %s\n", "BUG");
-		printf("Number of rows: %d\n",osiStoch->getNumRows());
-		printf("Number of cols: %d\n",osiStoch->getNumCols());
-		printf("Optimal value: %g\n",osiStoch->getObjValue());
-		
-		const double *drlo = osiStoch->getRowLower();
-		const double *drup = osiStoch->getRowUpper();
-
-		printf("Det Equiv rows\n");
-		for (int i=0; i< osiStoch->getNumRows(); i++) 
-			printf("Row  %d\t Lower %g \t Upper %g \n",i,drlo[i],drup[i]);
-}
-
-// MyCombineRule -- handle infinities in the correct way for SMPS model BUG.
-class MyCombineRule: public SmiCoreCombineReplace
-{
-public:
-	virtual void Process(double *d1, int o1, const CoinPackedVector &cpv2, char *type=0);
-	virtual CoinPackedVector * Process(CoinPackedVector *cpv1, CoinPackedVector *cpv2, char *type=0);
-
-}; 
-
-void SmpsBug()
-{
-		SmiScnModel smi;
-
-		char name[]="bug";
-
-		MyCombineRule myCombineRule;
-
-		// read SMPS model from files
-		//	<name>.core, <name>.time, and <name>.stoch
-		// the argument myCombineRule overrides the combine rule specified in the Stoch file
-		smi.readSmps(name, &myCombineRule);		
-
-		// generate OSI solver object
-		// 	here we use OsiClp
-		OsiClpSolverInterface *clp = new OsiClpSolverInterface();
-
-		// set solver object for SmiScnModel
-		smi.setOsiSolverHandle(*clp);	
-
-		// load solver data
-		// 	this step generates the deterministic equivalent 
-		//	and returns an OsiSolver object 
-		OsiSolverInterface *osiStoch = smi.loadOsiSolverData();
-
-		// set some nice Hints to the OSI solver
-		osiStoch->setHintParam(OsiDoPresolveInInitial,true);
-		osiStoch->setHintParam(OsiDoScale,true);
-		osiStoch->setHintParam(OsiDoCrash,true);
-
-		// solve
-		osiStoch->initialSolve();		
-
-		// print results
-		printf("Solved stochastic program %s\n", name);
-		printf("Number of rows: %d\n",osiStoch->getNumRows());
-		printf("Number of cols: %d\n",osiStoch->getNumCols());
-		printf("Optimal value: %g\n",osiStoch->getObjValue());		
-}	
-
-CoinPackedVector *  MyCombineRule::Process(CoinPackedVector *cr,CoinPackedVector *nr, char *type)
-{	
-
-	CoinPackedVector *newrow=NULL;
-
-	if (!cr && nr) newrow = new CoinPackedVector(*nr);
-	if (cr && !nr) newrow = new CoinPackedVector(*cr);
-	
-	if (cr && nr)
-	{
-		int maxentries = CoinMax(cr->getMaxIndex(),nr->getMaxIndex());
-		double* dense = cr->denseVector(maxentries+1);
-		double* elt_nr = nr->getElements();
-		int* ind_nr = nr->getIndices();
-		
-		for (int j=0; j<nr->getNumElements(); ++j)
-			dense[ind_nr[j]] = elt_nr[j];
-			
-		// generate new packed vector
-		newrow = new CoinPackedVector();
-		for (int i=0; i<maxentries+1; ++i)
-		{
-			if (dense[i] && dense[i] < SMI_INFINITY )	// SPECIAL: handle infinite entry
-				newrow->insert(i,dense[i]);
-		}
-
-		delete [] dense;
-	}
-
-	return newrow;
-
-	
-}
-
-void MyCombineRule::Process(double *d, int o, const CoinPackedVector &cpv, char *type)
-{
-	const double *cd = cpv.getElements();
-	const int *ci = cpv.getIndices();
-	
-	for (int j=0; j < cpv.getNumElements(); ++j) 
-		if (cd[j] < SMI_INFINITY)						// SPECIAL: handle infinite entry
-			d[ci[j]-o] = cd[j];
-
-}
-
-
-
-
 
 void SmpsIO(const char * const name )
 {
@@ -351,6 +76,9 @@ void SmpsIO(const char * const name )
 
 void ModelScenario(const char * const name )
 {
+	OsiClpSolverInterface *osiClp1 = new OsiClpSolverInterface();
+	double INF=osiClp1->getInfinity();
+
 	// example of direct interfaces for scenario generation
 	
     /* Model dimensions */
@@ -448,7 +176,6 @@ void ModelScenario(const char * const name )
 	SmiScnModel *smiModel = new SmiScnModel();
 
 
-	OsiClpSolverInterface *osiClp1 = new OsiClpSolverInterface();
 
 	smiModel->setOsiSolverHandle(*osiClp1);
 	
@@ -629,6 +356,9 @@ void ModelDiscrete(const char * const name)
 {
 	// example of direct interfaces for discrete distribution
 	
+	OsiClpSolverInterface *osiClp1 = new OsiClpSolverInterface();
+	double INF=osiClp1->getInfinity();
+	
     /* Model dimensions */
     int ncol=27, nrow=9, nels=44;
 	
@@ -720,7 +450,6 @@ void ModelDiscrete(const char * const name)
 	SmiScnModel *smiModel = new SmiScnModel();
 
 
-	OsiClpSolverInterface *osiClp1 = new OsiClpSolverInterface();
 
 	smiModel->setOsiSolverHandle(*osiClp1);
 	
