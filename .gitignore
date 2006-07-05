@@ -1,5 +1,10 @@
 /CYGWIN-O2
 /dep
+trunk/CYGWIN-O2
+trunk/dep
+trunk/unitTest
+trunk/unitTest.exe
+trunk/unitTest.exe.stackdump
 /unitTest
 /unitTest.exe
 /unitTest.exe.stackdump
