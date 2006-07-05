@@ -33,7 +33,7 @@ enum SmiSectionType { SMI_NO_SECTION, SMI_NAME_SECTION,
 };
 
 enum SmiSmpsType { SMI_SC_CARD, SMI_COLUMN_CARD, SMI_DISCRETE_DIST, SMI_SMPS_COMBINE_ADD, 
-	SMI_SMPS_COMBINE_REPLACE, SMI_SMPS_COMBINE_UNKNOWN, SMI_UNKNOWN_MPS_TYPE,
+	SMI_SMPS_COMBINE_REPLACE, SMI_SMPS_COMBINE_UNKNOWN, SMI_EVENT_CARD, SMI_UNKNOWN_MPS_TYPE,
 	SMI_TIME_UNORDERED_CORE_TYPE, SMI_TIME_ORDERED_CORE_TYPE
 };
 
@@ -49,6 +49,7 @@ public:
 	  inline const char *periodName (  ) const {return periodName_;};
 	  inline const char *scenarioNew (  ) const {return columnName_;};
 	  inline const char *scenarioAnc (  ) const {return rowName_;};
+	  inline const double probability() const {return prob_;};
 
 	  inline void setCoreCombineRule(SmiCoreCombineRule *r){combineRule_=r;combineRuleSet=true;}
 	  inline SmiCoreCombineRule *getCoreCombineRule() { return combineRule_;}
@@ -63,6 +64,8 @@ private:
 	 /// Current third name (for SmpsIO)
 	char periodName_[COIN_MAX_FIELD_LENGTH];
 	float fvalue_;
+	/// Probability field in INDEP DISCRETE format
+	double prob_;
 	SmiSectionType smiSection_;
 	SmiSmpsType smiSmpsType_;
 	SmiCoreCombineRule *combineRule_;

@@ -189,24 +189,49 @@ SmiSmpsIO::readStochFile(SmiScnModel *smi,SmiCoreData *core, const char *c, cons
 
 	if (ifstoch)
 	{
-/*
 		if (smpsCardReader_->nextSmpsField() == SMI_INDEPENDENT_SECTION) // INDEPENDENT card
 		{
+			CoinPackedVector drlo,drup,dclo,dcup,dobj;
+			CoinPackedMatrix *matrix = new CoinPackedMatrix(false,0.25,0.25);
+			assert(!matrix->isColOrdered());
+
+			int nrow = core->getNumRows();
+			int ncol = core->getNumCols();
+			matrix->setDimensions(nrow,ncol);
+
+			SmiDiscreteDistribution *smiDD = new SmiDiscreteDistribution(core);
+			int old_i=-1;
+			int old_j=-1;
+			SmiDiscreteRV *smiRV=NULL;
+			int event_length = 1;
+			double prob=0.0;
+
 			printf("Processing INDEPENDENT section\n");
 			
 			while( smpsCardReader_->nextSmpsField (  ) == SMI_INDEPENDENT_SECTION ) 
 			{
 				//do the section
-				if (smpsCardReader_->whichSmpsType() == SMI_SC_CARD)
-				{
-					//process card
-				}
-				else if(smpsCardReader_->whichSmpsType() == SMI_COLUMN_CARD)
+				if (smpsCardReader_->whichSmpsType() == SMI_EVENT_CARD)
 				{
 					int j=this->columnIndex(smpsCardReader_->columnName());
 					int i=this->rowIndex(smpsCardReader_->rowName());
 					double value = smpsCardReader_->value();
-
+					prob = smpsCardReader_->probability();
+				
+					// test if we are starting a new discrete distribution
+					if ( (j!=old_j) || (i!=old_i) )
+					{
+						// record new event indices
+						old_j=j;
+						old_i=i;
+						if (smiRV)
+						{
+							// add completed distribution to SmiModel
+							smiDD->addDiscreteRV(smiRV);
+							// get new RV
+							smiRV = new SmiDiscreteRV(event_length);
+						}
+					}
 					
 					if (j<0) // check RHS
 					{
@@ -245,18 +270,29 @@ SmiSmpsIO::readStochFile(SmiScnModel *smi,SmiCoreData *core, const char *c, cons
 					{
 						matrix->modifyCoefficient(i,j,value);
 					}
+					smiRV->addEvent(matrix,&dclo,&dcup,&dobj,&drlo,&drup,prob);
+					matrix->clear();
+					dclo.clear();
+					dcup.clear();
+					dobj.clear();
+					drlo.clear();
+					drup.clear();
+					matrix->setDimensions(nrow,ncol);
+						
 				}
 			}
 			
 			if (smpsCardReader_->whichSmpsSection() == SMI_ENDATA_SECTION)
 			{
 				//cleanup
+				if (smiRV)
+					 smiRV->addEvent(matrix,&dclo,&dcup,&dobj,&drlo,&drup,prob);
+				smi->processDiscreteDistributionIntoScenarios(smiDD);
 				return 0;
 			}
 			
 
 		}
-*/
 		if (smpsCardReader_->nextSmpsField() == SMI_SCENARIOS_SECTION) // SCENARIOS card
 		{
 			double prob=0.0;
@@ -443,15 +479,14 @@ SmiSmpsCardReader::nextSmpsField (  )
 			  position_ = eol_;
 			  
 		  }
-/*
 		  if ( smiSection_ == SMI_INDEPENDENT_SECTION )
 		  {
+			  smiSmpsType_ = SMI_EVENT_CARD;
 			  if (!(next = strtok(position_,blanks)))
 			  {
 				  smiSmpsType_ = SMI_UNKNOWN_MPS_TYPE;
 				  return smiSection_;
 			  }
-			  //already got the name
 			  strcpy(columnName_,next);
 			  
 			  if (!(next = strtok(NULL,blanks)))
@@ -484,7 +519,6 @@ SmiSmpsCardReader::nextSmpsField (  )
 			  assert(after>valstr);
 
 		  }
-*/
 		  if ( smiSection_ == SMI_SCENARIOS_SECTION )
 		  {
 			
