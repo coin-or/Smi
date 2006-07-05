@@ -19,7 +19,7 @@
 
 #if 1
 const static char *section[] = {
-  "", "NAME", "ENDATA", " ", "PERIODS", "SCENARIOS", " "
+  "", "NAME", "ENDATA", " ", "PERIODS", "SCENARIOS", "INDEPENDENT"," "
 };
 
 const static char *smpsType[] = {
@@ -189,6 +189,74 @@ SmiSmpsIO::readStochFile(SmiScnModel *smi,SmiCoreData *core, const char *c, cons
 
 	if (ifstoch)
 	{
+/*
+		if (smpsCardReader_->nextSmpsField() == SMI_INDEPENDENT_SECTION) // INDEPENDENT card
+		{
+			printf("Processing INDEPENDENT section\n");
+			
+			while( smpsCardReader_->nextSmpsField (  ) == SMI_INDEPENDENT_SECTION ) 
+			{
+				//do the section
+				if (smpsCardReader_->whichSmpsType() == SMI_SC_CARD)
+				{
+					//process card
+				}
+				else if(smpsCardReader_->whichSmpsType() == SMI_COLUMN_CARD)
+				{
+					int j=this->columnIndex(smpsCardReader_->columnName());
+					int i=this->rowIndex(smpsCardReader_->rowName());
+					double value = smpsCardReader_->value();
+
+					
+					if (j<0) // check RHS
+					{
+						if (!strcmp(this->getRhsName(),"")) {
+							 free(rhsName_);
+		 					 rhsName_=strdup(smpsCardReader_->columnName());
+						} else
+							assert(!strcmp(smpsCardReader_->columnName(),this->getRhsName()));
+						assert(!(i<0));
+
+						char c=this->getRowSense()[i];
+
+						switch(c)
+						{
+						case 'E':
+							drlo.insert(i,value);
+							drup.insert(i,value);
+							break;
+						case 'L':
+							drlo.insert(i,value);
+							break;
+						case 'G':
+							drup.insert(i,value);
+							break;
+						default:
+							assert(!"bad row sense: shouldn't get here");
+							break;
+						}
+					}
+					else if(i<0 || i==getNumRows()) // check OBJ
+					{
+						assert(!strcmp(smpsCardReader_->rowName(),this->getObjectiveName()));
+						dobj.insert(j,value);
+					}
+					else	// add element
+					{
+						matrix->modifyCoefficient(i,j,value);
+					}
+				}
+			}
+			
+			if (smpsCardReader_->whichSmpsSection() == SMI_ENDATA_SECTION)
+			{
+				//cleanup
+				return 0;
+			}
+			
+
+		}
+*/
 		if (smpsCardReader_->nextSmpsField() == SMI_SCENARIOS_SECTION) // SCENARIOS card
 		{
 			double prob=0.0;
@@ -254,10 +322,12 @@ SmiSmpsIO::readStochFile(SmiScnModel *smi,SmiCoreData *core, const char *c, cons
 							drup.insert(i,value);
 							break;
 						case 'L':
-							drlo.insert(i,value);
+							//drlo.insert(i,value);
+							drup.insert(i,value);
 							break;
 						case 'G':
-							drup.insert(i,value);
+							//drup.insert(i,value);
+							drlo.insert(i,value);
 							break;
 						default:
 							assert(!"bad row sense: shouldn't get here");
@@ -288,11 +358,13 @@ SmiSmpsIO::readStochFile(SmiScnModel *smi,SmiCoreData *core, const char *c, cons
 						smi->generateScenario(core,matrix,&dclo,&dcup,&dobj,&drlo,&drup,branch,anc,prob,smpsCardReader_->getCoreCombineRule() );
 						
 					}
+					return 0;
 				}
 
-		} else {
-			return -1;
-		}
+		} 
+
+		// didn't recognize section
+		return -1;
 
 		
 
@@ -371,6 +443,48 @@ SmiSmpsCardReader::nextSmpsField (  )
 			  position_ = eol_;
 			  
 		  }
+/*
+		  if ( smiSection_ == SMI_INDEPENDENT_SECTION )
+		  {
+			  if (!(next = strtok(position_,blanks)))
+			  {
+				  smiSmpsType_ = SMI_UNKNOWN_MPS_TYPE;
+				  return smiSection_;
+			  }
+			  //already got the name
+			  strcpy(columnName_,next);
+			  
+			  if (!(next = strtok(NULL,blanks)))
+			  {
+				  smiSmpsType_ = SMI_UNKNOWN_MPS_TYPE;
+				  break;
+			  }
+			  strcpy(rowName_,next);
+
+			  if (!(next = strtok(NULL,blanks)))
+			  {
+				  smiSmpsType_ = SMI_UNKNOWN_MPS_TYPE;
+				  break;
+			  }
+			  strcpy(valstr,next);
+
+			  value_ = osi_strtod(valstr,&after,0);
+			  // see if error
+			  assert(after>valstr);
+				  
+			  if (!(next = strtok(NULL,blanks)))
+			  {
+				  smiSmpsType_ = SMI_UNKNOWN_MPS_TYPE;
+				  break;
+			  }
+			  strcpy(valstr,next);
+
+			  prob_ = osi_strtod(valstr,&after,0);
+			  // see if error
+			  assert(after>valstr);
+
+		  }
+*/
 		  if ( smiSection_ == SMI_SCENARIOS_SECTION )
 		  {
 			
@@ -479,17 +593,25 @@ SmiSmpsCardReader::nextSmpsField (  )
 
 		  // find the section, if there is one
 		  for ( i = SMI_NAME_SECTION; i < SMI_UNKNOWN_SECTION; i++ ) {
-			  if ( !strncmp ( card_, section[i], strlen ( section[i] ) ) ) {
+			//printf("Comparing first 3 chars of %s with %s returns %d \n",
+			//	card_, section[i], strncmp(card_,section[i],3));
+			  if ( !strncmp ( card_, section[i], 3) ) {
 				  break;
 			  }
 		  }
+
+		  // didn't find anything so quit
+		  if (i==SMI_UNKNOWN_SECTION) return (SmiSectionType) i;
+
 		  position_ = card_;
 		  eol_ = card_;
 		  smiSection_ = ( SmiSectionType ) i;
 
 		  // if its a scenario card, need to process some more info
-		  if (smiSection_ == SMI_SCENARIOS_SECTION)
+		  if ( (smiSection_ == SMI_SCENARIOS_SECTION) || 
+				(smiSection_ == SMI_INDEPENDENT_SECTION) )
 		  {
+			  i = SMI_SMPS_COMBINE_UNKNOWN;
 			  next = strtok(position_,blanks);
 			  
 			  if (!(next = strtok(NULL,blanks)))
@@ -512,9 +634,10 @@ SmiSmpsCardReader::nextSmpsField (  )
 				  }
 			  }
 			  
+		   }
 			  // set combine rule if it is not already set.
-			  if (!combineRuleSet)
-			  {
+		   if (!combineRuleSet)
+		   {
 			  switch(i)
 			  {
 			  case SMI_SMPS_COMBINE_ADD:
@@ -527,7 +650,6 @@ SmiSmpsCardReader::nextSmpsField (  )
 				  this->setCoreCombineRule(SmiCoreCombineReplace::Instance());
 				  // MESSAGE
 				  printf(" Smps: setting default core combine rule to Replace\n");
-			  }
 			  }
 			  
 		  }
