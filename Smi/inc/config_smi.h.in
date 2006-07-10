@@ -1,8 +1,5 @@
 /* inc/config_smi.h.in.  Generated from configure.ac by autoheader.  */
 
-/* If defined, debug sanity checks are performed during runtime */
-#undef COIN_DEBUG
-
 /* Define to 1 if the Clp package is used */
 #undef COIN_HAS_CLP
 
@@ -17,6 +14,12 @@
 
 /* Define to 1 if the Smi package is used */
 #undef COIN_HAS_SMI
+
+/* Define to the debug sanity check level (0 is no test) */
+#undef COIN_SMI_CHECKLEVEL
+
+/* Define to the debug verbosity level (0 is no output) */
+#undef COIN_SMI_VERBOSITY
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
