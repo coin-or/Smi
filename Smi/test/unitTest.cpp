@@ -6,9 +6,15 @@
 #  pragma warning(disable:4786)
 #endif
 
+#include "SmiConfig.h"
+
 #include <cassert>
 #include <iostream>
 
+// Path to the directory with the data files
+#ifndef COIN_DATA_STOCHASTIC_PATH
+# define COIN_DATA_STOCHASTIC_PATH "../../Data/Stochastic/"
+#endif
 
 #include "SmiScnModel.hpp"
 #include "OsiClpSolverInterface.hpp"
@@ -316,8 +322,8 @@ void SmiScnSmpsIOUnitTest()
 {
 	{
 		// test SMPS files app0110R
-		SmiScnModel smi;	
-		smi.readSmps("../../Data/Stochastic/app0110R");		
+		SmiScnModel smi;
+		smi.readSmps(COIN_DATA_STOCHASTIC_PATH "app0110R");		
 		OsiClpSolverInterface *clp = new OsiClpSolverInterface();
 		smi.setOsiSolverHandle(*clp);	
 		OsiSolverInterface *osiStoch = smi.loadOsiSolverData();
@@ -335,7 +341,7 @@ void SmiScnSmpsIOUnitTest()
 	{
 		// test SMPS files app0110 -- ADD scenario values
 		SmiScnModel smi;	
-		smi.readSmps("../../Data/Stochastic/app0110");		
+		smi.readSmps(COIN_DATA_STOCHASTIC_PATH "app0110");		
 		OsiClpSolverInterface *clp = new OsiClpSolverInterface();
 		smi.setOsiSolverHandle(*clp);	
 		OsiSolverInterface *osiStoch = smi.loadOsiSolverData();

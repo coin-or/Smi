@@ -1,5 +1,8 @@
 /* inc/config_smi.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Define to absolute path for Data subdirectory Stochastic */
+#undef COIN_DATA_STOCHASTIC_PATH
+
 /* Define to 1 if the Clp package is used */
 #undef COIN_HAS_CLP
 
