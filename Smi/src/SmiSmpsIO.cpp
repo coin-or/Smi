@@ -189,7 +189,9 @@ SmiSmpsIO::readStochFile(SmiScnModel *smi,SmiCoreData *core, const char *c, cons
 
 	if (ifstoch)
 	{
-		if (smpsCardReader_->nextSmpsField() == SMI_INDEPENDENT_SECTION) // INDEPENDENT card
+		switch(smpsCardReader_->nextSmpsField()) 
+		{
+		case SMI_INDEPENDENT_SECTION: // INDEPENDENT card
 		{
 			CoinPackedVector drlo,drup,dclo,dcup,dobj;
 			CoinPackedMatrix *matrix = new CoinPackedMatrix(false,0.25,0.25);
@@ -270,7 +272,7 @@ SmiSmpsIO::readStochFile(SmiScnModel *smi,SmiCoreData *core, const char *c, cons
 					{
 						matrix->modifyCoefficient(i,j,value);
 					}
-					smiRV->addEvent(matrix,&dclo,&dcup,&dobj,&drlo,&drup,prob);
+					smiRV->addEvent(*matrix,dclo,dcup,dobj,drlo,drup,prob);
 					matrix->clear();
 					dclo.clear();
 					dcup.clear();
@@ -286,14 +288,14 @@ SmiSmpsIO::readStochFile(SmiScnModel *smi,SmiCoreData *core, const char *c, cons
 			{
 				//cleanup
 				if (smiRV)
-					 smiRV->addEvent(matrix,&dclo,&dcup,&dobj,&drlo,&drup,prob);
+					 smiRV->addEvent(*matrix,dclo,dcup,dobj,drlo,drup,prob);
 				smi->processDiscreteDistributionIntoScenarios(smiDD);
 				return 0;
 			}
 			
 
 		}
-		if (smpsCardReader_->nextSmpsField() == SMI_SCENARIOS_SECTION) // SCENARIOS card
+		case SMI_SCENARIOS_SECTION: // SCENARIOS card
 		{
 			double prob=0.0;
 			int scen=0,anc=0;
@@ -398,9 +400,11 @@ SmiSmpsIO::readStochFile(SmiScnModel *smi,SmiCoreData *core, const char *c, cons
 				}
 
 		} 
+		default:
 
 		// didn't recognize section
 		return -1;
+		}
 
 		
 

@@ -323,7 +323,12 @@ void SmiScnSmpsIOUnitTest()
 	{
 		// test SMPS files app0110R
 		SmiScnModel smi;
-		smi.readSmps(COIN_DATA_STOCHASTIC_PATH "app0110R");		
+		char filename[500];
+		strcpy(filename,COIN_DATA_STOCHASTIC_PATH);
+		strcat(filename,"app0110R");
+		printf("[SmiScnSmpsIOUnitTest] reading file %s \n",filename);
+		fflush(stdout);
+		smi.readSmps(filename);
 		OsiClpSolverInterface *clp = new OsiClpSolverInterface();
 		smi.setOsiSolverHandle(*clp);	
 		OsiSolverInterface *osiStoch = smi.loadOsiSolverData();
@@ -341,7 +346,11 @@ void SmiScnSmpsIOUnitTest()
 	{
 		// test SMPS files app0110 -- ADD scenario values
 		SmiScnModel smi;	
-		smi.readSmps(COIN_DATA_STOCHASTIC_PATH "app0110");		
+		char filename[500];
+		strcpy(filename,COIN_DATA_STOCHASTIC_PATH);
+		strcat(filename,"app0110");
+		printf("[SmiScnSmpsIOUnitTest] reading file %s \n",filename);
+		smi.readSmps(filename);
 		OsiClpSolverInterface *clp = new OsiClpSolverInterface();
 		smi.setOsiSolverHandle(*clp);	
 		OsiSolverInterface *osiStoch = smi.loadOsiSolverData();
