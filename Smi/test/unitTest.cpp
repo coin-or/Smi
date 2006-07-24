@@ -314,10 +314,16 @@ SmiTreeNodeUnitTest()
 
 void SmiScnSmpsIOUnitTest()
 {
+  std::string dataDir;
+#if defined(_MSC_VER)
+  dataDir="../../../../Data";
+#else
+  dataDir="../../Data";
+#endif
 	{
 		// test SMPS files app0110R
 		SmiScnModel smi;	
-		smi.readSmps("../../Data/Stochastic/app0110R");		
+		smi.readSmps((dataDir+"/Stochastic/app0110R").c_str());		
 		OsiClpSolverInterface *clp = new OsiClpSolverInterface();
 		smi.setOsiSolverHandle(*clp);	
 		OsiSolverInterface *osiStoch = smi.loadOsiSolverData();
@@ -335,7 +341,7 @@ void SmiScnSmpsIOUnitTest()
 	{
 		// test SMPS files app0110 -- ADD scenario values
 		SmiScnModel smi;	
-		smi.readSmps("../../Data/Stochastic/app0110");		
+		smi.readSmps((dataDir+"/Stochastic/app0110").c_str());		
 		OsiClpSolverInterface *clp = new OsiClpSolverInterface();
 		smi.setOsiSolverHandle(*clp);	
 		OsiSolverInterface *osiStoch = smi.loadOsiSolverData();
@@ -353,7 +359,7 @@ void SmiScnSmpsIOUnitTest()
 		// test SMPS files from Watson test suite (Cambridge, UK)
 		
 		SmiScnModel smi;
-		smi.readSmps("../../Data/Stochastic/wat_10_C_32");
+		smi.readSmps((dataDir+"/Stochastic/wat_10_C_32").c_str());
 		OsiClpSolverInterface *clp = new OsiClpSolverInterface();
 		smi.setOsiSolverHandle(*clp);	
 		OsiSolverInterface *osiStoch = smi.loadOsiSolverData();
