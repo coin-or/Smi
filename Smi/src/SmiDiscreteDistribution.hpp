@@ -28,6 +28,7 @@ class SmiDiscreteRV;
 
 class SmiDiscreteDistribution
 {
+	friend void SmiDiscreteUnitTest();
 public:
 	/// add discrete RV
 	void addDiscreteRV(SmiDiscreteRV *s)
@@ -61,6 +62,7 @@ public:
 	~SmiDiscreteDistribution();
 
 private:
+	SmiDiscreteDistribution(){core_=NULL;}
 	SmiCoreData *core_;
 	vector<SmiDiscreteRV *> smiDiscrete_;
 	SmiCoreCombineRule *combineRule_;
@@ -71,6 +73,7 @@ private:
 
 class SmiDiscreteEvent : public SmiLinearData
 {
+	friend void SmiDiscreteUnitTest();
 public:
 	inline void setEventProb(double p) {prob_ = p;}
 	inline const double getEventProb () { return prob_; }
@@ -83,6 +86,7 @@ private:
 
 class SmiDiscreteRV
 {
+	friend void SmiDiscreteUnitTest();
 public:
 	void addEvent(CoinPackedMatrix &matrix,
 				CoinPackedVector &dclo, CoinPackedVector &dcup,
@@ -117,7 +121,7 @@ private:
 	double prob_;
 };
 
-
+void SmiDiscreteUnitTest();
 
 #endif //SmiDiscreteRV_H
 

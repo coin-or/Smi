@@ -888,6 +888,100 @@ void SmiScnModelScenarioUnitTest()
         delete smiModel;
 }
 
+#if 0
+void SmiDiscreteUnitTest()
+{
+	// 3 period model
+	//
+	// min S_0 X_0 + B_0 Y_0
+	// s.t.
+	//     S_1 X_1 + B_1 Y_1 - S_1 X_0 - B_1 Y_0 = 0
+	//     S_2 X_2 + B_2 Y_2 - S_2 X_1 - B_2 Y_2 = 0
+	//     S_2 X_2 + B_2 Y_2                     \ge max(S_2 - K, B_2 - K)
+	//
+	//  X_0, Y_0, X_1, Y_1, X_2, Y_2 free.
+
+	OsiClpSolverInterface *osiClp1 = new OsiClpSolverInterface();
+	double INF=osiClp1->getInfinity();
+
+    /* Model dimensions */
+    int ncol=6, nrow=3, nels=10;
+	
+	/* Sparse matrix data...organized by row */
+    int cmcol[]={ 2, 3, 0, 1,
+				  4, 5, 2, 3,
+				  4, 5 };
+		
+	int cmrow[]={ 0, 0, 0, 0,
+				  1, 1, 1, 1,
+				  2, 2 };
+		
+
+    double cdels[] = { 100.0, 100.0, -100.0, -100.0,
+				      100.0, 100.0, -100.0, -100.0,
+					  100.0, 100.0 };
+    /* Objective */
+	double *cdobj[]={ 100.0, 100.0, 0.0, 0.0, 0.0, 0.0 };
+	
+    /* Column bounds */
+    double cdclo[]={ INF, INF, INF, INF, INF, INF };
+    double cdcup[]={ INF, INF, INF, INF, INF, INF };
+	
+    /* Row bounds */
+    double cdrlo[]={ 0.0, 0.0, 100.0 };
+    double cdrup[]={ 0.0, 0.0, INF };
+	
+    /* Stages */
+	int crstg[]={ 0,1,2 };
+    int ccstg[]={ 0,0,1,1,2,2 };
+
+	// initialize SmiModel
+	SmiScnModel *smiModel = new SmiScnModel();
+
+	// set core model using Osi interface
+	OsiClpSolverInterface ocsi;
+	ocsi.loadProblem(CoinPackedMatrix( 1,cmrow,cmcol,cdels,nels),cdclo,cdcup,cdobj,cdrlo,cdrup);
+	
+	// core model with 3 stages
+	SmiCoreData *smiCore = new SmiCoreData(&ocsi,3,ccstg,crstg);
+
+	SmiDiscreteDistribution *smiDD=new SmiDiscreteDistribution();
+
+	int nI = 4;
+	int ns[] = { 3, 3, 3, 3 };
+	int nt[] = { 1,2,1,2 };
+
+	for (int t=0; t<2; t++)
+	{
+		j = t+0;
+		SmiDiscreteRV *s=new SmiDiscreteRV(nt[j]);
+
+		double p = 0.5*ns[j]*(ns[j]+1);
+		for (int i=0; i<ns[j]; i++)
+		{
+			int cindx=j;
+			int rindx=i;
+			double elem=(double) (j*i);
+			CoinPackedVector c(1,&cindx,&elem);
+			CoinPackedVector r(1,&rindx,&elem);
+			CoinPackedMatrix m(false,&rindx,&cindx,&elem,1);
+			SmiLinearData d(m,c,c,c,r,r);
+			SmiDiscreteEvent *e = new SmiDiscreteEvent(d,(i+1)/p);
+			s->events_.push_back(e);
+
+			assert(e->getColLower().getIndices()[0]==j);
+			assert(e->getRowLower().getIndices()[0]==i);
+			assert(e->getMatrix().getCoefficient(i,j)==(double)(j*i));
+			assert(e->getEventProb()==(i+1)/p);
+		}
+		smiDD->addDiscreteRV(s);
+	}
+
+	SmiScnModel test;
+	test.processDiscreteDistributionIntoScenarios(smiDD,true);
+}
+#endif
+
 //forward declarations
 void replaceFirstWithSecond(CoinPackedVector &dfirst, const CoinPackedVector &dsecond);
 void SmiScnModelDiscreteUnitTest()
@@ -990,7 +1084,7 @@ void SmiScnModelDiscreteUnitTest()
 
 	smiModel->setOsiSolverHandle(*osiClp1);
 	
-	/* scramble LP entries */
+	/* scramble LP entries --- just for testing!! */
 	mrow = (int*)malloc(nels*sizeof(int));
 	mcol = (int*)malloc(nels*sizeof(int));
 	for (ii=0;ii<nels;ii++)
@@ -1077,7 +1171,7 @@ void SmiScnModelDiscreteUnitTest()
 	assert(smiDD->getNumRV() == nindp);
 
 	// this is cut-pasted from 	
-smiModel->processDiscreteDistributionIntoScenarios(smiDD);
+	smiModel->processDiscreteDistributionIntoScenarios(smiDD);
 
 	if (0)
 	{
@@ -1105,7 +1199,7 @@ smiModel->processDiscreteDistributionIntoScenarios(smiDD);
 	// initialize data for first scenario
 	vector<int> indx(nindp);
 	vector<int> nsamp(nindp);
-	vector<int> label(core->getNumStages()-1);
+	vector<int> label(core->getNumStages());
 	vector<int>::iterator iLabel;
 
 	for (iLabel=label.begin(); iLabel<label.end(); ++iLabel)
@@ -1274,7 +1368,9 @@ smiModel->processDiscreteDistributionIntoScenarios(smiDD);
 			int nEvents = smiDD->getDiscreteRV(jjj)->getNumEvents();
 			int iStage = smiDD->getDiscreteRV(jjj)->getStage();
 
-			label[iStage-1] += indx[jjj]*nEvents;
+			//label[iStage-1] += indx[jjj]*nEvents;
+			label[iStage] *= nEvents;
+			label[iStage] += indx[jjj];
 
 			drlo[irow[n_first_stg_rows + jjj]] = demand[ indx[jjj]+index ];
 			drup[irow[n_first_stg_rows + jjj]] = demand[ indx[jjj]+index ];
@@ -1323,7 +1419,8 @@ smiModel->processDiscreteDistributionIntoScenarios(smiDD);
 		// add scenario
 		anc = tnode->scenario();
 		assert(anc==0);
-		branch = tnode->depth()+1;
+//		branch = tnode->depth()+1;
+		branch = tnode->depth();
 		assert(branch==1);
 	    is = smiModel->generateScenario(core,&matrix,&cpv_dclo,&cpv_dcup,&cpv_dobj,
 									&cpv_drlo,&cpv_drup,branch,anc,dp);
@@ -1437,8 +1534,6 @@ smiModel->processDiscreteDistributionIntoScenarios(smiDD);
 	   Then get the parent.  Repeat until parent is NULL.
 	   (Only the root node has a NULL parent.)
 	 */
-
-//	FILE *fp = fopen("discrete.txt","wb");
 	for(int is=0; is<smiModel->getNumScenarios(); ++is)
 	{
 		/* this loop calculates the scenario objective value */
@@ -1452,6 +1547,7 @@ smiModel->processDiscreteDistributionIntoScenarios(smiDD);
 	
 		while (node != NULL)
 		{
+
 //			fprintf(fp,"probability \t %16f \n",scenprob);
 			// getColStart returns the starting index of node in OSI model
 			for(int j=node->getColStart(); j<node->getColStart()+node->getNumCols(); ++j)
@@ -1463,7 +1559,6 @@ smiModel->processDiscreteDistributionIntoScenarios(smiDD);
 				
 
 			}			
-			
 			// get parent of node
 			node = node->getParent();
 		}
@@ -1643,12 +1738,17 @@ void SmpsBug()
 {
 		SmiScnModel smi;
 
-		char name[]="bug";
-
+		std::string dataDir;
+#if defined(_MSC_VER)
+	dataDir="../../../../Data";
+#else
+	dataDir="../../Data";
+#endif
+		
 		// read SMPS model from files
 		//	<name>.core, <name>.time, and <name>.stoch
 		// the argument myCombineRule overrides the combine rule specified in the Stoch file
-		smi.readSmps(name);		
+		smi.readSmps((dataDir+"/Stochastic/bug").c_str());		
 
 		// generate OSI solver object
 		// 	here we use OsiClp
@@ -1666,7 +1766,7 @@ void SmpsBug()
 		osiStoch->initialSolve();		
 
 		// print results
-		printf("Solved stochastic program %s\n", name);
+		printf("Solved stochastic program Bug\n");
 		printf("Number of rows: %d\n",osiStoch->getNumRows());
 		printf("Number of cols: %d\n",osiStoch->getNumCols());
 		printf("Optimal value: %g\n",osiStoch->getObjValue());		

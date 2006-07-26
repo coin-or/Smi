@@ -85,7 +85,7 @@ public:
 
 
 	/// generate scenarios from discrete distribution
-	void processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s);
+	void processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s, bool test=false);
 
 	/** generate scenario with ancestor/branch node identification
 		

@@ -399,13 +399,25 @@ void replaceFirstWithSecond(CoinPackedVector &dfirst, const CoinPackedVector &ds
 }
 
 void
-SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *smiDD)
+SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *smiDD, bool test)
 
 {
 	SmiCoreData *core=smiDD->getCore();
 	
 	int nindp = smiDD->getNumRV();
-	assert(nindp > 0);
+	int nstages = 1;
+
+	if (test)
+	{
+		nstages = 3;
+		assert(nindp==4);
+	}
+	else
+	{
+		nstages = core->getNumStages();
+		assert(nindp > 0);
+	}
+
 	
 	int ns=1;
 	double dp=1.0;
@@ -426,7 +438,7 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 	// initialize data for first scenario
 	vector<int> indx(nindp);
 	vector<int> nsamp(nindp);
-	vector<int> label(core->getNumStages()-1);
+	vector<int> label(nstages);
 	vector<int>::iterator iLabel;
 	
 	for (iLabel=label.begin(); iLabel<label.end(); ++iLabel)
@@ -440,16 +452,18 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 		nsamp[jj] = smiRV->getNumEvents();
 		ns *= nsamp[jj];
 		dp *= smiRV->getEventProb(indx[jj]);
+
+		if (test) 
+		{
+			double p=0.5*nsamp[jj]*(nsamp[jj]+1);
+			assert(smiRV->getEventProb(indx[jj])==(indx[jj]+1)/p);
+		}
 		
 		
 		cpv_dclo.append(smiRV->getEventColLower(indx[jj]));
-		
 		cpv_dcup.append(smiRV->getEventColUpper(indx[jj]));
-		
 		cpv_dobj.append(smiRV->getEventObjective(indx[jj]));
-		
 		cpv_drlo.append(smiRV->getEventRowLower(indx[jj]));
-		
 		cpv_drup.append(smiRV->getEventRowUpper(indx[jj]));
 		
 		//TODO test smiModel code
@@ -463,8 +477,6 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 				CoinPackedVector rrow=matrix.getVector(i);
 				for (int j=m.getVectorFirst(i); j<m.getVectorLast(j); ++j)
 				{
-					
-					assert(rrow[j] == 0.0);//tests duplicate index
 					matrix.modifyCoefficient(i,j,row[j],true);
 				}
 			}
@@ -472,36 +484,32 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 		else
 			matrix = m;
 		
-		
     }
-	
+
+
 	// first scenario
 	int anc = 0;
 	int branch = 1;
-	int	is = this->generateScenario(core,&matrix,&cpv_dclo,&cpv_dcup,&cpv_dobj,
-		&cpv_drlo,&cpv_drup,branch,anc,dp);
+	int	is = 0;
+	
+	if (!test) 
+		is=this->generateScenario(core,&matrix,&cpv_dclo,&cpv_dcup,&cpv_dobj,
+						&cpv_drlo,&cpv_drup,branch,anc,dp);
+	else
+	{
+		assert(matrix.getNumElements()==4);
+		assert(cpv_dclo.getNumElements()==4);
+		for (int j=0;j<nindp;j++)
+		{
+			assert(cpv_dclo.getIndices()[j]==j);
+			assert(cpv_drlo.getIndices()[j]==indx[j]);
+			assert(matrix.getCoefficient(indx[j],j)==(double)(j*indx[j]));
+		}
+	}
+
 	
 	
 	SmiTreeNode<SmiScnNode *> *root = this->smiTree_.getRoot();
-        {
-          printf("start depth of root is %d and size of label is %d\n",
-                 root->depth(),label.size());
-          SmiTreeNode<SmiScnNode *> *n = root;
-          int t = n->depth();
-          //t--; // ??? so works
-          while(n->hasChild())
-            {
-              //n->setLastChildLabel(labels[++t]);
-              ++t;
-              printf("value of t %d\n",t);
-              if (t< (int) label.size()) {
-                n = n->getChild();
-              } else {
-                printf("ouch\n");
-                break;
-              }
-            }
-        }
 	this->smiTree_.setChildLabels(root,label);
 	
 	/* sample space increment initialized to 1 */
@@ -530,23 +538,33 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 		dp /= smiRV->getEventProb(indx[jj]);
 		indx[jj] += incr[jj];
 		dp *= smiRV->getEventProb(indx[jj]);
-		
+
+		if (test) 
+		{
+			double p=0.5*nsamp[jj]*(nsamp[jj]+1);
+			assert(smiRV->getEventProb(indx[jj])==(indx[jj]+1)/p);
+		}
+
+		for (iLabel=label.begin(); iLabel<label.end(); ++iLabel)
+			*iLabel=0;
+
+		for(int jjj=0; jjj<nindp; jjj++)
+		{	
+			SmiDiscreteRV *s = smiDD->getDiscreteRV(jjj);
+			
+			label[s->getStage()] *= s->getNumEvents();
+			label[s->getStage()] += indx[jjj];
+		}
+
 		
 		// set data
 		//TODO -- should we declare NULL entries to have 0 entries?  
 		//this would eliminate these tests
 		replaceFirstWithSecond(cpv_dclo,smiRV->getEventColLower(indx[jj]));
-		
-		
 		replaceFirstWithSecond(cpv_dcup,smiRV->getEventColUpper(indx[jj]));
-		
 		replaceFirstWithSecond(cpv_dobj,smiRV->getEventObjective(indx[jj]));
-		
 		replaceFirstWithSecond(cpv_drlo,smiRV->getEventRowLower(indx[jj]));
-		
-		
 		replaceFirstWithSecond(cpv_drup,smiRV->getEventRowUpper(indx[jj]));
-		
 		
 		//TODO test this code
 		CoinPackedMatrix m = smiRV->getEventMatrix(indx[jj]);
@@ -568,9 +586,23 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 		
 		// find ancestor node
 		SmiTreeNode<SmiScnNode *> *tnode = this->smiTree_.find(label);
-		
-		is = this->generateScenario(core,&matrix,&cpv_dclo,&cpv_dcup,&cpv_dobj,
-			&cpv_drlo,&cpv_drup,branch,anc,dp);
+		anc = tnode->scenario();
+		branch = tnode->depth();
+		if (!test) 
+		{
+			is = this->generateScenario(core,&matrix,&cpv_dclo,&cpv_dcup,&cpv_dobj,&cpv_drlo,&cpv_drup,branch,anc,dp);
+		}
+		else
+		{	
+			assert(matrix.getNumElements()==4);
+			assert(cpv_dclo.getNumElements()==4);
+			for (int j=0;j<nindp;j++)
+			{
+				assert(cpv_dclo.getIndices()[j]==j);
+				assert(cpv_drlo.getIndices()[j]==indx[j]);
+				assert(matrix.getCoefficient(j,indx[j])==(double)(j*indx[j]));
+			}
+		}
 		
 		this->smiTree_.setChildLabels(tnode,label);
 		
