@@ -16,9 +16,6 @@ Smi/src/Makefile.am -text
 Smi/src/Makefile.in -text
 Smi/test/Makefile.am -text
 Smi/test/Makefile.in -text
-Smi/test/bug.cor -text
-Smi/test/bug.stoch -text
-Smi/test/bug.time -text
 /config.guess -text
 /config.sub -text
 /configure -text
