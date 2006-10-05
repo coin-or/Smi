@@ -1774,10 +1774,50 @@ void SmpsBug()
 
 }	
 
+void Smps20()
+{
+		SmiScnModel smi;
+
+		std::string dataDir;
+#if defined(_MSC_VER)
+	dataDir="../../../../Data";
+#else
+	dataDir="../../Data";
+#endif
+		
+		// read SMPS model from files
+		//	<name>.core, <name>.time, and <name>.stoch
+		// the argument myCombineRule overrides the combine rule specified in the Stoch file
+		smi.readSmps((dataDir+"/Stochastic/20").c_str());		
+
+		// generate OSI solver object
+		// 	here we use OsiClp
+		OsiClpSolverInterface *clp = new OsiClpSolverInterface();
+
+		// set solver object for SmiScnModel
+		smi.setOsiSolverHandle(*clp);	
+
+		// load solver data
+		// 	this step generates the deterministic equivalent 
+		//	and returns an OsiSolver object 
+		OsiSolverInterface *osiStoch = smi.loadOsiSolverData();
+
+		// solve
+		osiStoch->initialSolve();		
+
+		// print results
+		printf("Solved stochastic program 20\n");
+		printf("Number of rows: %d\n",osiStoch->getNumRows());
+		printf("Number of cols: %d\n",osiStoch->getNumCols());
+		printf("Optimal value: %g\n",osiStoch->getObjValue());		
+		//assert(osiStoch->getObjValue()== 0.5);
+
+}	
+
 int main()
 {
   
-
+#if 1
 	testingMessage( "Testing SmiTreeNode \n");
 	SmiTreeNodeUnitTest();
 
@@ -1795,9 +1835,12 @@ int main()
 
 	testingMessage("Model generation for simple model Bug");
 	ModelBug();
-
+#endif
 	testingMessage("Read SMPS version of simple model Bug");
 	SmpsBug();
+
+	testingMessage("Read SMPS version of INDEP model 20");
+	Smps20();
 
 	testingMessage( "*** Done! *** \n");
 	

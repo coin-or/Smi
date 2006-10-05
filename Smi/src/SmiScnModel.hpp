@@ -15,6 +15,7 @@
 #include "SmiScnData.hpp"
 #include "OsiSolverInterface.hpp"
 #include "CoinPackedVector.hpp"
+#include "SmiMessage.hpp"
 
 // STL declarations
 #include <map>
@@ -182,6 +183,9 @@ public:
 	void addNode(SmiScnNode *node);
 
 private:
+	CoinMessageHandler *handler_;
+	SmiMessage *messages_;
+
 	// internal clone of user declared OSI
 	OsiSolverInterface * osiStoch_;
 	// model statistics useful for predefining size of structures

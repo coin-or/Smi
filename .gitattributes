@@ -14,6 +14,8 @@ Smi/examples/stoch.cpp -text
 Smi/inc/config_smi.h.in -text
 Smi/src/Makefile.am -text
 Smi/src/Makefile.in -text
+Smi/src/SmiMessage.cpp -text
+Smi/src/SmiMessage.hpp -text
 Smi/test/Makefile.am -text
 Smi/test/Makefile.in -text
 /config.guess -text

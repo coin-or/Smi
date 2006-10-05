@@ -23,7 +23,7 @@ const static char *section[] = {
 };
 
 const static char *smpsType[] = {
-	"SC","  ","DISCRETE","ADD","REPLACE",""
+	"SC","BL","  ","DISCRETE","ADD","REPLACE",""
 };
 #endif
 
@@ -189,22 +189,43 @@ SmiSmpsIO::readStochFile(SmiScnModel *smi,SmiCoreData *core, const char *c, cons
 
 	if (ifstoch)
 	{
-/*
-		if (smpsCardReader_->nextSmpsField() == SMI_INDEPENDENT_SECTION) // INDEPENDENT card
+		switch( smpsCardReader_->nextSmpsField() )
+		{
+		case SMI_INDEPENDENT_SECTION: // INDEPENDENT card
 		{
 			printf("Processing INDEPENDENT section\n");
-			
+
+			// Create discrete distribution
+			SmiDiscreteDistribution *smiDD = new SmiDiscreteDistribution(core);
+			SmiDiscreteRV *smiRV = NULL;
+
+			CoinPackedVector drlo,drup,dclo,dcup,dobj;
+			CoinPackedMatrix *matrix = new CoinPackedMatrix(false,0.25,0.25);
+			assert(!matrix->isColOrdered());
+
+			int nrow = core->getNumRows();
+			int ncol = core->getNumCols();
+			matrix->setDimensions(nrow,ncol);
+
+			int oldi=-1;
+			int oldj=-1;
+					
 			while( smpsCardReader_->nextSmpsField (  ) == SMI_INDEPENDENT_SECTION ) 
 			{
-				//do the section
-				if (smpsCardReader_->whichSmpsType() == SMI_SC_CARD)
+				
+				switch (smpsCardReader_->whichSmpsType())
 				{
-					//process card
+				case SMI_BL_CARD:
+				{
+					//this is a block 
+					// not handled yet
+					return -2;
 				}
-				else if(smpsCardReader_->whichSmpsType() == SMI_COLUMN_CARD)
+				case SMI_COLUMN_CARD:
 				{
 					int j=this->columnIndex(smpsCardReader_->columnName());
 					int i=this->rowIndex(smpsCardReader_->rowName());
+
 					double value = smpsCardReader_->value();
 
 					
@@ -245,19 +266,63 @@ SmiSmpsIO::readStochFile(SmiScnModel *smi,SmiCoreData *core, const char *c, cons
 					{
 						matrix->modifyCoefficient(i,j,value);
 					}
+					if ( !( (oldi==i)&&(oldj==j) ) ) // this is a new RV
+					{
+						oldi=i;
+						oldj=j;
+						// store the old one
+						if (smiRV != NULL) 
+						{
+							smiDD->addDiscreteRV(smiRV);
+						}
+						// create a new one -- row stage dominates unless is column bound
+						if (i>0)
+							smiRV = new SmiDiscreteRV(core->getRowStage(i));
+						else
+							smiRV = new SmiDiscreteRV(core->getColStage(j));
+						smiRV->addEvent(*matrix,dclo,dcup,dobj,drlo,drup,smpsCardReader_->getProb());
+						matrix->clear();
+						dclo.clear();
+						dcup.clear();
+						dobj.clear();
+						drlo.clear();
+						drup.clear();
+
+					}
+					else
+					{
+						smiRV->addEvent(*matrix,dclo,dcup,dobj,drlo,drup,smpsCardReader_->getProb());
+						matrix->clear();
+						dclo.clear();
+						dcup.clear();
+						dobj.clear();
+						drlo.clear();
+						drup.clear();
+					}
+
+
+
+
+				}
+				break;
+				case SMI_UNKNOWN_MPS_TYPE:
+					return -2;
 				}
 			}
 			
 			if (smpsCardReader_->whichSmpsSection() == SMI_ENDATA_SECTION)
 			{
-				//cleanup
+				//process discrete distribution
+				smi->processDiscreteDistributionIntoScenarios(smiDD);
 				return 0;
 			}
+			else
+				return -2;
 			
 
 		}
-*/
-		if (smpsCardReader_->nextSmpsField() == SMI_SCENARIOS_SECTION) // SCENARIOS card
+
+		case SMI_SCENARIOS_SECTION: // SCENARIOS card
 		{
 			double prob=0.0;
 			int scen=0,anc=0;
@@ -363,8 +428,9 @@ SmiSmpsIO::readStochFile(SmiScnModel *smi,SmiCoreData *core, const char *c, cons
 
 		} 
 
-		// didn't recognize section
+		default:// didn't recognize section
 		return -1;
+		}
 
 		
 
@@ -443,48 +509,79 @@ SmiSmpsCardReader::nextSmpsField (  )
 			  position_ = eol_;
 			  
 		  }
-/*
+
 		  if ( smiSection_ == SMI_INDEPENDENT_SECTION )
 		  {
-			  if (!(next = strtok(position_,blanks)))
+			  int i;
+			  if (strlen(next)==2)
 			  {
-				  smiSmpsType_ = SMI_UNKNOWN_MPS_TYPE;
-				  return smiSection_;
+				  for (i = SMI_BL_CARD; i < SMI_UNKNOWN_MPS_TYPE; ++i) {
+					  if ( !strncmp ( next, smpsType[i], 2 ) ) 
+					  {
+						  break;
+					  }
+				  }
 			  }
-			  //already got the name
-			  strcpy(columnName_,next);
-			  
-			  if (!(next = strtok(NULL,blanks)))
-			  {
-				  smiSmpsType_ = SMI_UNKNOWN_MPS_TYPE;
-				  break;
-			  }
-			  strcpy(rowName_,next);
+			  else
+				  i = SMI_COLUMN_CARD;
 
-			  if (!(next = strtok(NULL,blanks)))
+			  switch(smiSmpsType_ = (SmiSmpsType) i)
 			  {
-				  smiSmpsType_ = SMI_UNKNOWN_MPS_TYPE;
+			  case SMI_BL_CARD: // not handled yet
 				  break;
-			  }
-			  strcpy(valstr,next);
-
-			  value_ = osi_strtod(valstr,&after,0);
-			  // see if error
-			  assert(after>valstr);
+				 
+			  case SMI_COLUMN_CARD: // card info has "col,row,value,prob"
+				    
+				  if (!(next = strtok(position_,blanks)))
+				  {
+					  smiSmpsType_ = SMI_UNKNOWN_MPS_TYPE;
+					  return smiSection_;
+				  }
+				  //already got the name
+				  strcpy(columnName_,next);
 				  
-			  if (!(next = strtok(NULL,blanks)))
-			  {
-				  smiSmpsType_ = SMI_UNKNOWN_MPS_TYPE;
-				  break;
-			  }
-			  strcpy(valstr,next);
+				  if (!(next = strtok(NULL,blanks)))
+				  {
+					  smiSmpsType_ = SMI_UNKNOWN_MPS_TYPE;
+					  break;
+				  }
+				  strcpy(rowName_,next);
 
-			  prob_ = osi_strtod(valstr,&after,0);
-			  // see if error
-			  assert(after>valstr);
+				  if (!(next = strtok(NULL,blanks)))
+				  {
+					  smiSmpsType_ = SMI_UNKNOWN_MPS_TYPE;
+					  break;
+				  }
+				  strcpy(valstr,next);
+
+				  value_ = osi_strtod(valstr,&after,0);
+				  // see if error
+				  assert(after>valstr);
+					  
+				  if (!(next = strtok(NULL,blanks)))
+				  {
+					  smiSmpsType_ = SMI_UNKNOWN_MPS_TYPE;
+					  break;
+				  }
+				  strcpy(valstr,next);
+
+				  prob_ = osi_strtod(valstr,&after,0);
+				  // see if error
+				  assert(after>valstr);
+
+				  position_ = eol_;  //end of card -- no more information allowed
+				  break;
+
+			  case SMI_UNKNOWN_MPS_TYPE:
+				  break;
+			  default:
+				  smiSmpsType_=SMI_UNKNOWN_MPS_TYPE;
+			  }//end switch
+
+			  return smiSection_;
 
 		  }
-*/
+
 		  if ( smiSection_ == SMI_SCENARIOS_SECTION )
 		  {
 			

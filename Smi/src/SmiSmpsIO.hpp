@@ -32,7 +32,7 @@ enum SmiSectionType { SMI_NO_SECTION, SMI_NAME_SECTION,
 					  SMI_UNKNOWN_SECTION
 };
 
-enum SmiSmpsType { SMI_SC_CARD, SMI_COLUMN_CARD, SMI_DISCRETE_DIST, SMI_SMPS_COMBINE_ADD, 
+enum SmiSmpsType { SMI_SC_CARD, SMI_BL_CARD, SMI_COLUMN_CARD, SMI_DISCRETE_DIST, SMI_SMPS_COMBINE_ADD, 
 	SMI_SMPS_COMBINE_REPLACE, SMI_SMPS_COMBINE_UNKNOWN, SMI_UNKNOWN_MPS_TYPE,
 	SMI_TIME_UNORDERED_CORE_TYPE, SMI_TIME_ORDERED_CORE_TYPE
 };
@@ -50,19 +50,22 @@ public:
 	  inline const char *scenarioNew (  ) const {return columnName_;};
 	  inline const char *scenarioAnc (  ) const {return rowName_;};
 
+	  inline double getProb(){ return prob_;};
+
 	  inline void setCoreCombineRule(SmiCoreCombineRule *r){combineRule_=r;combineRuleSet=true;}
 	  inline SmiCoreCombineRule *getCoreCombineRule() { return combineRule_;}
 
 	  /// Constructor expects file to be open 
 	  /// This one takes gzFile if fp null
 	  SmiSmpsCardReader( CoinFileInput *input, CoinMpsIO * reader ):CoinMpsCardReader (input,reader ),
-		combineRuleSet(false){}
+		combineRuleSet(false),prob_(0.0){}
 
 	  ~SmiSmpsCardReader(){}
 private:
 	 /// Current third name (for SmpsIO)
 	char periodName_[COIN_MAX_FIELD_LENGTH];
 	float fvalue_;
+	double prob_;
 	SmiSectionType smiSection_;
 	SmiSmpsType smiSmpsType_;
 	SmiCoreCombineRule *combineRule_;

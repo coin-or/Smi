@@ -446,11 +446,15 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 	
 	int jj;
 	for (jj=0;jj<nindp;jj++) {
+
 		SmiDiscreteRV *smiRV = smiDD->getDiscreteRV(jj);
 		
 		indx[jj] = 0;
 		nsamp[jj] = smiRV->getNumEvents();
+
+		assert( INT_MAX / ns > nsamp[jj] );
 		ns *= nsamp[jj];
+		
 		dp *= smiRV->getEventProb(indx[jj]);
 
 		if (test) 
