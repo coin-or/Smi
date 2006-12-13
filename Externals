@@ -1,6 +1,6 @@
 BuildTools         https://projects.coin-or.org/svn/BuildTools/releases/0.5.1
-MSVisualStudio -r83 https://projects.coin-or.org/svn/MSVisualStudio/trunk/ExternalsDirs/Smi
+MSVisualStudio 	   https://projects.coin-or.org/svn/MSVisualStudio/releases/1.0.1/ExternalsDirs/Smi
 CoinUtils          https://projects.coin-or.org/svn/CoinUtils/releases/1.0.0/CoinUtils
 Data/Stochastic    https://projects.coin-or.org/svn/Data/releases/1.0.0/Stochastic
 Clp                https://projects.coin-or.org/svn/Clp/releases/1.3.3/Clp
-Osi          -r797 https://projects.coin-or.org/svn/Osi/trunk/Osi
+Osi                https://projects.coin-or.org/svn/Osi/releases/0.95.3/Osi

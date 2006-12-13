@@ -85,7 +85,7 @@ void ModelScenario(const char * const name )
     int ncol=27, nrow=9, nels=44;
 	
 	/* Sparse matrix data...organized by row */
-    int *mrow,cmrow[]={ 0, 0, 0, 0, 0,
+    int mrow[]={ 0, 0, 0, 0, 0,
 		1, 1, 1, 1,
 		2, 2, 2,
 		3, 3, 3, 3, 3,
@@ -94,7 +94,7 @@ void ModelScenario(const char * const name )
 		6, 6, 6, 6, 6,
 		7, 7, 7, 7, 7, 7,
 		8, 8, 8, 8, 8, 8 };
-	  int *mcol,cmcol[]={ 0, 1, 2, 3, 4,
+	  int mcol[]={ 0, 1, 2, 3, 4,
 		5, 6, 7, 8,
 		9,10, 11, 
 		12, 13, 14, 15, 16, 
@@ -115,32 +115,32 @@ void ModelScenario(const char * const name )
 		81.0, 57.0, 29.0, 55.0, -1.0, 1.0 };
 	
     /* Objective */
-    double *dobj,cdobj[]={ 18.0, 21.0, 18.0, 16.0, 10.0, 15.0, 16.0, 14.0, 9.0,
+    double dobj[]={ 18.0, 21.0, 18.0, 16.0, 10.0, 15.0, 16.0, 14.0, 9.0,
 		10.0,  9.0,  6.0, 17.0, 16.0, 17.0, 15.0, 10.0, 0.0,
 		13.0,  0.0, 13.0,  0.0,  7.0,  0.0,  7.0,  0.0, 1.0 };
 	
     /* Column bounds */
-    double *dclo,cdclo[]={ 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+    double dclo[]={ 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
 		0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
 		0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0 };
 
 
 
-    double *dcup,cdcup[]={ INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,
+    double dcup[]={ INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,
 		INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,
 		INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF };
 	
     /* Row bounds */
-    double *drlo,cdrlo[]={ -INF, -INF, -INF, -INF,  0.0, 4.0, 0.0, 8.0, 10.0 };
-    double *drup,cdrup[]={ 10.0, 19.0, 25.0, 15.0,  0.0, 7.0, 0.0, 8.0, 90.0 };
+    double drlo[]={ -INF, -INF, -INF, -INF,  0.0, 4.0, 0.0, 8.0, 10.0 };
+    double drup[]={ 10.0, 19.0, 25.0, 15.0,  0.0, 7.0, 0.0, 8.0, 90.0 };
 	
     /* Stages */
-    //int nstg=2;
+    int nstg=2;
     int n_first_stg_rows=4;
-    int *rstg,crstg[]={ 0,0,0,0,1,1,1,1,2 };
-    int *cstg,ccstg[]={ 0,0,0,0,0,0,0,0,0,
+    int rstg[]={ 0,0,0,0,1,1,1,1,1 };
+    int cstg[]={ 0,0,0,0,0,0,0,0,0,
 		0,0,0,0,0,0,0,0,1,
-		1,1,1,1,1,1,1,2,2 };
+		1,1,1,1,1,1,1,1,1 };
 	
     /* Stochastic data */
     int nindp=5;
@@ -156,12 +156,6 @@ void ModelScenario(const char * const name )
 		0.2, 0.2, 0.3, 0.2, 0.1,
 		0.1, 0.8, 0.1 };
 	
-	/* scramble */
-
-	int irow[]={ 1,2,7,8,0,3,4,5,6};
-    int icol[]={ 9,2,3,4,5,6,7,8,1,
-		19,21,23,25,0,26,24,22,20,
-		10,11,12,13,14,15,16,17,18 };
 
     /* local variables */
     int ns=1,ii,iii,jj,*indx,*incr;
@@ -169,62 +163,23 @@ void ModelScenario(const char * const name )
 
     for (ii=0;ii<nindp;ii++) ns *= nsamp[ii];     /* Compute number of scenarios */
 
-	// debug small sample
-	// ns = 3;
-	
 	// initialize SmiModel
 	SmiScnModel *smiModel = new SmiScnModel();
-
-
-
 	smiModel->setOsiSolverHandle(*osiClp1);
 	
-	/* scramble LP entries */
-	mrow = (int*)malloc(nels*sizeof(int));
-	mcol = (int*)malloc(nels*sizeof(int));
-	for (ii=0;ii<nels;ii++)
-	{
-		mcol[ii] = icol[cmcol[ii]];
-		mrow[ii] = irow[cmrow[ii]];
-	}
 	
-	drlo = (double *)malloc(nrow*sizeof(double));
-	drup = (double *)malloc(nrow*sizeof(double));
-	rstg = (int *)malloc(nrow*sizeof(int));
-	for (ii=0;ii<nrow;ii++)
-	{
-		drlo[irow[ii]] = cdrlo[ii];
-		drup[irow[ii]] = cdrup[ii];
-		rstg[irow[ii]] = crstg[ii];
-	}
-	
-	dclo = (double *)malloc(ncol*sizeof(double));
-	dcup = (double *)malloc(ncol*sizeof(double));
-	dobj = (double *)malloc(ncol*sizeof(double));
-	cstg = (int *)malloc(ncol*sizeof(int));
-	for (ii=0;ii<ncol;ii++)
-	{
-		dclo[icol[ii]] = cdclo[ii];
-		dcup[icol[ii]] = cdcup[ii];
-		dobj[icol[ii]] = cdobj[ii];
-		cstg[icol[ii]] = ccstg[ii];
-	}
-
-	// this is a fake, just to demo that we can also handle stochastic matrix entries
-	int corenels = nels - 4;
-
 	// set core model using Osi interface
 	OsiClpSolverInterface ocsi;
+
+	int corenels=sizeof(dels)/sizeof(double);
+
 	ocsi.loadProblem(CoinPackedMatrix( 1,mrow,mcol,dels,corenels),dclo,dcup,dobj,drlo,drup);
-	SmiCoreData *osiCore = new SmiCoreData(&ocsi,3,cstg,rstg);
+	SmiCoreData *osiCore = new SmiCoreData(&ocsi,nstg,cstg,rstg);
 	
 	// Coin structures for scenario updates to right hand sides
 	CoinPackedVector cpv_rlo;
 	CoinPackedVector cpv_rup;
 
-	// Coin structure for scenario "updates" to core matrix
-	// ..row-ordered
-	CoinPackedMatrix *cpm_mat = new CoinPackedMatrix(false,mrow+corenels,mcol+corenels,dels+corenels,nels-corenels);
 		
     // initialize right hand side data for first scenario
     indx = (int *) malloc( (1+nindp)*sizeof(int) );
@@ -233,17 +188,14 @@ void ModelScenario(const char * const name )
 		indx[jj+1] += indx[jj] + nsamp[jj];
 		dp *= dprobs[ indx[jj] ];
 
-		drlo[irow[n_first_stg_rows + jj]] = demand[ indx[jj] ];
-		drup[irow[n_first_stg_rows + jj]] = demand[ indx[jj] ];
-		
-		cpv_rlo.insert(irow[n_first_stg_rows + jj],demand[ indx[jj] ]);
-		cpv_rup.insert(irow[n_first_stg_rows + jj],demand[ indx[jj] ]);
+		cpv_rlo.insert(n_first_stg_rows + jj,demand[ indx[jj] ]);
+		cpv_rup.insert(n_first_stg_rows + jj,demand[ indx[jj] ]);
     }
 	
 	// first scenario
 	int anc = 0;
 	int branch = 1;
-	int	is = smiModel->generateScenario(osiCore,cpm_mat,NULL,NULL,NULL,
+	int	is = smiModel->generateScenario(osiCore,NULL,NULL,NULL,NULL,
 									&cpv_rlo,&cpv_rup,branch,anc,dp);	
 	
 
@@ -273,14 +225,11 @@ void ModelScenario(const char * const name )
 		dp *= dprobs[ indx[jj] ];
 
 		// set data
-		drlo[irow[n_first_stg_rows + jj]] = demand[ indx[jj] ];
-		drup[irow[n_first_stg_rows + jj]] = demand[ indx[jj] ];
-
-		cpv_rlo.setElement(cpv_rlo.findIndex(irow[n_first_stg_rows + jj]),demand[ indx[jj] ]);
-		cpv_rup.setElement(cpv_rup.findIndex(irow[n_first_stg_rows + jj]),demand[ indx[jj] ]);
+		cpv_rlo.setElement(cpv_rlo.findIndex(n_first_stg_rows + jj),demand[ indx[jj] ]);
+		cpv_rup.setElement(cpv_rup.findIndex(n_first_stg_rows + jj),demand[ indx[jj] ]);
 		
 		// genScenario
-		is = smiModel->generateScenario(osiCore,cpm_mat,NULL,NULL,NULL,
+		is = smiModel->generateScenario(osiCore,NULL,NULL,NULL,NULL,
 			&cpv_rlo,&cpv_rup,branch,anc,dp);	
 		
 		
@@ -363,7 +312,7 @@ void ModelDiscrete(const char * const name)
     int ncol=27, nrow=9, nels=44;
 	
 	/* Sparse matrix data...organized by row */
-    int *mrow,cmrow[]={ 0, 0, 0, 0, 0,
+    int mrow[]={ 0, 0, 0, 0, 0,
 		1, 1, 1, 1,
 		2, 2, 2,
 		3, 3, 3, 3, 3,
@@ -372,7 +321,7 @@ void ModelDiscrete(const char * const name)
 		6, 6, 6, 6, 6,
 		7, 7, 7, 7, 7, 7,
 		8, 8, 8, 8, 8, 8 };
-	  int *mcol,cmcol[]={ 0, 1, 2, 3, 4,
+    int mcol[]={ 0, 1, 2, 3, 4,
 		5, 6, 7, 8,
 		9,10, 11, 
 		12, 13, 14, 15, 16, 
@@ -393,33 +342,32 @@ void ModelDiscrete(const char * const name)
 		81.0, 57.0, 29.0, 55.0, -1.0, 1.0 };
 	
     /* Objective */
-    /* Objective */
-    double *dobj,cdobj[]={ 18.0, 21.0, 18.0, 16.0, 10.0, 15.0, 16.0, 14.0, 9.0,
+    double dobj[]={ 18.0, 21.0, 18.0, 16.0, 10.0, 15.0, 16.0, 14.0, 9.0,
 		10.0,  9.0,  6.0, 17.0, 16.0, 17.0, 15.0, 10.0, 0.0,
 		13.0,  0.0, 13.0,  0.0,  7.0,  0.0,  7.0,  0.0, 1.0 };
 	
     /* Column bounds */
-    double *dclo,cdclo[]={ 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+    double dclo[]={ 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
 		0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
 		0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0 };
 
 
 
-    double *dcup,cdcup[]={ INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,
+    double dcup[]={ INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,
 		INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,
 		INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF,  INF };
 	
     /* Row bounds */
-    double *drlo,cdrlo[]={ -INF, -INF, -INF, -INF,  0.0, 4.0, 0.0, 8.0, 10.0 };
-    double *drup,cdrup[]={ 10.0, 19.0, 25.0, 15.0,  0.0, 7.0, 0.0, 8.0, 90.0 };
+    double drlo[]={ -INF, -INF, -INF, -INF,  0.0, 4.0, 0.0, 8.0, 10.0 };
+    double drup[]={ 10.0, 19.0, 25.0, 15.0,  0.0, 7.0, 0.0, 8.0, 90.0 };
 	
     /* Stages */
-    //int nstg=2;
+    int nstg=2;
     int n_first_stg_rows=4;
-    int *rstg,crstg[]={ 0,0,0,0,1,1,1,1,2 };
-    int *cstg,ccstg[]={ 0,0,0,0,0,0,0,0,0,
+    int rstg[]={ 0,0,0,0,1,1,1,1,1 };
+    int cstg[]={ 0,0,0,0,0,0,0,0,0,
 		0,0,0,0,0,0,0,0,1,
-		1,1,1,1,1,1,1,2,2 };
+		1,1,1,1,1,1,1,1,1 };
 	
     /* Stochastic data */
     int nindp=5;
@@ -435,71 +383,21 @@ void ModelDiscrete(const char * const name)
 		0.2, 0.2, 0.3, 0.2, 0.1,
 		0.1, 0.8, 0.1 };
 	
-	/* scramble */
-
-	int irow[]={ 1,2,7,8,0,3,4,5,6};
-    int icol[]={ 9,2,3,4,5,6,7,8,1,
-		19,21,23,25,0,26,24,22,20,
-		10,11,12,13,14,15,16,17,18 };
-
     /* local variables */
     int ii,jj;
 
 
 	// initialize SmiModel
 	SmiScnModel *smiModel = new SmiScnModel();
-
-
-
 	smiModel->setOsiSolverHandle(*osiClp1);
-	
-	/* scramble LP entries */
-	mrow = (int*)malloc(nels*sizeof(int));
-	mcol = (int*)malloc(nels*sizeof(int));
-	for (ii=0;ii<nels;ii++)
-	{
-		mcol[ii] = icol[cmcol[ii]];
-		mrow[ii] = irow[cmrow[ii]];
-	}
-	
-	drlo = (double *)malloc(nrow*sizeof(double));
-	drup = (double *)malloc(nrow*sizeof(double));
-	rstg = (int *)malloc(nrow*sizeof(int));
-	for (ii=0;ii<nrow;ii++)
-	{
-		drlo[irow[ii]] = cdrlo[ii];
-		drup[irow[ii]] = cdrup[ii];
-		rstg[irow[ii]] = crstg[ii];
-	}
-	
-	dclo = (double *)malloc(ncol*sizeof(double));
-	dcup = (double *)malloc(ncol*sizeof(double));
-	dobj = (double *)malloc(ncol*sizeof(double));
-	cstg = (int *)malloc(ncol*sizeof(int));
-	for (ii=0;ii<ncol;ii++)
-	{
-		dclo[icol[ii]] = cdclo[ii];
-		dcup[icol[ii]] = cdcup[ii];
-		dobj[icol[ii]] = cdobj[ii];
-		cstg[icol[ii]] = ccstg[ii];
-	}
-
-	// this to test the matrix update stanza in genScenario
-	int corenels = nels - 4;
-	
 	
 	// set core model using Osi interface
 	OsiClpSolverInterface ocsi;
+	int corenels=sizeof(dels)/sizeof(double);
 	ocsi.loadProblem(CoinPackedMatrix( 1,mrow,mcol,dels,corenels),dclo,dcup,dobj,drlo,drup);
 	
-	// core model with 3 stages
-	SmiCoreData *smiCore = new SmiCoreData(&ocsi,3,cstg,rstg);
-
-	// Coin structure for scenario "updates" to core matrix
-	// ..row-ordered
-	CoinPackedMatrix *cpm_mat = new CoinPackedMatrix(false,mrow+corenels,mcol+corenels,dels+corenels,nels-corenels);
-
-
+	// core model 
+	SmiCoreData *smiCore = new SmiCoreData(&ocsi,nstg,cstg,rstg);
 
 	// Create discrete distribution
 	SmiDiscreteDistribution *smiDD = new SmiDiscreteDistribution(smiCore);
@@ -508,14 +406,15 @@ void ModelDiscrete(const char * const name)
 	for (jj=0;jj<nindp;jj++)
 	{
 		SmiDiscreteRV *smiRV = new SmiDiscreteRV(1);
+		CoinPackedVector cpv_rlo ;
+		CoinPackedVector cpv_rup ;
 		for (ii=0;ii<nsamp[jj];ii++)
 		{			
 			CoinPackedVector empty_vec;
-			CoinPackedVector cpv_rlo ;
-			CoinPackedVector cpv_rup ;
-			cpv_rlo.insert(irow[n_first_stg_rows + jj], demand[index+ii]);
-			cpv_rup.insert(irow[n_first_stg_rows + jj], demand[index+ii]);
-			smiRV->addEvent(*cpm_mat,empty_vec,empty_vec,empty_vec,cpv_rlo,cpv_rup,dprobs[index+ii]);
+			CoinPackedMatrix empty_mat;
+			cpv_rlo.insert(n_first_stg_rows + jj, demand[index+ii]);
+			cpv_rup.insert(n_first_stg_rows + jj, demand[index+ii]);
+			smiRV->addEvent(empty_mat,empty_vec,empty_vec,empty_vec,cpv_rlo,cpv_rup,dprobs[index+ii]);
 			cpv_rlo.clear();
 			cpv_rup.clear();
 		}
@@ -527,7 +426,7 @@ void ModelDiscrete(const char * const name)
 			assert(smiRV->getEventObjective(ii).getNumElements()==0);
 			assert(smiRV->getEventMatrix(ii).getNumElements()==cpm_mat->getNumElements());
 			assert(smiRV->getEventRowLower(ii).getElements()[0] == demand[index+ii]);
-			assert(smiRV->getEventRowLower(ii).getIndices()[0] == irow[n_first_stg_rows + jj]);
+			assert(smiRV->getEventRowLower(ii).getIndices()[0] == n_first_stg_rows + jj);
 			assert(smiRV->getEventRowUpper(ii).getElements()[0] == demand[index+ii]);
 			//printf("event prob %g\n",smiRV->getEventProb(ii));
 			assert(fabs(smiRV->getEventProb(ii) - dprobs[index+ii]) < 0.0000001);
@@ -539,7 +438,6 @@ void ModelDiscrete(const char * const name)
 	assert(smiDD->getNumRV() == nindp);
 
 	smiModel->processDiscreteDistributionIntoScenarios(smiDD);
-
 	
 	// load problem data into OsiSolver
 	smiModel->loadOsiSolverData();

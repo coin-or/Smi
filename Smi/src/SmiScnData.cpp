@@ -308,10 +308,9 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 					// revise indices
 					for(int j=0;j<stored->getNumElements();j++)
 					{
-						int t= core->getColStage(indx[j]);
 						indx[j] = core->getColInternalIndex(indx[j]);
 						// TODO: message about row stage incompatible with col stage
-						assert(!( t > stg));
+						assert(!( core->getColStage(indx[j]) > stg));
 					}
 					//TODO: this is nice for the addNode function but is it too expensive?
 					stored->sortIncrIndex();

@@ -327,10 +327,8 @@ SmiScnModel::addNode(SmiScnNode *tnode)
 	nrow_ += core->getNumRows(stg);
 
 	// for debug sanity
-	int mnrow = matrix_->getNumRows();
-	int mncol = matrix_->getNumCols();
-	assert(mnrow == nrow_);
-	assert(mncol == ncol_);
+	assert(nrow_ == matrix_->getNumRows());
+	assert(ncol_== int mncol = matrix_->getNumCols());
 }
 
 OsiSolverInterface *
@@ -455,8 +453,7 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 
 		if (test) 
 		{
-			double p=0.5*nsamp[jj]*(nsamp[jj]+1);
-			assert(smiRV->getEventProb(indx[jj])==(indx[jj]+1)/p);
+			assert(smiRV->getEventProb(indx[jj])==(indx[jj]+1)/(0.5*nsamp[jj]*(nsamp[jj]+1)));
 		}
 		
 		
@@ -541,8 +538,7 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 
 		if (test) 
 		{
-			double p=0.5*nsamp[jj]*(nsamp[jj]+1);
-			assert(smiRV->getEventProb(indx[jj])==(indx[jj]+1)/p);
+			assert(smiRV->getEventProb(indx[jj])==(indx[jj]+1)/(0.5*nsamp[jj]*(nsamp[jj]+1)));
 		}
 
 		for (iLabel=label.begin(); iLabel<label.end(); ++iLabel)
