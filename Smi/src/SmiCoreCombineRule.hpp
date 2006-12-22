@@ -11,25 +11,34 @@
 #if !defined(SmiCoreCombineRule_HPP)
 #define SmiCoreCombineRule_HPP
 
-#if defined(_MSC_VER)
-// Turn off compiler warning about long names
-#  pragma warning(disable:4786)
-#endif
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
-
+#include "CoinPragma.hpp"
 #include "CoinPackedVector.hpp"
 #include <string>
+/** This deals with combining Core and Stochastic data.
 
-//////////////////////////////////////////////////////////////////////
-// SmiCoreCombineRule
-// -- abstract base class
-//////////////////////////////////////////////////////////////////////
+	In the Stochastic MPS standard, stochastic data updates
+	the underlying core lp data.  To specify a new scenario,
+	one only has to identify those data that are different.
+	So, in a sense, the stochastic data is really a "diff" between
+	the scenario and the core data. This class specifies how
+	to perform the "undiff", that is, how to combine core
+	and stochastic data. 
+
+	And of course, a complete implementation specifies the
+	"diff" part as well.  Now during a fit of original confusion
+	in the birth of the SMPS standard, we decided to make
+	default combine rule "replace", which has a rather special
+	"diff", but we've learned to live with it.
+
+	There only needs to be one of these classes. so they're 
+	singletons.
+	*/
 class SmiCoreCombineRule  
 {
 public:
+  /**@name Virtual Functions: Process and Diff */
+  //@{
+  /// Process 
 	virtual void Process(double *d1, int o1, const CoinPackedVector &cpv2, char *type=0)=0;
 	virtual CoinPackedVector * Process(CoinPackedVector *cpv1, CoinPackedVector *cpv2, char *type=0)=0;
 	virtual ~SmiCoreCombineRule(){};
