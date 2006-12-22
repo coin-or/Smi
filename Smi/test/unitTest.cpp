@@ -1817,7 +1817,6 @@ void Smps20()
 int main()
 {
   
-#if 1
 	testingMessage( "Testing SmiTreeNode \n");
 	SmiTreeNodeUnitTest();
 
@@ -1835,12 +1834,10 @@ int main()
 
 	testingMessage("Model generation for simple model Bug");
 	ModelBug();
-#endif
+
 	testingMessage("Read SMPS version of simple model Bug");
 	SmpsBug();
 
-	testingMessage("Read SMPS version of INDEP model 20");
-	Smps20();
 
 	testingMessage( "*** Done! *** \n");
 	
