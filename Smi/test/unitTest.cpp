@@ -1,14 +1,6 @@
 // Copyright (C) 2003, International Business Machines
 // Corporation and others.  All Rights Reserved.
 
-#if defined(_MSC_VER)
-// Turn off compiler warning about long names
-#  pragma warning(disable:4786)
-#endif
-
-#include <cassert>
-#include <iostream>
-
 
 #include "SmiScnModel.hpp"
 #include "OsiClpSolverInterface.hpp"
