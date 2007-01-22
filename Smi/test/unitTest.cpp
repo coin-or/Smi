@@ -254,13 +254,21 @@ SmiTreeNodeUnitTest()
 
 	SmiTreeNode<int *> *n1 = new SmiTreeNode<int *>(i1);
 
-	SmiTreeNode<int *> *n2 = n1->addChild(i2,0);
-	SmiTreeNode<int *> *n3 = n1->addChild(i3,1);
-	SmiTreeNode<int *> *n4 = n2->addChild(i4,0);
-	SmiTreeNode<int *> *n5 = n2->addChild(i5,2);
-	SmiTreeNode<int *> *n6 = n3->addChild(i6,1);
-	SmiTreeNode<int *> *n7 = n3->addChild(i7,3);
-	SmiTreeNode<int *> *n8 = n3->addChild(i8,4);
+	SmiTreeNode<int *> *n2;
+	SmiTreeNode<int *> *n3;
+	SmiTreeNode<int *> *n4;
+	SmiTreeNode<int *> *n5;
+	SmiTreeNode<int *> *n6;
+	SmiTreeNode<int *> *n7;
+	SmiTreeNode<int *> *n8;
+
+	n2 = n1->addChild(i2,0);
+	n3 = n1->addChild(i3,1);
+	n4 = n2->addChild(i4,0);
+	n5 = n2->addChild(i5,2);
+	n6 = n3->addChild(i6,1);
+	n7 = n3->addChild(i7,3);
+	n8 = n3->addChild(i8,4);
 
 	assert( n1->depth() == 0 );
 	assert( n2->depth() == 1 );
@@ -306,22 +314,18 @@ SmiTreeNodeUnitTest()
 
 void SmiScnSmpsIOUnitTest()
 {
-  std::string dataDir;
-#if defined(_MSC_VER)
-  dataDir="../../../../Data";
-#else
-  dataDir="../../Data";
-#endif
+  	std::string dataDir="../../Data/Stochastic";
+	int nrows, ncols;
 	{
 		// test SMPS files app0110R
 		SmiScnModel smi;	
-		smi.readSmps((dataDir+"/Stochastic/app0110R").c_str());		
+		smi.readSmps((dataDir+"/app0110R").c_str());		
 		OsiClpSolverInterface *clp = new OsiClpSolverInterface();
 		smi.setOsiSolverHandle(*clp);	
 		OsiSolverInterface *osiStoch = smi.loadOsiSolverData();
 		
-		int nrows = osiStoch->getNumRows();
-		int ncols = osiStoch->getNumCols();
+		nrows = osiStoch->getNumRows();
+		ncols = osiStoch->getNumCols();
 		assert(nrows==129);
 		assert(ncols==268);
 		
@@ -333,13 +337,13 @@ void SmiScnSmpsIOUnitTest()
 	{
 		// test SMPS files app0110 -- ADD scenario values
 		SmiScnModel smi;	
-		smi.readSmps((dataDir+"/Stochastic/app0110").c_str());		
+		smi.readSmps((dataDir+"/app0110").c_str());		
 		OsiClpSolverInterface *clp = new OsiClpSolverInterface();
 		smi.setOsiSolverHandle(*clp);	
 		OsiSolverInterface *osiStoch = smi.loadOsiSolverData();
 		
-		int nrows = osiStoch->getNumRows();
-		int ncols = osiStoch->getNumCols();
+		nrows = osiStoch->getNumRows();
+		ncols = osiStoch->getNumCols();
 		assert(nrows==129);
 		assert(ncols==268);
 		
@@ -351,7 +355,7 @@ void SmiScnSmpsIOUnitTest()
 		// test SMPS files from Watson test suite (Cambridge, UK)
 		
 		SmiScnModel smi;
-		smi.readSmps((dataDir+"/Stochastic/wat_10_C_32").c_str());
+		smi.readSmps((dataDir+"/wat_10_C_32").c_str());
 		OsiClpSolverInterface *clp = new OsiClpSolverInterface();
 		smi.setOsiSolverHandle(*clp);	
 		OsiSolverInterface *osiStoch = smi.loadOsiSolverData();
@@ -745,11 +749,11 @@ void SmiScnModelScenarioUnitTest()
 			totalProb += dp;
 			
 			// get arrays	
-			const double *stochdrlo = smiOsi1->getRowLower()+nStochRow;
-			const double *stochdrup = smiOsi1->getRowUpper()+nStochRow;
-			const double *stochdclo = smiOsi1->getColLower()+nStochCol;
-			const double *stochdcup = smiOsi1->getColUpper()+nStochCol;
-			const double *stochdobj = smiOsi1->getObjCoefficients()+nStochCol;
+			stochdrlo = smiOsi1->getRowLower()+nStochRow;
+			stochdrup = smiOsi1->getRowUpper()+nStochRow;
+			stochdclo = smiOsi1->getColLower()+nStochCol;
+			stochdcup = smiOsi1->getColUpper()+nStochCol;
+			stochdobj = smiOsi1->getObjCoefficients()+nStochCol;
 			
 			// get matrix
 			const CoinPackedMatrix *stochmat = smiOsi1->getMatrixByRow();
@@ -772,8 +776,8 @@ void SmiScnModelScenarioUnitTest()
 					elt2 = dobj[ic];
 					assert(fabs(elt1 - (elt2*dp/totalProb)) < 1.0e-8);
 				}
-				int ir;
-				int rowOff = osiCore->getRowStart(1);
+				int ir,rowOff;
+				rowOff = osiCore->getRowStart(1);
 				for(ii=osiCore->getRowStart(t);ii<osiCore->getRowStart(t+1);ii++)
 				{
 					
@@ -1431,11 +1435,11 @@ void SmiScnModelDiscreteUnitTest()
 			totalProb += dp;
 			
 			// get arrays	
-			const double *stochdrlo = smiOsi1->getRowLower()+nStochRow;
-			const double *stochdrup = smiOsi1->getRowUpper()+nStochRow;
-			const double *stochdclo = smiOsi1->getColLower()+nStochCol;
-			const double *stochdcup = smiOsi1->getColUpper()+nStochCol;
-			const double *stochdobj = smiOsi1->getObjCoefficients()+nStochCol;
+			stochdrlo = smiOsi1->getRowLower()+nStochRow;
+			stochdrup = smiOsi1->getRowUpper()+nStochRow;
+			stochdclo = smiOsi1->getColLower()+nStochCol;
+			stochdcup = smiOsi1->getColUpper()+nStochCol;
+			stochdobj = smiOsi1->getObjCoefficients()+nStochCol;
 			
 			// get matrix
 			const CoinPackedMatrix *stochmat = smiOsi1->getMatrixByRow();
@@ -1458,8 +1462,8 @@ void SmiScnModelDiscreteUnitTest()
 					elt2 = dobj[ic];
 					assert(fabs(elt1 - (elt2*dp/totalProb)) < 1.0e-8);
 				}
-				int ir;
-				int rowOff = core->getRowStart(1);
+				int ir,rowOff;
+				rowOff = core->getRowStart(1);
 				for(ii=core->getRowStart(t);ii<core->getRowStart(t+1);ii++)
 				{
 					
@@ -1730,17 +1734,12 @@ void SmpsBug()
 {
 		SmiScnModel smi;
 
-		std::string dataDir;
-#if defined(_MSC_VER)
-	dataDir="../../../../Data";
-#else
-	dataDir="../../Data";
-#endif
+		std::string dataDir="../../Data/Stochastic";
 		
 		// read SMPS model from files
 		//	<name>.core, <name>.time, and <name>.stoch
 		// the argument myCombineRule overrides the combine rule specified in the Stoch file
-		smi.readSmps((dataDir+"/Stochastic/bug").c_str());		
+		smi.readSmps((dataDir+"/bug").c_str());		
 
 		// generate OSI solver object
 		// 	here we use OsiClp
@@ -1770,17 +1769,12 @@ void Smps20()
 {
 		SmiScnModel smi;
 
-		std::string dataDir;
-#if defined(_MSC_VER)
-	dataDir="../../../../Data";
-#else
-	dataDir="../../Data";
-#endif
+		std::string dataDir="data";
 		
 		// read SMPS model from files
 		//	<name>.core, <name>.time, and <name>.stoch
 		// the argument myCombineRule overrides the combine rule specified in the Stoch file
-		smi.readSmps((dataDir+"/Stochastic/20").c_str());		
+		smi.readSmps((dataDir+"/20").c_str());		
 
 		// generate OSI solver object
 		// 	here we use OsiClp

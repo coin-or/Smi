@@ -24,6 +24,7 @@ libSmi_la_SOURCES = \
 	SmiScenarioTree.hpp \
 	SmiScnData.cpp SmiScnData.hpp \
 	SmiScnModel.cpp SmiScnModel.hpp \
+	SmiMessage.cpp SmiMessage.hpp \
 	SmiSmpsIO.cpp SmiSmpsIO.hpp
 
 # This is for libtool (on Windows)
@@ -60,4 +61,5 @@ include_HEADERS = \
 	SmiLinearData.hpp \
 	SmiScenarioTree.hpp \
 	SmiScnData.hpp \
+	SmiMessage.hpp \
 	SmiScnModel.hpp

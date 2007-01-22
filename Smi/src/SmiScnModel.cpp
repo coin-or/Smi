@@ -327,8 +327,9 @@ SmiScnModel::addNode(SmiScnNode *tnode)
 	nrow_ += core->getNumRows(stg);
 
 	// for debug sanity
-	int mnrow = matrix_->getNumRows();
-	int mncol = matrix_->getNumCols();
+	int mnrow,mncol;
+	mnrow = matrix_->getNumRows();
+	mncol = matrix_->getNumCols();
 	assert(mnrow == nrow_);
 	assert(mncol == ncol_);
 }
@@ -459,7 +460,8 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 
 		if (test) 
 		{
-			double p=0.5*nsamp[jj]*(nsamp[jj]+1);
+			double p;
+			p=0.5*nsamp[jj]*(nsamp[jj]+1);
 			assert(smiRV->getEventProb(indx[jj])==(indx[jj]+1)/p);
 		}
 		
@@ -545,7 +547,8 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 
 		if (test) 
 		{
-			double p=0.5*nsamp[jj]*(nsamp[jj]+1);
+			double p;
+			p=0.5*nsamp[jj]*(nsamp[jj]+1);
 			assert(smiRV->getEventProb(indx[jj])==(indx[jj]+1)/p);
 		}
 

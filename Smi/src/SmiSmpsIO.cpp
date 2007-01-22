@@ -306,6 +306,7 @@ SmiSmpsIO::readStochFile(SmiScnModel *smi,SmiCoreData *core, const char *c, cons
 				}
 				break;
 				case SMI_UNKNOWN_MPS_TYPE:
+				default:
 					return -2;
 				}
 			}

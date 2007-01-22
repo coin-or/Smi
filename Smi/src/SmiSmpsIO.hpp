@@ -65,11 +65,11 @@ private:
 	 /// Current third name (for SmpsIO)
 	char periodName_[COIN_MAX_FIELD_LENGTH];
 	float fvalue_;
-	double prob_;
 	SmiSectionType smiSection_;
 	SmiSmpsType smiSmpsType_;
 	SmiCoreCombineRule *combineRule_;
 	bool combineRuleSet;
+	double prob_;
 };
 
 class SmiSmpsIO: 

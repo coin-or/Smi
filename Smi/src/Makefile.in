@@ -65,7 +65,7 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libSmi_la_LIBADD =
 am_libSmi_la_OBJECTS = SmiCoreCombineRule.lo SmiScnData.lo \
-	SmiScnModel.lo SmiSmpsIO.lo
+	SmiScnModel.lo SmiMessage.lo SmiSmpsIO.lo
 libSmi_la_OBJECTS = $(am_libSmi_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -255,6 +255,7 @@ libSmi_la_SOURCES = \
 	SmiScenarioTree.hpp \
 	SmiScnData.cpp SmiScnData.hpp \
 	SmiScnModel.cpp SmiScnModel.hpp \
+	SmiMessage.cpp SmiMessage.hpp \
 	SmiSmpsIO.cpp SmiSmpsIO.hpp
 
 
@@ -293,6 +294,7 @@ include_HEADERS = \
 	SmiLinearData.hpp \
 	SmiScenarioTree.hpp \
 	SmiScnData.hpp \
+	SmiMessage.hpp \
 	SmiScnModel.hpp
 
 all: all-am
@@ -365,6 +367,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SmiCoreCombineRule.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SmiMessage.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SmiScnData.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SmiScnModel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SmiSmpsIO.Plo@am__quote@

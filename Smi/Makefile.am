@@ -29,9 +29,6 @@ endif
 # Here we need include all files that are not mentioned in other Makefiles
 
 EXTRA_DIST = \
-	examples/bug.cor \
-	examples/bug.stoch \
-	examples/bug.time \
 	examples/Makefile.in \
 	examples/README \
 	examples/stoch.cpp

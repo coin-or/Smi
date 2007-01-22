@@ -74,10 +74,6 @@ AC_COIN_CHECK_GNU_READLINE
 # In case this is a VPATH configuration we need to make sure that the
 # input files for the examples are available in the VPATH directory.
 
-AC_COIN_VPATH_LINK(examples/bug.cor)
-AC_COIN_VPATH_LINK(examples/bug.stoch)
-AC_COIN_VPATH_LINK(examples/bug.time)
-
 ##############################################################################
 #                   Finishing up by writing all the output                   #
 ##############################################################################

@@ -308,7 +308,8 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 					// revise indices
 					for(int j=0;j<stored->getNumElements();j++)
 					{
-						int t= core->getColStage(indx[j]);
+						int t;
+						t = core->getColStage(indx[j]);
 						indx[j] = core->getColInternalIndex(indx[j]);
 						// TODO: message about row stage incompatible with col stage
 						assert(!( t > stg));
