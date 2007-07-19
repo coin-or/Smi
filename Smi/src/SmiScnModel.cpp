@@ -29,9 +29,9 @@ SmiScnModel::~SmiScnModel()
 {
 	if (osiStoch_)
 		delete osiStoch_;
-	
-	if (core_)
-		delete core_;
+
+	if (core_) 
+	  delete core_;
 	
 	if (drlo_)
 		delete [] drlo_;
@@ -50,6 +50,15 @@ SmiScnModel::~SmiScnModel()
 
 	if (matrix_)
 		delete matrix_;
+	// delete scenario tree
+	//delete smiTree_.getRoot();
+	{
+	  vector<SmiScnNode *> & node_vec = smiTree_.wholeTree();
+	  // Need to zap root node???
+	  node_vec[0]->zapNode();
+	  for (unsigned int i=0; i<node_vec.size(); ++i)
+	    delete node_vec[i];
+	}
 	
 
 }
@@ -115,7 +124,6 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 
 
 	int scen = smiTree_.addPathtoLeaf(anc,branch,node_vec);
-
 	// add probability to all scenario nodes in path
 	SmiTreeNode<SmiScnNode *> *child = smiTree_.getLeaf(scen);
 	SmiTreeNode<SmiScnNode *> *parent = child->getParent();
@@ -316,6 +324,7 @@ SmiScnModel::addNode(SmiScnNode *tnode)
 				}
 			}
 			matrix_->appendRow(*newrow);
+			delete newrow;
 		}
 		else
 			matrix_->appendRow(*cr);
@@ -386,6 +395,7 @@ SmiScnModel::readSmps(const char *c, SmiCoreCombineRule *r)
 	}
 	if (i == -1)
 		return -1;
+	core_=smiCore;
 
 	return 0;
 }

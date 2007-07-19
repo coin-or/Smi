@@ -71,7 +71,6 @@ public:
 	int numChildren() { return nchild_; }
 	int scenario() {return scen_; }
 	void setScenario(int s) {scen_=s; }
-	
 
 	SmiTreeNode<T> * addChild(T cd, int scenario)
 	{
@@ -130,9 +129,9 @@ public:
    
    ~SmiTreeNode()
    {
-	   //delete sibling_;
-	   //delete child_;
-	   delete ptr_ ;
+	   delete sibling_;
+	   delete child_;
+	   //delete ptr_ ;
    }
  
    //@}
@@ -366,8 +365,8 @@ public:
 	SmiScenarioTree<T>(): leaf_(0),root_(NULL) {};
 
    /// Destructor 
-//   virtual ~SmiScenarioTree<T>() {delete root_;}
-	virtual ~SmiScenarioTree<T>() {};
+       virtual ~SmiScenarioTree<T>() {delete root_;}
+       //virtual ~SmiScenarioTree<T>() {};
    //@}
 
 private:

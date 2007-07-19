@@ -80,13 +80,13 @@ public:
 	int readStochFile(SmiScnModel *smi,SmiCoreData *core, const char *c,const char *ext="stoch");
     
 	inline void setCoreCombineRule(SmiCoreCombineRule *r){combineRule_=r; combineRuleSet=true;}
-    inline SmiCoreCombineRule *getCoreCombineRule() { return combineRule_;}
+        inline SmiCoreCombineRule *getCoreCombineRule() { return combineRule_;}
 	inline int getNumStages(){ return nstag_;}
 	inline int *getColumnStages(){ return cstag_;}
 	inline int *getRowStages(){ return rstag_;}	
 public:
 	SmiSmpsIO():CoinMpsIO(),nstag_(0),cstag_(NULL),rstag_(NULL),iftime(false),combineRuleSet(false){}
-	~SmiSmpsIO(){delete [] cstag_;delete[] rstag_;}
+        ~SmiSmpsIO(){delete [] cstag_;delete[] rstag_;delete smpsCardReader_;}
 private:
 	int nstag_;
 	int *cstag_;

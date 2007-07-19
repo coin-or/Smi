@@ -157,6 +157,7 @@ SmiSmpsIO::readStochFile(SmiScnModel *smi,SmiCoreData *core, const char *c, cons
 			  smpsCardReader_->setCoreCombineRule(combineRule_);
         }
 	
+
 	smpsCardReader_->readToNextSection();
 	if ( smpsCardReader_->whichSection (  ) == COIN_NAME_SECTION ) {
 		ifstoch = true;
@@ -424,6 +425,7 @@ SmiSmpsIO::readStochFile(SmiScnModel *smi,SmiCoreData *core, const char *c, cons
 						smi->generateScenario(core,matrix,&dclo,&dcup,&dobj,&drlo,&drup,branch,anc,prob,smpsCardReader_->getCoreCombineRule() );
 						
 					}
+					delete matrix;
 					return 0;
 				}
 

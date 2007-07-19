@@ -168,6 +168,8 @@ public:
 		osiStoch_ = osi.clone(false);
 	}
 	OsiSolverInterface * getOsiSolverInterface();
+        // If user wants to delete SmiScnModel but keep OsiSolverInterface
+        inline void releaseSolver() {osiStoch_=NULL;}
 
 
 	// constructor 
@@ -220,15 +222,17 @@ public:
 	int getCoreColIndex(int i);
 	int getCoreRowIndex(int i);
 	inline void setScenarioIndex(SmiScenarioIndex i){ scen_=i;}
-    inline SmiScenarioIndex getScenarioIndex() {return scen_;}
+        inline SmiScenarioIndex getScenarioIndex() {return scen_;}
 	inline int  getColStart() {return coffset_;}	
 	inline int  getRowStart() {return roffset_;}
 	inline int getNumCols(){ return node_->getCore()->getNumCols(node_->getStage());}
 	inline int getNumRows(){ return node_->getCore()->getNumRows(node_->getStage());}
 	inline double getModelProb(){return mdl_prob_;}
 	inline SmiScnNode * getParent(){ return parent_;}
+        // So can delete root node
+        inline void zapNode() {node_=NULL;}
 
-	~SmiScnNode(){}
+        ~SmiScnNode(){delete node_;}
 
 private:
 	inline void setRowOffset(int r) {roffset_ = r;}

@@ -214,17 +214,6 @@ void SmiCoreData::copyObjective(double * d,SmiStageIndex t)
 
 SmiCoreData::~SmiCoreData()
 {
-	delete nColInStage_;
-	delete nRowInStage_;
-	delete stageColPtr_;
-	delete stageRowPtr_;
-	delete colStage_;
-	delete rowStage_;
-	delete colEx2In_;
-	delete rowEx2In_;
-	delete colIn2Ex_;
-	delete rowIn2Ex_;
-
 	for(int t=0; t<this->getNumStages(); ++t)
 	{
 		int irow=this->getRowStart(t);
@@ -234,19 +223,30 @@ SmiCoreData::~SmiCoreData()
 		cdclo_[t]-=icol;
 		cdcup_[t]-=icol;
 		cdobj_[t]-=icol;
-		delete cdrlo_[t];
-		delete cdrup_[t];
-		delete cdclo_[t];
-		delete cdcup_[t];
-		delete cdobj_[t];
+		delete [] cdrlo_[t];
+		delete [] cdrup_[t];
+		delete [] cdclo_[t];
+		delete [] cdcup_[t];
+		delete [] cdobj_[t];
 	}
-	
-	delete cdrlo_;
-	delete cdrup_;
-	delete cdclo_;
-	delete cdcup_;
-	delete cdobj_;
-
+	// Now we can delete pointers
+	delete [] nColInStage_;
+	delete [] nRowInStage_;
+	delete [] colStage_;
+	delete [] rowStage_;
+	delete [] colEx2In_;
+	delete [] rowEx2In_;
+	delete [] colIn2Ex_;
+	delete [] rowIn2Ex_;
+	delete [] stageColPtr_;
+	delete [] stageRowPtr_;
+	delete [] cdrlo_;
+	delete [] cdrup_;
+	delete [] cdclo_;
+	delete [] cdcup_;
+	delete [] cdobj_;
+	for (unsigned int i=0; i<nodes_.size(); ++i)
+	  delete nodes_[i];
 
 }
 
@@ -448,10 +448,12 @@ void SmiNodeData::copyObjective(double * d){
 	combineWithCoreDoubleArray(d,getObjective(),getCore()->getColStart(t));
 }
 
-
 SmiNodeData::~SmiNodeData()
 {
-
+	SmiRowMap::iterator iRowMap;
+	
+	for (iRowMap=rowMap.begin(); iRowMap!=rowMap.end(); ++iRowMap)
+	  delete iRowMap->second;
 	
 }
 
