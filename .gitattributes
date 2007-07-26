@@ -4,6 +4,7 @@
 /Makefile.am -text
 /Makefile.in -text
 /README -text
+Smi/AUTHORS -text
 Smi/LICENSE -text
 Smi/Makefile.am -text
 Smi/Makefile.in -text
