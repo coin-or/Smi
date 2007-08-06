@@ -1,3 +1,4 @@
+BuildTools         https://projects.coin-or.org/svn/BuildTools/stable/0.5
 Data/Stochastic    https://projects.coin-or.org/svn/Data/trunk/Stochastic
 CoinUtils          https://projects.coin-or.org/svn/CoinUtils/trunk/CoinUtils
 Data/Stochastic    https://projects.coin-or.org/svn/Data/stable/1.0/Stochastic
