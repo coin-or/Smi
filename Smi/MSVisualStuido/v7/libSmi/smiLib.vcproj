@@ -22,7 +22,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\..\Clp\src;..\..\..\..\..\Osi\src;..\..\..\..\..\CoinUtils\src;..\..\..\..\..\BuildTools\headers"
+				AdditionalIncludeDirectories="..\..\..\..\Clp\src;..\..\..\..\Osi\src;..\..\..\..\CoinUtils\src;..\..\..\..\BuildTools\headers"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;OSLMSDLL"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="5"
@@ -74,7 +74,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\..\..\Clp\src;..\..\..\..\..\Osi\src;..\..\..\..\..\CoinUtils\src;..\..\..\..\..\BuildTools\headers"
+				AdditionalIncludeDirectories="..\..\..\..\Clp\src;..\..\..\..\Osi\src;..\..\..\..\CoinUtils\src;..\..\..\..\BuildTools\headers"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;OSLMSDLL"
 				StringPooling="TRUE"
 				RuntimeLibrary="4"
@@ -122,10 +122,10 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat">
 			<File
-				RelativePath="..\..\..\..\src\SmiCoreCombineRule.cpp">
+				RelativePath="..\..\..\src\SmiCoreCombineRule.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\SmiScnData.cpp">
+				RelativePath="..\..\..\src\SmiScnData.cpp">
 				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
@@ -140,7 +140,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\SmiScnModel.cpp">
+				RelativePath="..\..\..\src\SmiScnModel.cpp">
 				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
@@ -155,7 +155,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\SmiSmpsIO.cpp">
+				RelativePath="..\..\..\src\SmiSmpsIO.cpp">
 				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
@@ -174,28 +174,28 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl">
 			<File
-				RelativePath="..\..\..\..\src\SmiCoreCombineRule.hpp">
+				RelativePath="..\..\..\src\SmiCoreCombineRule.hpp">
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\SmiDiscreteDistribution.hpp">
+				RelativePath="..\..\..\src\SmiDiscreteDistribution.hpp">
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\SmiLinearData.hpp">
+				RelativePath="..\..\..\src\SmiLinearData.hpp">
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\SmiMessage.hpp">
+				RelativePath="..\..\..\src\SmiMessage.hpp">
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\SmiScenarioTree.hpp">
+				RelativePath="..\..\..\src\SmiScenarioTree.hpp">
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\SmiScnData.hpp">
+				RelativePath="..\..\..\src\SmiScnData.hpp">
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\SmiScnModel.hpp">
+				RelativePath="..\..\..\src\SmiScnModel.hpp">
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\SmiSmpsIO.hpp">
+				RelativePath="..\..\..\src\SmiSmpsIO.hpp">
 			</File>
 		</Filter>
 	</Files>
