@@ -38,7 +38,7 @@ public:
 	SmiDiscreteRV * getDiscreteRV(int i) {return smiDiscrete_[i];}
 
 	/// get number of RV
-	int getNumRV() { return smiDiscrete_.size(); }
+	int getNumRV() { return (int)smiDiscrete_.size(); }
 
 	/// get core model 
 	SmiCoreData *getCore(){ return core_; }
@@ -98,6 +98,13 @@ public:
 		events_.push_back(e); 
 		prob_+=prob;
 	}
+	void addEvent(OsiSolverInterface &osi, double prob)
+	{
+		SmiLinearData d(osi);
+		SmiDiscreteEvent *e = new SmiDiscreteEvent(d,prob);
+		events_.push_back(e); 
+		prob_+=prob;
+	}
 
 	inline const CoinPackedMatrix &getEventMatrix(int i)   {return events_[i]->getMatrix(); }
 	inline const CoinPackedVector &getEventColLower(int i) {return events_[i]->getColLower();}
@@ -109,7 +116,7 @@ public:
 	//	return events_[i]->getEventProb()/prob_;
 			return events_[i]->getEventProb();
 	}
-	inline int getNumEvents() { return events_.size(); }
+	inline size_t getNumEvents() { return events_.size(); }
 	inline int getStage() {return stg_;}
 	inline void setStage(int p) {stg_=p;}
 	SmiDiscreteRV(){prob_=0.0; stg_=-1;}

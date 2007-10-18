@@ -18,6 +18,7 @@
 
 #include "CoinPackedVector.hpp"
 #include "CoinPackedMatrix.hpp"
+#include "OsiSolverInterface.hpp"
 
 class SmiLinearData
 {
@@ -42,7 +43,8 @@ public:
 						   dcup_(),
 						   dobj_(),
 						   drlo_(),
-						   drup_() {}
+						   drup_() 
+	{}
 
 	SmiLinearData(SmiLinearData &d):
 								matrix_(d.getMatrix()),
@@ -50,7 +52,8 @@ public:
 								dcup_(d.getColUpper()),
 								dobj_(d.getObjective()),
 								drlo_(d.getRowLower()),
-								drup_(d.getRowUpper()) {}
+								drup_(d.getRowUpper()) 
+	{}
 
 	SmiLinearData(CoinPackedMatrix &matrix,
 				CoinPackedVector &dclo, CoinPackedVector &dcup,
@@ -60,7 +63,14 @@ public:
 						   dcup_(dcup),
 						   dobj_(dobj),
 						   drlo_(drlo),
-						   drup_(drup){}
+						   drup_(drup)
+	{}
+    SmiLinearData(OsiSolverInterface &osi):matrix_((*osi.getMatrixByCol())),
+		dclo_(osi.getColLower()),dcup_(osi.getColUpper()),
+		drlo_(osi.getRowLower()),drup_(osi.getRowUpper()),
+		dobj_(osi.getObjCoefficients())
+	{}
+				
 	~SmiLinearData(){};
 private:
 	CoinPackedMatrix matrix_;
