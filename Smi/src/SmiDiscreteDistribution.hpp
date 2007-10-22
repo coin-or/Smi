@@ -38,7 +38,7 @@ public:
 	SmiDiscreteRV * getDiscreteRV(int i) {return smiDiscrete_[i];}
 
 	/// get number of RV
-	int getNumRV() { return smiDiscrete_.size(); }
+	int getNumRV() { return (int)smiDiscrete_.size(); }
 
 	/// get core model 
 	SmiCoreData *getCore(){ return core_; }
@@ -109,7 +109,7 @@ public:
 	//	return events_[i]->getEventProb()/prob_;
 			return events_[i]->getEventProb();
 	}
-	inline int getNumEvents() { return events_.size(); }
+	inline int getNumEvents() { return (int)events_.size(); }
 	inline int getStage() {return stg_;}
 	inline void setStage(int p) {stg_=p;}
 	SmiDiscreteRV(){prob_=0.0; stg_=-1;}

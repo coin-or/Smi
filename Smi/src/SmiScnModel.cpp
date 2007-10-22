@@ -361,28 +361,34 @@ SmiScnModel::readSmps(const char *c, SmiCoreCombineRule *r)
 	if (r != NULL)
 		smiSmpsIO.setCoreCombineRule(r);
 
-	const char* core_ext[] = {"core", "cor"};
+	const char* core_ext[] = {"cor","core"};
 	for (i = sizeof(core_ext)/sizeof(const char*) - 1; i >= 0; --i) {
 		if (smiSmpsIO.readMps(c,core_ext[i]) >= 0)
 			break;
+		else
+			cerr << "No core file with extension " << core_ext[i] << " was found." << endl;
 	}
 	if (i == -1)
 		return -1;
 
 	SmiCoreData *smiCore = NULL;
-	const char* time_ext[] = {"time", "tim"};
+	const char* time_ext[] = {"tim", "time"};
 	for (i = sizeof(time_ext)/sizeof(const char*) - 1; i >= 0; --i) {
 		smiCore = smiSmpsIO.readTimeFile(this,c,time_ext[i]);
 		if (smiCore)
 			break;
+		else
+			cerr << "No time file with extension " << time_ext[i] << " was found." << endl;
 	}
 	if (i == -1)
 		return -1;
 
-	const char* stoch_ext[] = {"stoch", "stoc", "sto"};
+	const char* stoch_ext[] = {"sto", "stoc","stoch"};
 	for (i = sizeof(stoch_ext)/sizeof(const char*) - 1; i >= 0; --i) {
 		if (smiSmpsIO.readStochFile(this,smiCore,c,stoch_ext[i]) >= 0)
 			break;
+		else
+			cerr << "No stoch file with extension " << stoch_ext[i] << " was found." << endl;
 	}
 	if (i == -1)
 		return -1;
@@ -474,9 +480,10 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 		
 		//TODO test smiModel code
 		CoinPackedMatrix m = smiRV->getEventMatrix(indx[jj]);
-		assert(!m.isColOrdered());
+		if (m.getNumElements()) assert(!m.isColOrdered());
+
 		if (matrix.getNumElements())
-		{
+		{			
 			for (int i=0; i<m.getNumRows(); ++i)
 			{
 				CoinPackedVector row=m.getVector(i);
@@ -575,7 +582,7 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 		
 		//TODO test this code
 		CoinPackedMatrix m = smiRV->getEventMatrix(indx[jj]);
-		assert(!m.isColOrdered());
+		if (m.getNumElements()) assert(!m.isColOrdered());
 		if (matrix.getNumElements())
 		{
 			for (int i=0; i<m.getNumRows(); ++i)

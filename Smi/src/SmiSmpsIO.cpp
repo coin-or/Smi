@@ -37,6 +37,7 @@ SmiSmpsIO::readTimeFile(SmiScnModel *smi, const char *c, const char *ext)
         CoinFileInput *input = 0;
         int returnCode = dealWithFileName(c,ext,input);
         if (returnCode<0) {
+			cerr << "No time file with extension " << ext << " was found." << endl;
           return NULL;
         } else if (returnCode>0) {
           // delete cardReader_;
