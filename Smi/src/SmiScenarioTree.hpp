@@ -224,7 +224,7 @@ public:
 	/** get number of scenarios */
 	int getNumScenarios()
 	{
-		return leaf_.size();
+		return (int) leaf_.size();
 	}
 
 
