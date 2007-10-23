@@ -340,16 +340,83 @@ SmiScnModel::getOsiSolverInterface()
 	return osiStoch_;
 }
 
-const double *
-SmiScnModel::getColSolution(int ns)
-{
-	return NULL;
+
+double *
+SmiScnModel::getColSolution(int ns, int *length)
+{	
+	CoinPackedVector *soln=new CoinPackedVector();
+	const double * osiSoln = this->getOsiSolverInterface()->getColSolution();
+	int numcols=0;
+
+	assert( ns < this->getNumScenarios() );
+
+	// start with leaf node
+	SmiScnNode *node = this->getLeafNode(ns);
+	while (node != NULL){
+		// accumulate number of rows along scenario
+		numcols+=node->getNumCols();
+		
+		// get parent of node
+		node = node->getParent();
+	}
+
+	// malloc vector
+	double *dsoln = (double *)calloc(numcols,sizeof(double));
+
+	// start with leaf node
+	node = this->getLeafNode(ns);
+	while (node != NULL){
+		// copy entries
+		// getColStart returns the starting index of node in OSI model
+		for(int j=node->getColStart(); j<node->getColStart()+node->getNumCols(); ++j){
+				// getCoreRowIndex returns the corresponding Core index
+				// in the original (user's) ordering
+				dsoln[node->getCoreColIndex(j)] = osiSoln[j];	
+		}		
+		// get parent of node
+		node = node->getParent();
+	}
+	*length=numcols;
+	return dsoln;
 }
 
-const double *
-SmiScnModel::getRowSolution(int ns)
-{
-	return NULL;
+double *
+SmiScnModel::getRowSolution(int ns, int *length)
+{	
+	CoinPackedVector *soln=new CoinPackedVector();
+	const double * osiSoln = this->getOsiSolverInterface()->getRowActivity();
+	int numrows=0;
+
+	assert( ns < this->getNumScenarios() );
+
+	// start with leaf node
+	SmiScnNode *node = this->getLeafNode(ns);
+	while (node != NULL){
+		// accumulate number of rows along scenario
+		numrows+=node->getNumRows();
+		
+		// get parent of node
+		node = node->getParent();
+	}
+
+	// malloc vector
+	double *dsoln = (double *)calloc(numrows,sizeof(double));
+
+	// start with leaf node
+	node = this->getLeafNode(ns);
+	while (node != NULL){
+		// copy entries
+		// getRowStart returns the starting index of node in OSI model
+		for(int j=node->getRowStart(); j<node->getRowStart()+node->getNumRows(); ++j){
+				// getCoreRowIndex returns the corresponding Core index
+				// in the original (user's) ordering
+				dsoln[node->getCoreRowIndex(j)] = osiSoln[j];	
+		}		
+		// get parent of node
+		node = node->getParent();
+	}
+	*length=numrows;
+	return dsoln;
 }
 
 int

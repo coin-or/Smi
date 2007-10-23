@@ -159,8 +159,8 @@ public:
 
 	// getXXX by scenario
 	double getObjectiveValue(SmiScenarioIndex ns);
-	const double *getColSolution(SmiScenarioIndex ns);
-	const double *getRowSolution(SmiScenarioIndex ns);
+	double *getColSolution(SmiScenarioIndex ns, int *length);
+	double *getRowSolution(SmiScenarioIndex ns, int *length);
 
 	// OsiSolverInterface
 	void setOsiSolverHandle(OsiSolverInterface &osi)
