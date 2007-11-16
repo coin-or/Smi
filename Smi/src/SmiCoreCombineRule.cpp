@@ -112,7 +112,33 @@ CoinPackedVector *SmiCoreCombineAdd::Process(CoinPackedVector *cr,CoinPackedVect
 	
 	if (cr && nr)
 	{
-		newrow = new CoinPackedVector(*cr + *nr);
+		//newrow = new CoinPackedVector(*cr + *nr);
+			// merge using denseVector
+
+		// get max entries
+		int maxentries = CoinMax(cr->getMaxIndex(),nr->getMaxIndex());
+		
+		double* dense = cr->denseVector(maxentries+1);
+		double* elt_nr = nr->getElements();
+		int* ind_nr = nr->getIndices();
+		
+		int j;
+
+			for (j=0; j<nr->getNumElements(); ++j)
+			{
+				dense[ind_nr[j]] += elt_nr[j];
+			}
+
+		// generate new packed vector
+		newrow = new CoinPackedVector();
+
+		for (int i=0; i<maxentries+1; ++i)
+		{
+			if (dense[i])
+				newrow->insert(i,dense[i]);
+		}
+
+		delete [] dense;
 	}
 
 	return newrow;

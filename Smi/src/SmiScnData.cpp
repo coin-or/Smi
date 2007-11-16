@@ -408,7 +408,8 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 
 CoinPackedVector * SmiNodeData::combineWithCoreRow(CoinPackedVector *cr, CoinPackedVector *nr)
 {
-	return getCoreCombineRule()->Process(cr,nr);
+	CoinPackedVector *cpv = getCoreCombineRule()->Process(cr,nr);
+	return cpv;
 }
 
 void SmiNodeData::combineWithCoreDoubleArray(double *d_out, const CoinPackedVector &cpv, int o)
