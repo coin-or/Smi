@@ -201,6 +201,9 @@ private:
 	double *dclo_; 
 	double *dcup_;
 	CoinPackedMatrix *matrix_;
+	double *dels_;
+	int    *indx_;
+	int    *rstrt_;
 	// number of scenarios
 //	int scen_;
 	// not sure if this is used

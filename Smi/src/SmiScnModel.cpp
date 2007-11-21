@@ -6,6 +6,7 @@
 #include "OsiSolverInterface.hpp"
 #include "CoinHelperFunctions.hpp"
 #include "CoinError.hpp"
+#include "CoinPackedVector.hpp"
 #include <assert.h>
 #include <algorithm>
 
@@ -110,7 +111,7 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 		
 		this->ncol_ += core->getNumCols(t);
 		this->nrow_ += core->getNumRows(t);
-		this->nels_ += node->getNumElements();
+		this->nels_ += core->getNode(t)->getNumElements() + node->getNumElements();
 	}
 
 
@@ -164,6 +165,7 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 		// generate new data node
 		SmiNodeData *node = new SmiNodeData(t,core,matrix,
 			v_dclo,v_dcup,v_dobj,v_drlo,v_drup);
+		
 		node->setCoreCombineRule(r);
 		// generate new tree node
 		SmiScnNode *tnode = new SmiScnNode(node);
@@ -171,7 +173,7 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 		
 		this->ncol_ += core->getNumCols(t);
 		this->nrow_ += core->getNumRows(t);
-		this->nels_ += node->getNumElements();
+		this->nels_ += core->getNode(t)->getNumElements() + node->getNumElements();
 	}
 
 	SmiTreeNode<SmiScnNode *> *node = smiTree_.find(labels);
@@ -214,17 +216,25 @@ SmiScnModel::loadOsiSolverData()
 	this->dobj_ = new double[this->ncol_];
 	this->drlo_ = new double[this->nrow_];
 	this->drup_ = new double[this->nrow_];
-	// initialize row-ordered matrix with no extragaps or extramajors
-	CoinPackedMatrix *matrix = new CoinPackedMatrix(false,0,0);
-	matrix->reserve(nrow_,4*nels_);
-	this->matrix_=matrix;
+
+	// initialize row-ordered matrix arrays
+	this->dels_ = new double[this->nels_];
+	this->indx_ = new int[this->nels_];
+	this->rstrt_ = new int[this->nrow_+1];
+	this->rstrt_[0] = 0;
 
 	ncol_=0;
 	nrow_=0;
+	nels_=0;
 	
 	// loop to addNodes
 	for_each(smiTree_.treeBegin(),smiTree_.treeEnd(),SmiScnModelAddNode(this));
 
+	matrix_ = new CoinPackedMatrix(false,0,0);
+	int *len=NULL;
+	matrix_->assignMatrix(false,ncol_,nrow_,nels_,
+		dels_,indx_,rstrt_,len);
+	
 	// pass data to osiStoch
 	osiStoch_->loadProblem(CoinPackedMatrix(*matrix_),dclo_,dcup_,dobj_,drlo_,drup_);
 
@@ -270,68 +280,104 @@ SmiScnModel::addNode(SmiScnNode *tnode)
 	for(int j=ncol_; j<ncol_+core->getNumCols(stg); ++j)
 		dobj_[j] *= prob;
 	
+
+	vector<int> stochColStart(stg+1);
+	SmiScnNode *pnode=tnode;
 	
+	stochColStart[stg]=ncol_;
+	for (int t=stg-1; t>0; t--)
+	{
+		pnode=pnode->getParent();
+		stochColStart[t] = pnode->getColStart();
+	}
+
+	// row counter
+	int rowCount=nrow_;
+
 	// add rows to matrix
 	for (int i=core->getRowStart(stg); i<core->getRowStart(stg+1) ; i++)
 	{
 		// get node rows
 		CoinPackedVector *cr = cnode->getRow(i);
+		
 		if (stg)
 		{
-			CoinPackedVector *newrow = node->combineWithCoreRow(cr,node->getRow(i));
+			// build row explicitly into sparse arrays
+			CoinPackedVector *nodeRow = node->getRow(i);
+			int rowStart=this->rstrt_[rowCount];
 
-			// TODO: this is probably a throwable error
-			if (!newrow)
-				continue;
-			
+			int rowNumEls=0;
+			if (nodeRow)
+			{
+				vector<double> *denseCoreRow = cnode->getDenseRow(i);
+				rowNumEls=node->combineWithDenseCoreRow(denseCoreRow,nodeRow,dels_+rowStart,indx_+rowStart);
+			}
+			else
+			{
+				CoinPackedVector *coreRow=cnode->getRow(i);
+				double *cels=coreRow->getElements();
+				int *cind=coreRow->getIndices();
+				rowNumEls=coreRow->getNumElements();
+				memcpy(dels_+rowStart,cels,sizeof(double)*rowNumEls);
+				memcpy(indx_+rowStart,cind,sizeof(int)*rowNumEls);
+			}
+
+
+			rowCount++;
+			nels_+=rowNumEls;
+			this->rstrt_[rowCount] = nels_;
 			
 			// coefficients of new row
-			int *indx = newrow->getIndices();
+			int *indx = indx_+rowStart;
 			
 			// stage starts
 			int t=stg;
 			int jlo=core->getColStart(stg);
 			
 			// net offset to be added to indices
-			int coff = ncol_-jlo;
+			int coff= stochColStart[stg]-jlo;
 			
 			if(coff)
 			{
-				// parent node
-				SmiScnNode *pnode=tnode;
 				
 				// main loop iterates backwards through indices
-				for (int j=newrow->getNumElements()-1; j>-1;--j)
+				for (int j=rowNumEls-1; j>-1;--j)
 				{
 					// get new offset from parent node when crossing stage bndy
 					while (indx[j]<jlo)
 					{
 						jlo = core->getColStart(--t);
-						pnode=pnode->getParent();
-						coff = pnode->getColStart()-jlo;
+						coff = stochColStart[t] - jlo;
 					}
 					
 					// add offset to index
 					indx[j]+=coff;
 				}
 			}
-			matrix_->appendRow(*newrow);
 		}
 		else
-			matrix_->appendRow(*cr);
+		{
+			// build row explicitly into sparse arrays
+			double *els = cr->getElements();
+			int *ind = cr->getIndices();
+
+			int rowStart=this->rstrt_[rowCount];
+
+			memcpy(dels_+rowStart,els,sizeof(double)*cr->getNumElements());
+			memcpy(indx_+rowStart,ind,sizeof(int)*cr->getNumElements());
+
+			rowCount++;
+			nels_+=cr->getNumElements();
+			this->rstrt_[rowCount] = nels_;
+
+		}
+
 
 	}
 
 	// update row, col counts
 	ncol_ += core->getNumCols(stg);
 	nrow_ += core->getNumRows(stg);
-
-	// for debug sanity
-	int mnrow,mncol;
-	mnrow = matrix_->getNumRows();
-	mncol = matrix_->getNumCols();
-	assert(mnrow == nrow_);
-	assert(mncol == ncol_);
 }
 
 OsiSolverInterface *
