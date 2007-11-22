@@ -41,7 +41,7 @@ class SmiScnNode;
 	\code
 	SmiScnModel smi;
 	smi.readSmps("app0110R");
-	smi.setOsiSolverHandle(OsiClpSolverInterface());
+	smi.setOsiSolverHandle(new OsiClpSolverInterface());
 	OsiSolverInterface *osiStoch = smi.loadOsiSolverData();
 	osiStoch->initialSolve();
 	\endcode
@@ -68,7 +68,7 @@ public:
 
 	*/
 	int readSmps(const char *name,
-				 SmiCoreCombineRule *r=NULL );
+		SmiCoreCombineRule *r=SmiCoreCombineReplace::Instance() );
 
 	//SmiCoreData * getCore() {return core_;}
 
