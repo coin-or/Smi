@@ -473,6 +473,7 @@ SmiScnModel::readSmps(const char *c, SmiCoreCombineRule *r)
 
 	if (r != NULL)
 		smiSmpsIO.setCoreCombineRule(r);
+	
 
 	const char* core_ext[] = {"cor","core"};
 	for (i = sizeof(core_ext)/sizeof(const char*) - 1; i >= 0; --i) {

@@ -68,7 +68,7 @@ public:
 
 	*/
 	int readSmps(const char *name,
-		SmiCoreCombineRule *r=SmiCoreCombineReplace::Instance() );
+		SmiCoreCombineRule *r=NULL );
 
 	//SmiCoreData * getCore() {return core_;}
 
