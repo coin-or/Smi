@@ -67,8 +67,8 @@ public:
 	{}
     SmiLinearData(OsiSolverInterface &osi):matrix_((*osi.getMatrixByCol())),
 		dclo_(osi.getColLower()),dcup_(osi.getColUpper()),
-		drlo_(osi.getRowLower()),drup_(osi.getRowUpper()),
-		dobj_(osi.getObjCoefficients())
+		dobj_(osi.getObjCoefficients()),
+		drlo_(osi.getRowLower()),drup_(osi.getRowUpper())
 	{}
 				
 	~SmiLinearData(){};

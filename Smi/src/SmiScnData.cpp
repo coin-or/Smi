@@ -474,3 +474,4 @@ SmiNodeData::getDenseRow(int i) {
 		}
 		return dRowMap[i];
 	}
+
