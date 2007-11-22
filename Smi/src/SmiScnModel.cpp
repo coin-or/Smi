@@ -738,6 +738,38 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 	free (incr);
 }
 
+double SmiScnModel::getObjectiveValue(SmiScenarioIndex ns)
+{
+	const double *dsoln = this->getOsiSolverInterface()->getColSolution();
+	const double *dobj  = this->getOsiSolverInterface()->getObjCoefficients();
+
+	/* calculate the scenario objective value */
+	double scenSum = 0.0;
+
+	// start with leaf node
+	SmiScnNode *node = this->getLeafNode(ns);
+	
+	while (node != NULL)
+	{
+		double nodeSum = 0.0;
+		double nodeProb = node->getModelProb();
+
+		assert(nodeProb>0);
+
+		// getColStart returns the starting index of node in OSI model
+		for(int j=node->getColStart(); j<node->getColStart()+node->getNumCols(); ++j)
+		{
+			nodeSum += dobj[j]*dsoln[j];		
+		}
+		nodeSum /= nodeProb;
+		scenSum += nodeSum;
+	
+		// get parent of node
+		node = node->getParent();
+	}
+
+	return scenSum;	
+}
 
 
 

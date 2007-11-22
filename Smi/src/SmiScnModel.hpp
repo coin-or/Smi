@@ -70,7 +70,7 @@ public:
 	int readSmps(const char *name,
 				 SmiCoreCombineRule *r=NULL );
 
-	SmiCoreData * getCore() {return core_;}
+	//SmiCoreData * getCore() {return core_;}
 
 	/**@name Direct methods.
 		
