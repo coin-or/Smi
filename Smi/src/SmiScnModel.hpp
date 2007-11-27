@@ -41,7 +41,7 @@ class SmiScnNode;
 	\code
 	SmiScnModel smi;
 	smi.readSmps("app0110R");
-	smi.setOsiSolverHandle(OsiClpSolverInterface());
+	smi.setOsiSolverHandle(new OsiClpSolverInterface());
 	OsiSolverInterface *osiStoch = smi.loadOsiSolverData();
 	osiStoch->initialSolve();
 	\endcode
@@ -68,9 +68,9 @@ public:
 
 	*/
 	int readSmps(const char *name,
-				 SmiCoreCombineRule *r=NULL );
+		SmiCoreCombineRule *r=NULL );
 
-	SmiCoreData * getCore() {return core_;}
+	//SmiCoreData * getCore() {return core_;}
 
 	/**@name Direct methods.
 		
@@ -201,6 +201,9 @@ private:
 	double *dclo_; 
 	double *dcup_;
 	CoinPackedMatrix *matrix_;
+	double *dels_;
+	int    *indx_;
+	int    *rstrt_;
 	// number of scenarios
 //	int scen_;
 	// not sure if this is used

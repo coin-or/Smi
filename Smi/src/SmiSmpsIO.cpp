@@ -605,6 +605,8 @@ SmiSmpsCardReader::nextSmpsField (  )
 						  break;
 					  }
 				  }
+				  if (i==SMI_UNKNOWN_MPS_TYPE)
+					  i = SMI_COLUMN_CARD;
 			  }
 			  else
 				  i = SMI_COLUMN_CARD;
@@ -647,6 +649,8 @@ SmiSmpsCardReader::nextSmpsField (  )
 				  // no futher strings allowed.
 				  position_=eol_;
 				  break;
+			  case SMI_UNKNOWN_MPS_TYPE:
+				  //this in case the column name has two characters!
 			  case SMI_COLUMN_CARD:
 
 				  //already got the name
