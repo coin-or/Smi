@@ -469,44 +469,76 @@ int
 SmiScnModel::readSmps(const char *c, SmiCoreCombineRule *r)
 {
 	int i;
-	SmiSmpsIO smiSmpsIO;
-
-	if (r != NULL)
-		smiSmpsIO.setCoreCombineRule(r);
-	
+	SmiSmpsIO *smiSmpsIO=NULL;
+	string fname(c);
 
 	const char* core_ext[] = {"cor","core"};
 	for (i = sizeof(core_ext)/sizeof(const char*) - 1; i >= 0; --i) {
-		if (smiSmpsIO.readMps(c,core_ext[i]) >= 0)
+		string ext(core_ext[i]);
+		string fullname=fname+"."+ext;
+		if (fileCoinReadable(fullname))
 			break;
-		else
-			cerr << "SmiScnModel::readSmps() - No core file with extension " << core_ext[i] << " was found." << endl;
 	}
 	if (i == -1)
+	{
+		cerr << "SmiScnModel::readSmps() - No file "<< c <<" with extensions .core or .cor were found." << endl;
 		return -1;
+	}
+
+	smiSmpsIO = new SmiSmpsIO();
+
+	if (r != NULL)
+		smiSmpsIO->setCoreCombineRule(r);
+
+	if (smiSmpsIO->readMps(c,core_ext[i]) == -1)
+	{
+		delete smiSmpsIO;
+		return -1;
+	}
 
 	SmiCoreData *smiCore = NULL;
 	const char* time_ext[] = {"tim", "time"};
+
 	for (i = sizeof(time_ext)/sizeof(const char*) - 1; i >= 0; --i) {
-		smiCore = smiSmpsIO.readTimeFile(this,c,time_ext[i]);
-		if (smiCore)
+		string ext(time_ext[i]);
+		string fullname=fname+"."+ext;
+		if (fileCoinReadable(fullname))
 			break;
-		else
-			cerr << "SmiScnModel::readSmps() - No time file with extension " << time_ext[i] << " was found." << endl;
 	}
 	if (i == -1)
+	{
+		cerr << "SmiScnModel::readSmps() - No file "<< c <<" with extensions .time or .tim were found." << endl;
+		delete smiSmpsIO;
 		return -1;
+	}
+
+	smiCore = smiSmpsIO->readTimeFile(this,c,time_ext[i]);
+	if (!smiCore)
+	{
+		delete smiSmpsIO;
+		return -1;
+	}
 
 	const char* stoch_ext[] = {"sto", "stoc","stoch"};
 	for (i = sizeof(stoch_ext)/sizeof(const char*) - 1; i >= 0; --i) {
-		if (smiSmpsIO.readStochFile(this,smiCore,c,stoch_ext[i]) >= 0)
+		string ext(stoch_ext[i]);
+		string fullname=fname+"."+ext;
+		if (fileCoinReadable(fullname))
 			break;
-		else
-			cerr << "SmiScnModel::readSmps() - No stoch file with extension " << stoch_ext[i] << " was found." << endl;
 	}
 	if (i == -1)
+	{
+		cerr << "SmiScnModel::readSmps() - No file "<< c <<" with extensions .stoch, .stoc, or .sto were found." << endl;
+		delete smiSmpsIO;
 		return -1;
+	}
+	if (smiSmpsIO->readStochFile(this,smiCore,c,stoch_ext[i]) == -1)
+	{
+		delete smiSmpsIO;
+		return -1;
+	}
 
+	delete smiSmpsIO;
 	return 0;
 }
   
