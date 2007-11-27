@@ -14,6 +14,9 @@
 #include "CoinPragma.hpp"
 #include "CoinPackedVector.hpp"
 #include <string>
+#include <vector>
+using namespace std;
+
 /** This deals with combining Core and Stochastic data.
 
 	In the Stochastic MPS standard, stochastic data updates
@@ -41,6 +44,7 @@ public:
   /// Process 
 	virtual void Process(double *d1, int o1, const CoinPackedVector &cpv2, char *type=0)=0;
 	virtual CoinPackedVector * Process(CoinPackedVector *cpv1, CoinPackedVector *cpv2, char *type=0)=0;
+	virtual int Process(vector<double> *dr,CoinPackedVector *cpv,double *dels,int *indx)=0;
 	virtual ~SmiCoreCombineRule(){};
 };
 
@@ -54,6 +58,7 @@ public:
 	static SmiCoreCombineReplace * Instance();
 	virtual void Process(double *d1, int o1, const CoinPackedVector &cpv2, char *type=0);
 	virtual CoinPackedVector * Process(CoinPackedVector *cpv1, CoinPackedVector *cpv2, char *type=0);
+	virtual int Process(vector<double> *dr,CoinPackedVector *cpv,double *dels,int *indx);
 protected:
 	SmiCoreCombineReplace(){}
 private:
@@ -70,6 +75,7 @@ public:
 	static SmiCoreCombineAdd * Instance();
 	virtual void Process(double *d1, int o1, const CoinPackedVector &cpv2, char* type=0);
 	virtual CoinPackedVector * Process(CoinPackedVector *cpv1, CoinPackedVector *cpv2, char* type=0);
+	virtual int Process(vector<double> *dr,CoinPackedVector *cpv,double *dels,int *indx);
 protected:
 	SmiCoreCombineAdd(){}
 private:

@@ -186,7 +186,9 @@ SmiCoreData::gutsOfConstructor(int nrow,int ncol,int nstag,
 		
 	}
 
-	
+	// reserve space for dense row pointers
+	pDenseRow_.reserve(nrow_);
+	for (int i=0; i<nrow_; ++i) pDenseRow_[i]=NULL;	
 
 }
 
@@ -405,10 +407,15 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 	}
 }
 
+int SmiNodeData::combineWithDenseCoreRow(vector<double> *dr,CoinPackedVector *cpv,double *dels,int *indx)
+{
+	return getCoreCombineRule()->Process(dr,cpv,dels,indx);
+}
 
 CoinPackedVector * SmiNodeData::combineWithCoreRow(CoinPackedVector *cr, CoinPackedVector *nr)
 {
-	return getCoreCombineRule()->Process(cr,nr);
+	CoinPackedVector *cpv = getCoreCombineRule()->Process(cr,nr);
+	return cpv;
 }
 
 void SmiNodeData::combineWithCoreDoubleArray(double *d_out, const CoinPackedVector &cpv, int o)
@@ -456,4 +463,15 @@ SmiNodeData::~SmiNodeData()
 	  delete iRowMap->second;
 	
 }
+
+vector<double> *
+SmiNodeData::getDenseRow(int i) {
+		if ( dRowMap[i] == NULL )
+		{
+			double * dbeg=this->getRow(i)->denseVector(this->getCore()->getNumCols());
+			double * dend=dbeg+this->getCore()->getNumCols();
+			dRowMap[i] = new vector<double>(dbeg,dend);
+		}
+		return dRowMap[i];
+	}
 

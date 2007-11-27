@@ -62,7 +62,7 @@ DIST_COMMON = $(am__configure_deps) \
 	$(srcdir)/../ltmain.sh $(srcdir)/../missing \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/configure $(top_srcdir)/examples/Makefile.in \
-	$(top_srcdir)/inc/config_smi.h.in
+	$(top_srcdir)/inc/config_smi.h.in AUTHORS
 @HAVE_EXTERNALS_TRUE@am__append_2 = Externals
 @HAVE_EXTERNALS_TRUE@am__append_3 = .Externals-stamp
 subdir = .

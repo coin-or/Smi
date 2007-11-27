@@ -31,11 +31,13 @@ class SmiNodeData : public SmiLinearData
 {
 public:
 	typedef map<int,CoinPackedVector *> SmiRowMap;
+	typedef map<int,vector<double> *> SmiDenseRowMap;
 	void setCoreNode();
 	CoinPackedVector * getRow(int i) { 
 		SmiRowMap::iterator r=rowMap.find(i); 
 		if (r!=rowMap.end()) return r->second; 
 		else return NULL;}
+	vector<double> * getDenseRow(int i);
 	inline SmiCoreData * getCore() { return core_;}
 	inline int getStage() { return stg_;}
 	inline  int getNumElements(){ return nels_; }
@@ -50,6 +52,7 @@ public:
 	void copyObjective(double * dobj);
 
 	CoinPackedVector * combineWithCoreRow(CoinPackedVector *cr, CoinPackedVector *nr);
+	int combineWithDenseCoreRow(vector<double> *dr,CoinPackedVector *cpv,double *dels,int *indx);
 
 	SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 				 const CoinPackedMatrix *const matrix,
@@ -66,6 +69,7 @@ protected:
 private:
 	SmiStageIndex stg_;
 	SmiRowMap rowMap;
+	SmiDenseRowMap dRowMap;
 	int nels_;
 	SmiCoreData *core_;
 	bool isCoreNode_;
@@ -136,6 +140,7 @@ private:
 	double **cdclo_; 
 	double **cdcup_;
 	vector<SmiNodeData*> nodes_;
+	vector<double *> pDenseRow_;
 };
 
 #endif //#define SmiScnData_HPP
