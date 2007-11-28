@@ -37,7 +37,6 @@ int main()
 	testingMessage( "Model generation using discrete distribution specification methods.\n" );
 	ModelDiscrete("Dantzig-Ferguson Aircraft Allocation using Discrete Distribution");
 
-
 	testingMessage( "*** Done! *** \n");
 
  	return 0;
