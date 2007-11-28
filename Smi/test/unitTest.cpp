@@ -351,7 +351,7 @@ void SmiScnSmpsIOUnitTest()
 		assert(fabs(osiStoch->getObjValue()-44.66666) < 0.0001);
 		printf(" *** Successfully tested SMPS interfaces on app0110 with Add option.\n");
 	}
-	if (0)  // AJK - per JP - objective value test fails on Linux (-2640.43) 28-11-2007
+	if (0)  // AJK - per JP - objective value test fails on Linux ubuntu (-2640.43) 28-11-2007
 	{
 		// test SMPS files from Watson test suite (Cambridge, UK)
 		
