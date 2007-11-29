@@ -72,6 +72,15 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 
 	node_vec.reserve(core->getNumStages());
 
+	CoinPackedMatrix *localMatrix = new CoinPackedMatrix();
+
+	if (matrix != NULL && matrix->isColOrdered())
+	{
+		matrix->reverseOrderedCopyOf(*localMatrix);
+	}
+	else
+		localMatrix = matrix;
+
 	// first scenario
 	if (this->getNumScenarios()==0)
 	{
@@ -133,6 +142,12 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 	root->getDataPtr()->addProb(prob);
 
 	this->totalProb_+=prob;
+
+	// if we had to make a rowOrdered copy then delete it now
+	if (matrix != NULL && matrix->isColOrdered())
+	{
+		delete localMatrix;
+	}
 
 	return scen;
 
