@@ -46,11 +46,11 @@ public:
 	    
 	  SmiSmpsType whichSmpsType() {return smiSmpsType_;}
 	
-	  inline const char *periodName (  ) const {return periodName_;};
-	  inline const char *scenarioNew (  ) const {return columnName_;};
-	  inline const char *scenarioAnc (  ) const {return rowName_;};
+	  inline const char *periodName (  ) const {return periodName_;}
+	  inline const char *scenarioNew (  ) const {return columnName_;}
+	  inline const char *scenarioAnc (  ) const {return rowName_;}
 
-	  inline double getProb(){ return prob_;};
+	  inline double getProb(){ return prob_;}
 
 	  inline void setCoreCombineRule(SmiCoreCombineRule *r){combineRule_=r;combineRuleSet=true;}
 	  inline SmiCoreCombineRule *getCoreCombineRule() { return combineRule_;}

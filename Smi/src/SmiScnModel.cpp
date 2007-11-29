@@ -620,7 +620,7 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 		indx[jj] = 0;
 		nsamp[jj] = smiRV->getNumEvents();
 
-		assert( INT_MAX / ns > nsamp[jj] );
+		assert( COIN_INT_MAX / ns > nsamp[jj] );
 		ns *= nsamp[jj];
 		
 		dp *= smiRV->getEventProb(indx[jj]);

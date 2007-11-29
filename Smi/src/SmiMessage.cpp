@@ -3,6 +3,7 @@
 
 #include "CoinPragma.hpp"
 #include "SmiMessage.hpp"
+#include <cstring>
 /// Structure for use by SmiMessage.cpp
 typedef struct {
   SMI_Message internalNumber;

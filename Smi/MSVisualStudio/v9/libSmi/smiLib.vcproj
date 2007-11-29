@@ -176,6 +176,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\SmiMessage.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\SmiScnData.cpp"
 				>
 				<FileConfiguration

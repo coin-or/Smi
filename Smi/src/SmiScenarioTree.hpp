@@ -362,11 +362,10 @@ public:
    /**@name Constructors, destructors and major modifying methods*/
    //@{
    /// Default Constructor creates an empty scenario tree
-	SmiScenarioTree<T>(): leaf_(0),root_(NULL) {};
+	SmiScenarioTree<T>(): leaf_(0),root_(NULL) {}
 
    /// Destructor 
        virtual ~SmiScenarioTree<T>() {delete root_;}
-       //virtual ~SmiScenarioTree<T>() {};
    //@}
 
 private:
