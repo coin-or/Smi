@@ -312,11 +312,11 @@ SmiTreeNodeUnitTest()
 
 
 
-void SmiScnSmpsIOUnitTest()
+void SmiScnSmpsIOUnitTestReplace()
 {
   	std::string dataDir="../../Data/Stochastic";
 	int nrows, ncols;
-	{
+	
 		// test SMPS files app0110R
 		SmiScnModel smi;	
 		smi.readSmps((dataDir+"/app0110R").c_str());		
@@ -332,9 +332,12 @@ void SmiScnSmpsIOUnitTest()
 		osiStoch->initialSolve();		
 		assert(fabs(osiStoch->getObjValue()-44.66666) < 0.0001);
 		printf(" *** Successfully tested SMPS interfaces on app0110 with Replace option.\n");
-	}
+}
+void SmiScnSmpsIOUnitTestAdd()
+{
+	std::string dataDir="../../Data/Stochastic";
+	int nrows, ncols;
 	
-	{
 		// test SMPS files app0110 -- ADD scenario values
 		SmiScnModel smi;	
 		smi.readSmps((dataDir+"/app0110").c_str());		
@@ -350,23 +353,8 @@ void SmiScnSmpsIOUnitTest()
 		osiStoch->initialSolve();		
 		assert(fabs(osiStoch->getObjValue()-44.66666) < 0.0001);
 		printf(" *** Successfully tested SMPS interfaces on app0110 with Add option.\n");
-	}
-	if (0)  // AJK - per JP - objective value test fails on Linux ubuntu (-2640.43) 28-11-2007
-	{
-		// test SMPS files from Watson test suite (Cambridge, UK)
-		
-		SmiScnModel smi;
-		smi.readSmps((dataDir+"/wat_10_C_32").c_str());
-		OsiClpSolverInterface *clp = new OsiClpSolverInterface();
-		smi.setOsiSolverHandle(*clp);	
-		OsiSolverInterface *osiStoch = smi.loadOsiSolverData();
-		osiStoch->setHintParam(OsiDoPresolveInInitial,true);
-		osiStoch->setHintParam(OsiDoScale,true);
-		osiStoch->setHintParam(OsiDoCrash,true);
-		osiStoch->initialSolve();		
-		assert(fabs(osiStoch->getObjValue()+2622.062) < 0.01);
-		printf(" *** Successfully tested SMPS interfaces on wat_10_32_C.\n");
-	}
+	
+	
 }	
 void SmiScnModelScenarioUnitTest()
 {
@@ -1810,8 +1798,11 @@ int main()
 	testingMessage( "Testing SmiScenarioTree\n" );
 	SmiScenarioTreeUnitTest();
 
-	testingMessage( "Testing SmiScnSmpsIO\n" );
-	SmiScnSmpsIOUnitTest();
+	testingMessage( "Testing SmiScnSmpsIO Replace\n" );
+	SmiScnSmpsIOUnitTestReplace();
+
+	testingMessage( "Testing SmiScnSmpsIO Add\n" );
+	SmiScnSmpsIOUnitTestAdd();
 
 	testingMessage( "Testing base data structures for SmiScnModel\n");
 	SmiScnModelScenarioUnitTest();
