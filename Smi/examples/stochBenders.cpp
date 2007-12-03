@@ -31,12 +31,6 @@ int main()
 	testingMessage( "Model generation using SMPS files for Cambridge-Watson problems.\n" );
 	SmpsIO("../../../../Data/Stochastic/wat_10_C_32");		
 
-	testingMessage( "Model generation using scenario tree construction methods.\n");
-	ModelScenario("Dantzig-Ferguson Aircraft Allocation using Scenarios");
-
-	testingMessage( "Model generation using discrete distribution specification methods.\n" );
-	ModelDiscrete("Dantzig-Ferguson Aircraft Allocation using Discrete Distribution");
-
 	testingMessage( "*** Done! *** \n");
 
  	return 0;
@@ -71,25 +65,6 @@ void SmpsIO(const char * const name )
 		printf("Number of rows: %d\n",osiStoch->getNumRows());
 		printf("Number of cols: %d\n",osiStoch->getNumCols());
 		printf("Optimal value: %g\n",osiStoch->getObjValue());		
-
-		// print solution to file
-		string outfilename(name);
-		const string suffix(".out");
-		outfilename = outfilename + suffix;
-		FILE *fp = fopen(outfilename.c_str(),"w");
-		int numScenarios=smi.getNumScenarios();
-
-		for (int i=0 ; i<numScenarios; ++i) {
-			double *dsoln=NULL;
-			int numCols=0;
-			fprintf(fp,"Scenario %d \n",i);
-			dsoln = smi.getColSolution(i,&numCols);
-			for (int j=0; j<numCols; j++)
-				fprintf(fp,"%g \n",dsoln[j]);
-			free(dsoln);
-		}
-		fclose(fp);
-
 
 }	
 

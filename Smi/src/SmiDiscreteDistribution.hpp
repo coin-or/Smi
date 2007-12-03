@@ -78,7 +78,7 @@ public:
 	inline void setEventProb(double p) {prob_ = p;}
 	inline const double getEventProb () { return prob_; }
 	SmiDiscreteEvent(SmiLinearData d, double p):SmiLinearData(d),prob_(p){}
-	~SmiDiscreteEvent(){};
+	~SmiDiscreteEvent(){}
 private:
 	double prob_;
 };
@@ -121,7 +121,7 @@ public:
 	inline void setStage(int p) {stg_=p;}
 	SmiDiscreteRV(){prob_=0.0; stg_=-1;}
 	SmiDiscreteRV(int p) {prob_=0.0; stg_=p;}
-	~SmiDiscreteRV(){};
+	~SmiDiscreteRV(){}
 private:
 	vector<SmiDiscreteEvent *> events_;
 	SmiStageIndex  stg_;

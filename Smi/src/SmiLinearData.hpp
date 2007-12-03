@@ -71,7 +71,7 @@ public:
 		drlo_(osi.getRowLower()),drup_(osi.getRowUpper())
 	{}
 				
-	~SmiLinearData(){};
+	~SmiLinearData(){}
 private:
 	CoinPackedMatrix matrix_;
 	CoinPackedVector dclo_;
