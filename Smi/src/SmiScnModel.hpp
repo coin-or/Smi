@@ -167,6 +167,10 @@ public:
 	{
 		osiStoch_ = osi.clone(false);
 	}
+	void setOsiSolverHandle(OsiSolverInterface *osi)
+	{
+		osiStoch_ = osi->clone(false);
+	}
 	OsiSolverInterface * getOsiSolverInterface();
         // If user wants to delete SmiScnModel but keep OsiSolverInterface
         inline void releaseSolver() {osiStoch_=NULL;}
