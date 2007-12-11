@@ -546,11 +546,13 @@ void SmiScnModelScenarioUnitTest()
   int t;
 	for ( t=0;t<3;t++)
 	{
-		const CoinPackedVector cpvdrlo = osiCore->getRowLower(t);
-		const CoinPackedVector cpvdrup = osiCore->getRowUpper(t);
-		const CoinPackedVector cpvdclo = osiCore->getColLower(t);
-		const CoinPackedVector cpvdcup = osiCore->getColUpper(t);
-		const CoinPackedVector cpvdobj = osiCore->getObjCoefficients(t);
+		SmiNodeData *n=osiCore->getNode(t);
+		CoinPackedVector cpvdrlo(n->getRowLowerLength(),n->getRowLowerIndices(),n->getRowLowerElements());
+		CoinPackedVector cpvdrup(n->getRowUpperLength(),n->getRowUpperIndices(),n->getRowUpperElements());
+		CoinPackedVector cpvdclo(n->getColLowerLength(),n->getColLowerIndices(),n->getColLowerElements());
+		CoinPackedVector cpvdcup(n->getColUpperLength(),n->getColUpperIndices(),n->getColUpperElements());
+		CoinPackedVector cpvdobj(n->getObjectiveLength(),n->getObjectiveIndices(),n->getObjectiveElements());
+		
 
 		double *core_drlo = new double[osiCore->getNumRows(t)];
 		osiCore->getNode(t)->copyRowLower(core_drlo);
@@ -576,12 +578,12 @@ void SmiScnModelScenarioUnitTest()
 			assert(cpvdrup[ii]==drup[osiCore->getRowExternalIndex(ii)]);
 			assert(core_drlo[ii-osiCore->getRowStart(t)] ==drlo[osiCore->getRowExternalIndex(ii)]);
 
-			CoinPackedVector *row1 = osiCore->getMatrixRow(t,ii);
+			CoinPackedVector row1(n->getRowLength(ii),n->getRowIndices(ii),n->getRowElements(ii));
 			const CoinPackedVector row2 = origCore->getVector(osiCore->getRowExternalIndex(ii));
-			assert(row1->getNumElements() == row2.getNumElements());
-			int *indx = row1->getIndices();
-			double *els = row1->getElements();
-			for (int j=0; j<row1->getNumElements(); j++)
+			assert(row1.getNumElements() == row2.getNumElements());
+			int *indx = row1.getIndices();
+			double *els = row1.getElements();
+			for (int j=0; j<row1.getNumElements(); j++)
 			{
 				elt1 = els[j];
 				ic = osiCore->getColExternalIndex(indx[j]);
