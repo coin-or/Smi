@@ -94,7 +94,7 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 		node_vec.push_back(tnode);
 		this->ncol_ = core->getNumCols(0);
 		this->nrow_ = core->getNumRows(0);
-		this->nels_ = node->getNumElements();
+		this->nels_ = node->getNumMatrixElements();
 
 	}
 	else
@@ -120,7 +120,7 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 		
 		this->ncol_ += core->getNumCols(t);
 		this->nrow_ += core->getNumRows(t);
-		this->nels_ += core->getNode(t)->getNumElements() + node->getNumElements();
+		this->nels_ += core->getNode(t)->getNumMatrixElements() + node->getNumMatrixElements();
 	}
 
 
@@ -188,7 +188,7 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 		
 		this->ncol_ += core->getNumCols(t);
 		this->nrow_ += core->getNumRows(t);
-		this->nels_ += core->getNode(t)->getNumElements() + node->getNumElements();
+		this->nels_ += core->getNode(t)->getNumMatrixElements() + node->getNumMatrixElements();
 	}
 
 	SmiTreeNode<SmiScnNode *> *node = smiTree_.find(labels);
@@ -237,6 +237,7 @@ SmiScnModel::loadOsiSolverData()
 	this->indx_ = new int[this->nels_];
 	this->rstrt_ = new int[this->nrow_+1];
 	this->rstrt_[0] = 0;
+	this->nels_max = nels_;
 
 	ncol_=0;
 	nrow_=0;
@@ -276,11 +277,13 @@ SmiScnModel::addNode(SmiScnNode *tnode)
 	int stg = node->getStage();
 	SmiNodeData *cnode = core->getNode(stg);
 
+	// pretty sure this is an error? 
 	core->copyRowLower(drlo_+nrow_,stg);
 	core->copyRowUpper(drup_+nrow_,stg);
 	core->copyColLower(dclo_+ncol_,stg);
 	core->copyColUpper(dcup_+ncol_,stg);
 	core->copyObjective(dobj_+ncol_,stg);
+	
 
 	node->copyColLower(dclo_+ncol_);
 	node->copyColUpper(dcup_+ncol_);
@@ -312,29 +315,24 @@ SmiScnModel::addNode(SmiScnNode *tnode)
 	// add rows to matrix
 	for (int i=core->getRowStart(stg); i<core->getRowStart(stg+1) ; i++)
 	{
-		// get node rows
-		CoinPackedVector *cr = cnode->getRow(i);
-		
 		if (stg)
 		{
 			// build row explicitly into sparse arrays
-			CoinPackedVector *nodeRow = node->getRow(i);
 			int rowStart=this->rstrt_[rowCount];
-
 			int rowNumEls=0;
-			if (nodeRow)
+			if (node->getRowLength(i))
 			{
 				vector<double> *denseCoreRow = cnode->getDenseRow(i);
-				rowNumEls=node->combineWithDenseCoreRow(denseCoreRow,nodeRow,dels_+rowStart,indx_+rowStart);
+				rowNumEls=node->combineWithDenseCoreRow(denseCoreRow,node->getRowLength(i),node->getRowIndices(i),node->getRowElements(i),dels_+rowStart,indx_+rowStart);
 			}
 			else
 			{
-				CoinPackedVector *coreRow=cnode->getRow(i);
-				double *cels=coreRow->getElements();
-				int *cind=coreRow->getIndices();
-				rowNumEls=coreRow->getNumElements();
-				memcpy(dels_+rowStart,cels,sizeof(double)*rowNumEls);
-				memcpy(indx_+rowStart,cind,sizeof(int)*rowNumEls);
+				const double *cels=cnode->getRowElements(i);
+				const int *cind=cnode->getRowIndices(i);
+				const int len=cnode->getRowLength(i);
+				memcpy(dels_+rowStart,cels,sizeof(double)*len);
+				memcpy(indx_+rowStart,cind,sizeof(int)*len);
+				rowNumEls=len;
 			}
 
 
@@ -354,6 +352,8 @@ SmiScnModel::addNode(SmiScnNode *tnode)
 			
 			if(coff)
 			{
+				// TODO -- decide if better to sort COL indices in core
+#if 1
 				
 				// main loop iterates backwards through indices
 				for (int j=rowNumEls-1; j>-1;--j)
@@ -368,21 +368,29 @@ SmiScnModel::addNode(SmiScnNode *tnode)
 					// add offset to index
 					indx[j]+=coff;
 				}
+#else
+				for (int j=0; j<rowNumEls; ++j)
+				{
+					t = core->getColStage(indx[j]);
+					indx[j] += stochColStart[t] - core->getColStart(t);
+				}
+#endif
 			}
 		}
 		else
 		{
 			// build row explicitly into sparse arrays
-			double *els = cr->getElements();
-			int *ind = cr->getIndices();
+			const double *els = cnode->getRowElements(i);
+			const int *ind = cnode->getRowIndices(i);
+			const int len = cnode->getRowLength(i);
 
 			int rowStart=this->rstrt_[rowCount];
 
-			memcpy(dels_+rowStart,els,sizeof(double)*cr->getNumElements());
-			memcpy(indx_+rowStart,ind,sizeof(int)*cr->getNumElements());
+			memcpy(dels_+rowStart,els,sizeof(double)*len);
+			memcpy(indx_+rowStart,ind,sizeof(int)*len);
 
 			rowCount++;
-			nels_+=cr->getNumElements();
+			nels_+=len;
 			this->rstrt_[rowCount] = nels_;
 
 		}
@@ -393,6 +401,10 @@ SmiScnModel::addNode(SmiScnNode *tnode)
 	// update row, col counts
 	ncol_ += core->getNumCols(stg);
 	nrow_ += core->getNumRows(stg);
+
+	// sanity check
+	assert(! ( this->nels_ > this->nels_max ) );
+
 }
 
 OsiSolverInterface *

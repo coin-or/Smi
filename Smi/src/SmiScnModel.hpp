@@ -198,6 +198,7 @@ private:
 	int nrow_;
 	int ncol_;
 	int nels_;
+	int nels_max;
 	// data pointers used in AddNode
 	double *drlo_; 
 	double *drup_;

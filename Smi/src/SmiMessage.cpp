@@ -36,6 +36,7 @@ SmiMessage::SmiMessage(Language language) :
   // now override any language ones
 
   switch (language) {
+	case 0:
     default:
     message=NULL;
     break;
