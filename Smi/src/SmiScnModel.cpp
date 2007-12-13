@@ -403,7 +403,7 @@ SmiScnModel::getOsiSolverInterface()
 double *
 SmiScnModel::getColSolution(int ns, int *length)
 {
-	CoinPackedVector *soln=new CoinPackedVector();
+	//CoinPackedVector *soln=new CoinPackedVector();
 	const double * osiSoln = this->getOsiSolverInterface()->getColSolution();
 	int numcols=0;
 
@@ -442,7 +442,7 @@ SmiScnModel::getColSolution(int ns, int *length)
 double *
 SmiScnModel::getRowSolution(int ns, int *length)
 {
-	CoinPackedVector *soln=new CoinPackedVector();
+	//CoinPackedVector *soln=new CoinPackedVector();
 	const double * osiSoln = this->getOsiSolverInterface()->getRowActivity();
 	int numrows=0;
 

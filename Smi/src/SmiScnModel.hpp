@@ -29,7 +29,7 @@ class SmiScnNode;
 //#############################################################################
 
 /** SmiScnModel: COIN-SMI Scenario Model Class
-	
+
 	Concrete class for generating scenario stochastic linear programs.
 
 	This class implements the Scenarios format of the Stochastic MPS
@@ -52,7 +52,7 @@ class SmiScnNode;
   */
 class SmiScnModel
 {
-	friend void SmiScnModelDiscreteUnitTest();	
+	friend void SmiScnModelDiscreteUnitTest();
 public:
 
     /**@name Read SMPS files.
@@ -62,7 +62,7 @@ public:
 		hack the method yourself.
 		The files can be compressed. The object that reads the files is
 		derived from CoinMpsIO.
-		
+
 		  The optional argument SmiCoreCombineRule allows user to pass in
 		a class to override the default methods to combine core and stochastic data.
 
@@ -73,11 +73,11 @@ public:
 	//SmiCoreData * getCore() {return core_;}
 
 	/**@name Direct methods.
-		
-		Direct methods require the user to create instances of 
+
+		Direct methods require the user to create instances of
 		Core data and Scenario data.
 		Currently, the dimension of the core nodes determines the
-		dimension of the scenario nodes, but this is something that 
+		dimension of the scenario nodes, but this is something that
 		could easily be changed.
 	*/
 
@@ -89,45 +89,21 @@ public:
 	void processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s, bool test=false);
 
 	/** generate scenario with ancestor/branch node identification
-		
-		Core argument must be supplied. 
-		Data values combine with corresponding core values, 
-		if found, or creates them if not. 
-		
+
+		Core argument must be supplied.
+		Data values combine with corresponding core values,
+		if found, or creates them if not.
+
 		Scenario nodes need to have same dimensions as core nodes.
-		
-		Data field arguments can be NULL, or empty. 
-		
+
+		Data field arguments can be NULL, or empty.
+
 		branch, anc, arguments must be supplied.  These
 		identify the branching node according to the Stochastic MPS
 		standard.
-		
+
 	*/
-	SmiScenarioIndex generateScenario(SmiCoreData *core, 
-		CoinPackedMatrix *matrix,
-		CoinPackedVector *dclo, CoinPackedVector *dcup,
-		CoinPackedVector *dobj,
-		CoinPackedVector *drlo, CoinPackedVector *drup,
-		vector<int>labels, double prob,
-		SmiCoreCombineRule *r = SmiCoreCombineReplace::Instance());
-
-	/** generate scenario with labels information
-		
-		Core argument must be supplied. 
-		Data values combine with corresponding core values, 
-		if found, or creates them if not. 
-		
-		Scenario nodes need to have same dimensions as core nodes.
-		
-		Data field arguments can be NULL, or empty. 
-
-		Labels are passed as vector<int> array.
-		Adds new path using labels to find branching node.
-	    The depth (root to leaf) of new path is labels.size(). 
-
-				
-	*/
-	SmiScenarioIndex generateScenario(SmiCoreData *core, 
+	SmiScenarioIndex generateScenario(SmiCoreData *core,
 				CoinPackedMatrix *matrix,
 				CoinPackedVector *dclo, CoinPackedVector *dcup,
 				CoinPackedVector *dobj,
@@ -135,8 +111,31 @@ public:
 				SmiStageIndex branch, SmiScenarioIndex anc, double prob,
 				SmiCoreCombineRule *r = SmiCoreCombineReplace::Instance());
 
+	/** generate scenario with labels information
+
+		Core argument must be supplied.
+		Data values combine with corresponding core values,
+		if found, or creates them if not.
+
+		Scenario nodes need to have same dimensions as core nodes.
+
+		Data field arguments can be NULL, or empty.
+
+		Labels are passed as vector<int> array.
+		Adds new path using labels to find branching node.
+	    The depth (root to leaf) of new path is labels.size().
+
+	*/
+	SmiScenarioIndex generateScenario(SmiCoreData *core,
+		CoinPackedMatrix *matrix,
+		CoinPackedVector *dclo, CoinPackedVector *dcup,
+		CoinPackedVector *dobj,
+		CoinPackedVector *drlo, CoinPackedVector *drup,
+		vector<int>labels, double prob,
+		SmiCoreCombineRule *r = SmiCoreCombineReplace::Instance());
+
 	/**@name loadOsiSolverData
-		
+
 		Loads deterministic equivalent model into internal osi data structures
 		and return handle.
 
@@ -149,7 +148,7 @@ public:
 	OsiSolverInterface * loadOsiSolverData();
 
 //@}
-		
+
 	// get scenario problem data
 	SmiScenarioIndex getNumScenarios(){ return smiTree_.getNumScenarios();}
 	double getScenarioProb(SmiScenarioIndex ns);
@@ -176,8 +175,8 @@ public:
         inline void releaseSolver() {osiStoch_=NULL;}
 
 
-	// constructor 
-	SmiScnModel(): 
+	// constructor
+	SmiScnModel():
 		osiStoch_(NULL),
 		drlo_(NULL), drup_(NULL), dobj_(NULL), dclo_(NULL), dcup_(NULL), matrix_(NULL),
 		solve_synch_(false),totalProb_(0),core_(NULL)
@@ -200,10 +199,10 @@ private:
 	int nels_;
 	int nels_max;
 	// data pointers used in AddNode
-	double *drlo_; 
+	double *drlo_;
 	double *drup_;
 	double *dobj_;
-	double *dclo_; 
+	double *dclo_;
 	double *dcup_;
 	CoinPackedMatrix *matrix_;
 	double *dels_;
@@ -231,7 +230,7 @@ public:
 	int getCoreRowIndex(int i);
 	inline void setScenarioIndex(SmiScenarioIndex i){ scen_=i;}
         inline SmiScenarioIndex getScenarioIndex() {return scen_;}
-	inline int  getColStart() {return coffset_;}	
+	inline int  getColStart() {return coffset_;}
 	inline int  getRowStart() {return roffset_;}
 	inline int getNumCols(){ return node_->getCore()->getNumCols(node_->getStage());}
 	inline int getNumRows(){ return node_->getCore()->getNumRows(node_->getStage());}
@@ -255,7 +254,7 @@ private:
 
 private:
 	SmiNodeData *node_;
-	SmiScnNode *parent_;  
+	SmiScnNode *parent_;
 	double prob_;
 	double mdl_prob_;
 	int coffset_;
