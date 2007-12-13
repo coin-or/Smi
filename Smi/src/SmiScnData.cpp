@@ -209,7 +209,7 @@ SmiCoreData::gutsOfConstructor(int nrow,int ncol,int nstag,
 
 	// reserve space for dense row pointers
 	pDenseRow_.resize(nrow_);
-	for (int i=0; i<nrow_; ++i) pDenseRow_[0]=NULL;
+	for (int i=0; i<nrow_; ++i) pDenseRow_[i]=NULL;
 
 }
 
