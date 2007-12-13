@@ -27,7 +27,7 @@ typedef int SmiStageIndex;
 
 class SmiCoreData;
 
-class SmiNodeData 
+class SmiNodeData
 	//: public SmiLinearData
 {
 public:
@@ -35,13 +35,13 @@ public:
 	typedef map<int,vector<double> *> SmiDenseRowMap;
 	void setCoreNode();
 	/*
-	CoinPackedVector * getRow(int i) { 
-		SmiRowMap::iterator r=rowMap.find(i); 
-		if (r!=rowMap.end()) return r->second; 
+	CoinPackedVector * getRow(int i) {
+		SmiRowMap::iterator r=rowMap.find(i);
+		if (r!=rowMap.end()) return r->second;
 		else return NULL;}
 	*/
 	vector<double> * getDenseRow(int i);
-	
+
 	inline SmiCoreData * getCore() { return core_;}
 	inline int getStage() { return stg_;}
 
@@ -55,9 +55,9 @@ public:
 	void copyObjective(double * dobj);
 
 	const int getNumMatrixElements(){
-		if (this->has_matrix_) 
-			return this->strt_[getMatEnd()]-this->strt_[getMatStart()]; 
-		else 
+		if (this->has_matrix_)
+			return this->strt_[getMatEnd()]-this->strt_[getMatStart()];
+		else
 			return 0;
 	}
 	 const int getRowLength(int irow){
@@ -79,7 +79,8 @@ public:
 			 return NULL;
 	 }
 	 int *getMutableRowIndices(int irow){
-		 return (int *)getRowIndices(irow);
+		 // using const_cast to stop warnings about cast-away constness
+		 return const_cast<int *>(getRowIndices(irow));
 	 }
 	 const int *getRowLowerIndices()   {return getIndices(this->getRloStart());}
 	 const int *getRowUpperIndices()   {return getIndices(this->getRupStart());}
@@ -94,7 +95,8 @@ public:
 			 return NULL;
 	 }
 	 double *getMutableRowElements(int irow){
-		 return (double *)getRowElements(irow);
+		 // using const_cast to stop warnings about cast-away constness
+		 return const_cast<double *>(getRowElements(irow));
 	 }
 	 const double *getRowLowerElements()   {return getElements(this->getRloStart());}
 	 const double *getRowUpperElements()   {return getElements(this->getRupStart());}
@@ -109,10 +111,10 @@ public:
 
 	SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 				 const CoinPackedMatrix *const matrix,
-				 CoinPackedVector *dclo, 
+				 CoinPackedVector *dclo,
 				 CoinPackedVector *dcup,
 				 CoinPackedVector *dobj,
-				 CoinPackedVector *drlo, 
+				 CoinPackedVector *drlo,
 				 CoinPackedVector *drup);
 	~SmiNodeData();
 
@@ -148,11 +150,11 @@ private:
 	SmiStageIndex stg_;
 	SmiRowMap rowMap;
 	SmiDenseRowMap dRowMap;
-	
+
 	SmiCoreData *core_;
 	bool isCoreNode_;
 	SmiCoreCombineRule *combineRule_;
-	
+
 	int numarrays_;
 	int nels_;
 	int nrow_;
@@ -197,7 +199,7 @@ public:
 	inline const double * getDenseColLower(SmiStageIndex t){return cdclo_[t];}
 	inline const double * getDenseColUpper(SmiStageIndex t){return cdcup_[t];}
 	inline const double * getDenseObjCoefficients(SmiStageIndex t){return cdobj_[t];}
-	
+
 	void copyRowLower(double * drlo,SmiStageIndex t );
 	void copyRowUpper(double * drup,SmiStageIndex t);
 	void copyColLower(double * dclo,SmiStageIndex t);
@@ -232,10 +234,10 @@ private:
 	int *rowEx2In_;
 	int *colIn2Ex_;
 	int *rowIn2Ex_;
-	double **cdrlo_; 
+	double **cdrlo_;
 	double **cdrup_;
 	double **cdobj_;
-	double **cdclo_; 
+	double **cdclo_;
 	double **cdcup_;
 	vector<SmiNodeData*> nodes_;
 	vector<double *> pDenseRow_;
