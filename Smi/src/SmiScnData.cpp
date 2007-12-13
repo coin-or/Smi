@@ -13,7 +13,7 @@ SmiCoreData::SmiCoreData(OsiSolverInterface *osi,int nstag,int *cstag,int *rstag
 	int ncol = osi->getNumCols();
 	CoinPackedVector *drlo = new CoinPackedVector(nrow,osi->getRowLower());
 	CoinPackedVector *drup = new CoinPackedVector(nrow,osi->getRowUpper());
-	CoinPackedVector *dclo = new CoinPackedVector(ncol,osi->getColLower()); 
+	CoinPackedVector *dclo = new CoinPackedVector(ncol,osi->getColLower());
 	CoinPackedVector *dcup = new CoinPackedVector(ncol,osi->getColUpper());
 	CoinPackedVector *dobj = new CoinPackedVector(ncol,osi->getObjCoefficients());
 
@@ -21,7 +21,7 @@ SmiCoreData::SmiCoreData(OsiSolverInterface *osi,int nstag,int *cstag,int *rstag
 	matrix->eliminateDuplicates(0.0);
 
 	gutsOfConstructor(nrow,ncol,nstag,cstag,rstag,matrix,dclo,dcup,dobj,drlo,drup);
-	
+
 		delete matrix;
 		delete drlo;
 		delete drup;
@@ -39,7 +39,7 @@ SmiCoreData::SmiCoreData(CoinMpsIO *osi,int nstag,int *cstag,int *rstag)
 	int ncol = osi->getNumCols();
 	CoinPackedVector *drlo = new CoinPackedVector(nrow,osi->getRowLower());
 	CoinPackedVector *drup = new CoinPackedVector(nrow,osi->getRowUpper());
-	CoinPackedVector *dclo = new CoinPackedVector(ncol,osi->getColLower()); 
+	CoinPackedVector *dclo = new CoinPackedVector(ncol,osi->getColLower());
 	CoinPackedVector *dcup = new CoinPackedVector(ncol,osi->getColUpper());
 	CoinPackedVector *dobj = new CoinPackedVector(ncol,osi->getObjCoefficients());
 
@@ -47,7 +47,7 @@ SmiCoreData::SmiCoreData(CoinMpsIO *osi,int nstag,int *cstag,int *rstag)
 	matrix->eliminateDuplicates(0.0);
 
 	gutsOfConstructor(nrow,ncol,nstag,cstag,rstag,matrix,dclo,dcup,dobj,drlo,drup);
-	
+
 		delete matrix;
 		delete drlo;
 		delete drup;
@@ -86,7 +86,7 @@ SmiCoreData::gutsOfConstructor(int nrow,int ncol,int nstag,
 	rowStage_ = new int[nrow_];
 	rowEx2In_ = new int[nrow_];
 	rowIn2Ex_ = new int[nrow_];
-	
+
 	// store stage maps
 	CoinDisjointCopyN(cstag,ncol_,colStage_);
 	CoinDisjointCopyN(rstag,nrow_,rowStage_);
@@ -97,7 +97,7 @@ SmiCoreData::gutsOfConstructor(int nrow,int ncol,int nstag,
 		nColInStage_[i] = 0;
 		nRowInStage_[i] = 0;
 	}
-		
+
 	// array to point to start of new stage
 	stageRowPtr_ = new int[nstag_+1];
 
@@ -123,7 +123,7 @@ SmiCoreData::gutsOfConstructor(int nrow,int ncol,int nstag,
 	for (i=0;i<nstag_;i++)
 		stageRowPtr_[i+1] = stageRowPtr_[i] + nRowInStage_[i];
 
-			
+
 	// array to point to start of new stage
 	stageColPtr_ = new int[nstag_+1];
 
@@ -165,7 +165,7 @@ SmiCoreData::gutsOfConstructor(int nrow,int ncol,int nstag,
 
 	for (i=0;i<nstag_;i++)
 	{
-	
+
 		SmiNodeData *node = new SmiNodeData(i,this,
 			matrix,dclo,dcup,dobj,drlo,drup);
 
@@ -180,7 +180,7 @@ SmiCoreData::gutsOfConstructor(int nrow,int ncol,int nstag,
 
 		CoinPackedVector cpv_rlo(node->getRowLowerLength(),node->getRowLowerIndices(),node->getRowLowerElements());
 		cdrlo_[i]=cpv_rlo.denseVector(nrow+irow)+irow;
-		
+
 		CoinPackedVector cpv_rup(node->getRowUpperLength(),node->getRowUpperIndices(),node->getRowUpperElements());
 		cdrup_[i]=cpv_rup.denseVector(nrow+irow)+irow;
 
@@ -192,7 +192,7 @@ SmiCoreData::gutsOfConstructor(int nrow,int ncol,int nstag,
 
 		CoinPackedVector cpv_obj(node->getObjectiveLength(),node->getObjectiveIndices(),node->getObjectiveElements());
 		cdobj_[i]=cpv_obj.denseVector(ncol+icol)+icol;
-		
+
 		// sort indices in each row
 		for (int ii=irow; ii<irow+nrow; ++ii)
 		{
@@ -209,31 +209,29 @@ SmiCoreData::gutsOfConstructor(int nrow,int ncol,int nstag,
 
 	// reserve space for dense row pointers
 	pDenseRow_.resize(nrow_);
-	for (int i=0; i<nrow_; ++i) pDenseRow_.push_back(NULL);	
-
-	
+	for (int i=0; i<nrow_; ++i) pDenseRow_[0]=NULL;
 
 }
 
 void SmiCoreData::copyRowLower(double * d,SmiStageIndex t )
-{	
+{
 	CoinDisjointCopyN(cdrlo_[t],this->getNumRows(t),d);
 }
-	
+
 void SmiCoreData::copyRowUpper(double * d,SmiStageIndex t)
-{	
+{
 	CoinDisjointCopyN(cdrup_[t],this->getNumRows(t),d);
 }
 void SmiCoreData::copyColLower(double * d,SmiStageIndex t)
-{	
+{
 	CoinDisjointCopyN(cdclo_[t],this->getNumCols(t),d);
 }
 void SmiCoreData::copyColUpper(double * d,SmiStageIndex t)
-{	
+{
 	CoinDisjointCopyN(cdcup_[t],this->getNumCols(t),d);
 }
 void SmiCoreData::copyObjective(double * d,SmiStageIndex t)
-{	
+{
 	CoinDisjointCopyN(cdobj_[t],this->getNumCols(t),d);
 }
 
@@ -275,7 +273,7 @@ SmiCoreData::~SmiCoreData()
 
 }
 
-void 
+void
 SmiNodeData::setCoreNode()
 {
 	isCoreNode_=true;
@@ -291,10 +289,10 @@ using namespace std;
 // TODO: allow for special node data like integer variables not in core, etc
 SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 				 const CoinPackedMatrix * const matrix,
-				 CoinPackedVector *dclo, 
+				 CoinPackedVector *dclo,
 				 CoinPackedVector *dcup,
 				 CoinPackedVector *dobj,
-				 CoinPackedVector *drlo, 
+				 CoinPackedVector *drlo,
 				 CoinPackedVector *drup)
 {
 	// initialize specialized core node info
@@ -311,13 +309,13 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 	int nrow = core->getNumRows(stg_);
 	int ncol = core->getNumCols(stg_);
 
-		
+
 	if (matrix && nels_>0)
 	{
 
 		// should already be done but no harm checking
 		assert(!matrix->isColOrdered());
-		
+
 		// pick up and store rows belonging to node's stage
 		// TODO: is this a fast way to do this?
 		for (i=core->getRowStart(stg); i<core->getRowStart(stg+1) ; i++)
@@ -350,7 +348,7 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 			}
 		}
 	}
-	
+
 	const int *ind;
 	const double *elt;
 
@@ -369,7 +367,7 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 		}
 	}
 
-	
+
 	if (dcup && dcup->getNumElements())
 	{
 		//this->dcup_ = new CoinPackedVector(false);
@@ -382,9 +380,9 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 			if ( core->getColStage(icol) == stg)
 				this->getMutableColUpper().insert(core->getColInternalIndex(icol),elt[i]);
 		}
-	}	
+	}
 
-	
+
 	if (dobj && dobj->getNumElements())
 	{
 		//this->dobj_ = new CoinPackedVector(false);
@@ -397,9 +395,9 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 			if ( core->getColStage(icol) == stg)
 				this->getMutableObjective().insert(core->getColInternalIndex(icol),elt[i]);
 		}
-	}	
+	}
 
-	
+
 	if (drlo && drlo->getNumElements())
 	{
 		//this->drlo_ = new CoinPackedVector(false);
@@ -415,7 +413,7 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 	}
 
 
-				
+
 	if (drup && drup->getNumElements())
 	{
 		//this->drup_ = new CoinPackedVector(false);
@@ -462,41 +460,41 @@ void SmiNodeData::copyRowLower(double * d)
 {
 	int t=getStage();
 	getCore()->copyRowLower(d,t);
-	combineWithCoreDoubleArray(d,getRowLowerLength(),getRowLowerIndices(),getRowLowerElements(),getCore()->getRowStart(t));	
+	combineWithCoreDoubleArray(d,getRowLowerLength(),getRowLowerIndices(),getRowLowerElements(),getCore()->getRowStart(t));
 }
 
 void SmiNodeData::copyRowUpper(double * d){
 	int t=getStage();
 	getCore()->copyRowUpper(d,t);
-	combineWithCoreDoubleArray(d,getRowUpperLength(),getRowUpperIndices(),getRowUpperElements(),getCore()->getRowStart(t));	
+	combineWithCoreDoubleArray(d,getRowUpperLength(),getRowUpperIndices(),getRowUpperElements(),getCore()->getRowStart(t));
 }
 
 void SmiNodeData::copyColLower(double * d){
 	int t=getStage();
 	getCore()->copyColLower(d,t);
-	combineWithCoreDoubleArray(d,getColLowerLength(),getColLowerIndices(),getColLowerElements(),getCore()->getColStart(t));	
+	combineWithCoreDoubleArray(d,getColLowerLength(),getColLowerIndices(),getColLowerElements(),getCore()->getColStart(t));
 }
 
 void SmiNodeData::copyColUpper(double * d){
 	int t=getStage();
 	getCore()->copyColUpper(d,t);
-	combineWithCoreDoubleArray(d,getColUpperLength(),getColUpperIndices(),getColUpperElements(),getCore()->getColStart(t));	
+	combineWithCoreDoubleArray(d,getColUpperLength(),getColUpperIndices(),getColUpperElements(),getCore()->getColStart(t));
 }
 
 void SmiNodeData::copyObjective(double * d){
 	int t=getStage();
 	getCore()->copyObjective(d,t);
-	combineWithCoreDoubleArray(d,getObjectiveLength(),getObjectiveIndices(),getObjectiveElements(),getCore()->getColStart(t));	
+	combineWithCoreDoubleArray(d,getObjectiveLength(),getObjectiveIndices(),getObjectiveElements(),getCore()->getColStart(t));
 }
 
 SmiNodeData::~SmiNodeData()
 {
 	SmiRowMap::iterator iRowMap;
-	
+
 	for (iRowMap=rowMap.begin(); iRowMap!=rowMap.end(); ++iRowMap)
 	  delete iRowMap->second;
 
-	deleteMemory();	
+	deleteMemory();
 }
 
 vector<double> *
@@ -533,17 +531,17 @@ SmiNodeData::deleteMemory()
 	free(this->strt_);
 }
 
-	
+
 
 
 // constructor from LP data
 // TODO: allow for special node data like integer variables not in core, etc
 SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 				 const CoinPackedMatrix * const matrix,
-				 CoinPackedVector *dclo, 
+				 CoinPackedVector *dclo,
 				 CoinPackedVector *dcup,
 				 CoinPackedVector *dobj,
-				 CoinPackedVector *drlo, 
+				 CoinPackedVector *drlo,
 				 CoinPackedVector *drup)
 {
 	// initialize node info from core data
@@ -566,7 +564,7 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 		nels_ += dclo->getNumElements();
 	if (dcup)
 		nels_ += dcup->getNumElements();
-	if (dobj) 
+	if (dobj)
 		nels_ += dobj->getNumElements();
 	if (drlo)
 		nels_ += drlo->getNumElements();
@@ -594,12 +592,12 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 		// should already be done but no harm checking
 		assert(!matrix->isColOrdered());
 		has_matrix_=true;
-		
+
 		const double *matrix_els = matrix->getElements();
 		const int    *matrix_ind = matrix->getIndices();
 		const int    *matrix_len = matrix->getVectorLengths();
 		const int    *matrix_str = matrix->getVectorStarts();
-		
+
 		// check all rows in stage
 		for (int i=0; i<this->nrow_; ++i)
 		{
@@ -609,7 +607,7 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 			//copy the matrix row to destination
 			if (len = matrix_len[isrc])
 			{
-				//matrix row start				
+				//matrix row start
 				offset_src = matrix_str[isrc];
 
 				//copy elements and indices
@@ -650,7 +648,7 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 	}
 	i_start++;
 	this->strt_[i_start] = offset_dst;
-	
+
 	// Column Upper Bound
 	this->cup_strt_ = i_start;
 	if (dcup)
@@ -712,7 +710,7 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 	this->strt_[i_start] = offset_dst;
 
 	// Row Upper Bound
-	this->rup_strt_ = i_start;				
+	this->rup_strt_ = i_start;
 	if (drup)
 	{
 		ind = drup->getIndices();
