@@ -17,6 +17,7 @@ Smi/MSVisualStudio/v8/libSmi/smiLib.vcproj -text
 Smi/MSVisualStudio/v8/unitTestSmi/smiUnitTest.vcproj -text
 Smi/MSVisualStudio/v9/Smi.sln -text
 Smi/MSVisualStudio/v9/exampleBenders/exampleBenders.vcproj -text
+Smi/MSVisualStudio/v9/exampleFlopCpp/exampleFlopCpp.vcproj -text
 Smi/MSVisualStudio/v9/exampleSmi/exampleSmi.vcproj -text
 Smi/MSVisualStudio/v9/libSmi/smiLib.vcproj -text
 Smi/MSVisualStudio/v9/unitTestSmi/bug_gen.mps -text
@@ -26,6 +27,7 @@ Smi/Makefile.in -text
 Smi/configure -text
 Smi/configure.ac -text
 Smi/examples/Makefile.in -text
+Smi/examples/investment.cpp -text
 Smi/examples/stoch.cpp -text
 Smi/examples/stochBenders.cpp -text
 Smi/inc/config_smi.h.in -text

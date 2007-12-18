@@ -13,14 +13,14 @@
 using namespace std;
 
 
-int 
+int
 SmiScnNode::getCoreColIndex(int i)
 {
 	SmiCoreData *core = node_->getCore();
 	return core->getColExternalIndex(i-coffset_+core->getColStart(node_->getStage()));
 }
 
-int 
+int
 SmiScnNode::getCoreRowIndex(int i){
 	SmiCoreData *core = node_->getCore();
 	return core->getRowExternalIndex(i-roffset_+core->getRowStart(node_->getStage()));
@@ -30,19 +30,19 @@ SmiScnModel::~SmiScnModel()
 {
 	if (osiStoch_)
 		delete osiStoch_;
-	
+
 	if (core_)
 		delete core_;
-	
+
 	if (drlo_)
 		delete [] drlo_;
-	
+
 	if (drup_)
 		delete [] drup_;
-	
+
 	if (dclo_)
 		delete [] dclo_;
-	
+
 	if (dcup_)
 		delete [] dcup_;
 
@@ -51,16 +51,16 @@ SmiScnModel::~SmiScnModel()
 
 	if (matrix_)
 		delete matrix_;
-	
+
 
 }
 
-SmiScenarioIndex 
-SmiScnModel::generateScenario(SmiCoreData *core, 
+SmiScenarioIndex
+SmiScnModel::generateScenario(SmiCoreData *core,
 				CoinPackedMatrix *matrix,
 				CoinPackedVector *v_dclo, CoinPackedVector *v_dcup,
 				CoinPackedVector *v_dobj,
-				CoinPackedVector *v_drlo, CoinPackedVector *v_drup,				
+				CoinPackedVector *v_drlo, CoinPackedVector *v_drup,
 				SmiStageIndex branch, SmiScenarioIndex anc, double prob,
 				SmiCoreCombineRule *r)
 {
@@ -71,15 +71,6 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 	vector<SmiScnNode *> node_vec;
 
 	node_vec.reserve(core->getNumStages());
-
-	CoinPackedMatrix *localMatrix = new CoinPackedMatrix();
-
-	if (matrix != NULL && matrix->isColOrdered())
-	{
-		matrix->reverseOrderedCopyOf(*localMatrix);
-	}
-	else
-		localMatrix = matrix;
 
 	// first scenario
 	if (this->getNumScenarios()==0)
@@ -94,7 +85,7 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 		node_vec.push_back(tnode);
 		this->ncol_ = core->getNumCols(0);
 		this->nrow_ = core->getNumRows(0);
-		this->nels_ = node->getNumElements();
+		this->nels_ = node->getNumMatrixElements();
 
 	}
 	else
@@ -117,10 +108,10 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 		// generate new tree node
 		SmiScnNode *tnode = new SmiScnNode(node);
 		node_vec.push_back(tnode);
-		
+
 		this->ncol_ += core->getNumCols(t);
 		this->nrow_ += core->getNumRows(t);
-		this->nels_ += core->getNode(t)->getNumElements() + node->getNumElements();
+		this->nels_ += core->getNode(t)->getNumMatrixElements() + node->getNumMatrixElements();
 	}
 
 
@@ -143,21 +134,16 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 
 	this->totalProb_+=prob;
 
-	// if we had to make a rowOrdered copy then delete it now
-	if (matrix != NULL && matrix->isColOrdered())
-	{
-		delete localMatrix;
-	}
-
 	return scen;
 
 }
-SmiScenarioIndex 
-SmiScnModel::generateScenario(SmiCoreData *core, 
+
+SmiScenarioIndex
+SmiScnModel::generateScenario(SmiCoreData *core,
 				CoinPackedMatrix *matrix,
 				CoinPackedVector *v_dclo, CoinPackedVector *v_dcup,
 				CoinPackedVector *v_dobj,
-				CoinPackedVector *v_drlo, CoinPackedVector *v_drup,				
+				CoinPackedVector *v_drlo, CoinPackedVector *v_drup,
 				vector<int> labels, double prob,
 				SmiCoreCombineRule *r)
 {
@@ -180,15 +166,15 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 		// generate new data node
 		SmiNodeData *node = new SmiNodeData(t,core,matrix,
 			v_dclo,v_dcup,v_dobj,v_drlo,v_drup);
-		
+
 		node->setCoreCombineRule(r);
 		// generate new tree node
 		SmiScnNode *tnode = new SmiScnNode(node);
 		node_vec.push_back(tnode);
-		
+
 		this->ncol_ += core->getNumCols(t);
 		this->nrow_ += core->getNumRows(t);
-		this->nels_ += core->getNode(t)->getNumElements() + node->getNumElements();
+		this->nels_ += core->getNode(t)->getNumMatrixElements() + node->getNumMatrixElements();
 	}
 
 	SmiTreeNode<SmiScnNode *> *node = smiTree_.find(labels);
@@ -219,7 +205,7 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 
 
 
- 
+
 OsiSolverInterface *
 SmiScnModel::loadOsiSolverData()
 {
@@ -237,11 +223,12 @@ SmiScnModel::loadOsiSolverData()
 	this->indx_ = new int[this->nels_];
 	this->rstrt_ = new int[this->nrow_+1];
 	this->rstrt_[0] = 0;
+	this->nels_max = nels_;
 
 	ncol_=0;
 	nrow_=0;
 	nels_=0;
-	
+
 	// loop to addNodes
 	for_each(smiTree_.treeBegin(),smiTree_.treeEnd(),SmiScnModelAddNode(this));
 
@@ -249,7 +236,7 @@ SmiScnModel::loadOsiSolverData()
 	int *len=NULL;
 	matrix_->assignMatrix(false,ncol_,nrow_,nels_,
 		dels_,indx_,rstrt_,len);
-	
+
 	// pass data to osiStoch
 	osiStoch_->loadProblem(CoinPackedMatrix(*matrix_),dclo_,dcup_,dobj_,drlo_,drup_);
 
@@ -259,7 +246,7 @@ SmiScnModel::loadOsiSolverData()
 
 
 
-void 
+void
 SmiScnModel::addNode(SmiScnNode *tnode)
 {
 
@@ -276,29 +263,31 @@ SmiScnModel::addNode(SmiScnNode *tnode)
 	int stg = node->getStage();
 	SmiNodeData *cnode = core->getNode(stg);
 
+	// pretty sure this is an error?
 	core->copyRowLower(drlo_+nrow_,stg);
 	core->copyRowUpper(drup_+nrow_,stg);
 	core->copyColLower(dclo_+ncol_,stg);
 	core->copyColUpper(dcup_+ncol_,stg);
 	core->copyObjective(dobj_+ncol_,stg);
 
+
 	node->copyColLower(dclo_+ncol_);
 	node->copyColUpper(dcup_+ncol_);
 	node->copyObjective(dobj_+ncol_);
 	node->copyRowLower(drlo_+nrow_);
 	node->copyRowUpper(drup_+nrow_);
-	
+
 	// multiply obj coeffs by node probability and normalize
 	double prob = tnode->getProb()/this->totalProb_;
 	tnode->setModelProb(prob);
 
 	for(int j=ncol_; j<ncol_+core->getNumCols(stg); ++j)
 		dobj_[j] *= prob;
-	
+
 
 	vector<int> stochColStart(stg+1);
 	SmiScnNode *pnode=tnode;
-	
+
 	stochColStart[stg]=ncol_;
 	for (int t=stg-1; t>0; t--)
 	{
@@ -312,49 +301,46 @@ SmiScnModel::addNode(SmiScnNode *tnode)
 	// add rows to matrix
 	for (int i=core->getRowStart(stg); i<core->getRowStart(stg+1) ; i++)
 	{
-		// get node rows
-		CoinPackedVector *cr = cnode->getRow(i);
-		
 		if (stg)
 		{
 			// build row explicitly into sparse arrays
-			CoinPackedVector *nodeRow = node->getRow(i);
 			int rowStart=this->rstrt_[rowCount];
-
 			int rowNumEls=0;
-			if (nodeRow)
+			if (node->getRowLength(i))
 			{
 				vector<double> *denseCoreRow = cnode->getDenseRow(i);
-				rowNumEls=node->combineWithDenseCoreRow(denseCoreRow,nodeRow,dels_+rowStart,indx_+rowStart);
+				rowNumEls=node->combineWithDenseCoreRow(denseCoreRow,node->getRowLength(i),node->getRowIndices(i),node->getRowElements(i),dels_+rowStart,indx_+rowStart);
 			}
 			else
 			{
-				CoinPackedVector *coreRow=cnode->getRow(i);
-				double *cels=coreRow->getElements();
-				int *cind=coreRow->getIndices();
-				rowNumEls=coreRow->getNumElements();
-				memcpy(dels_+rowStart,cels,sizeof(double)*rowNumEls);
-				memcpy(indx_+rowStart,cind,sizeof(int)*rowNumEls);
+				const double *cels=cnode->getRowElements(i);
+				const int *cind=cnode->getRowIndices(i);
+				const int len=cnode->getRowLength(i);
+				memcpy(dels_+rowStart,cels,sizeof(double)*len);
+				memcpy(indx_+rowStart,cind,sizeof(int)*len);
+				rowNumEls=len;
 			}
 
 
 			rowCount++;
 			nels_+=rowNumEls;
 			this->rstrt_[rowCount] = nels_;
-			
+
 			// coefficients of new row
 			int *indx = indx_+rowStart;
-			
+
 			// stage starts
 			int t=stg;
 			int jlo=core->getColStart(stg);
-			
+
 			// net offset to be added to indices
 			int coff= stochColStart[stg]-jlo;
-			
+
 			if(coff)
 			{
-				
+				// TODO -- decide if better to sort COL indices in core
+#if 1
+
 				// main loop iterates backwards through indices
 				for (int j=rowNumEls-1; j>-1;--j)
 				{
@@ -364,25 +350,33 @@ SmiScnModel::addNode(SmiScnNode *tnode)
 						jlo = core->getColStart(--t);
 						coff = stochColStart[t] - jlo;
 					}
-					
+
 					// add offset to index
 					indx[j]+=coff;
 				}
+#else
+				for (int j=0; j<rowNumEls; ++j)
+				{
+					t = core->getColStage(indx[j]);
+					indx[j] += stochColStart[t] - core->getColStart(t);
+				}
+#endif
 			}
 		}
 		else
 		{
 			// build row explicitly into sparse arrays
-			double *els = cr->getElements();
-			int *ind = cr->getIndices();
+			const double *els = cnode->getRowElements(i);
+			const int *ind = cnode->getRowIndices(i);
+			const int len = cnode->getRowLength(i);
 
 			int rowStart=this->rstrt_[rowCount];
 
-			memcpy(dels_+rowStart,els,sizeof(double)*cr->getNumElements());
-			memcpy(indx_+rowStart,ind,sizeof(int)*cr->getNumElements());
+			memcpy(dels_+rowStart,els,sizeof(double)*len);
+			memcpy(indx_+rowStart,ind,sizeof(int)*len);
 
 			rowCount++;
-			nels_+=cr->getNumElements();
+			nels_+=len;
 			this->rstrt_[rowCount] = nels_;
 
 		}
@@ -393,6 +387,10 @@ SmiScnModel::addNode(SmiScnNode *tnode)
 	// update row, col counts
 	ncol_ += core->getNumCols(stg);
 	nrow_ += core->getNumRows(stg);
+
+	// sanity check
+	assert(! ( this->nels_ > this->nels_max ) );
+
 }
 
 OsiSolverInterface *
@@ -404,8 +402,8 @@ SmiScnModel::getOsiSolverInterface()
 
 double *
 SmiScnModel::getColSolution(int ns, int *length)
-{	
-	CoinPackedVector *soln=new CoinPackedVector();
+{
+	//CoinPackedVector *soln=new CoinPackedVector();
 	const double * osiSoln = this->getOsiSolverInterface()->getColSolution();
 	int numcols=0;
 
@@ -416,7 +414,7 @@ SmiScnModel::getColSolution(int ns, int *length)
 	while (node != NULL){
 		// accumulate number of rows along scenario
 		numcols+=node->getNumCols();
-		
+
 		// get parent of node
 		node = node->getParent();
 	}
@@ -432,8 +430,8 @@ SmiScnModel::getColSolution(int ns, int *length)
 		for(int j=node->getColStart(); j<node->getColStart()+node->getNumCols(); ++j){
 				// getCoreRowIndex returns the corresponding Core index
 				// in the original (user's) ordering
-				dsoln[node->getCoreColIndex(j)] = osiSoln[j];	
-		}		
+				dsoln[node->getCoreColIndex(j)] = osiSoln[j];
+		}
 		// get parent of node
 		node = node->getParent();
 	}
@@ -443,8 +441,8 @@ SmiScnModel::getColSolution(int ns, int *length)
 
 double *
 SmiScnModel::getRowSolution(int ns, int *length)
-{	
-	CoinPackedVector *soln=new CoinPackedVector();
+{
+	//CoinPackedVector *soln=new CoinPackedVector();
 	const double * osiSoln = this->getOsiSolverInterface()->getRowActivity();
 	int numrows=0;
 
@@ -455,7 +453,7 @@ SmiScnModel::getRowSolution(int ns, int *length)
 	while (node != NULL){
 		// accumulate number of rows along scenario
 		numrows+=node->getNumRows();
-		
+
 		// get parent of node
 		node = node->getParent();
 	}
@@ -471,8 +469,8 @@ SmiScnModel::getRowSolution(int ns, int *length)
 		for(int j=node->getRowStart(); j<node->getRowStart()+node->getNumRows(); ++j){
 				// getCoreRowIndex returns the corresponding Core index
 				// in the original (user's) ordering
-				dsoln[node->getCoreRowIndex(j)] = osiSoln[j];	
-		}		
+				dsoln[node->getCoreRowIndex(j)] = osiSoln[j];
+		}
 		// get parent of node
 		node = node->getParent();
 	}
@@ -556,7 +554,7 @@ SmiScnModel::readSmps(const char *c, SmiCoreCombineRule *r)
 	delete smiSmpsIO;
 	return 0;
 }
-  
+
 void replaceFirstWithSecond(CoinPackedVector &dfirst, const CoinPackedVector &dsecond)
 {
 	double *delt1 = dfirst.getElements();
@@ -571,7 +569,7 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 
 {
 	SmiCoreData *core=smiDD->getCore();
-	
+
 	int nindp = smiDD->getNumRV();
 	int nstages = 1;
 
@@ -586,65 +584,65 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 		assert(nindp > 0);
 	}
 
-	
+
 	int ns=1;
 	double dp=1.0;
-	
+
 	CoinPackedMatrix matrix ;
 	CoinPackedVector cpv_dclo ;
 	CoinPackedVector cpv_dcup ;
 	CoinPackedVector cpv_dobj ;
 	CoinPackedVector cpv_drlo ;
 	CoinPackedVector cpv_drup ;
-	
+
 	cpv_dclo.setTestForDuplicateIndex(true);
 	cpv_dcup.setTestForDuplicateIndex(true);
 	cpv_dobj.setTestForDuplicateIndex(true);
 	cpv_drlo.setTestForDuplicateIndex(true);
 	cpv_drup.setTestForDuplicateIndex(true);
-	
+
 	// initialize data for first scenario
 	vector<int> indx(nindp);
 	vector<int> nsamp(nindp);
 	vector<int> label(nstages);
 	vector<int>::iterator iLabel;
-	
+
 	for (iLabel=label.begin(); iLabel<label.end(); ++iLabel)
 		*iLabel=0;
-	
+
 	int jj;
 	for (jj=0;jj<nindp;jj++) {
 
 		SmiDiscreteRV *smiRV = smiDD->getDiscreteRV(jj);
-		
+
 		indx[jj] = 0;
 		nsamp[jj] = smiRV->getNumEvents();
 
 		assert( COIN_INT_MAX / ns > nsamp[jj] );
 		ns *= nsamp[jj];
-		
+
 		dp *= smiRV->getEventProb(indx[jj]);
 
-		if (test) 
+		if (test)
 		{
 			double p;
 			p=0.5*nsamp[jj]*(nsamp[jj]+1);
 			assert(smiRV->getEventProb(indx[jj])==(indx[jj]+1)/p);
 		}
-		
-		
+
+
 		cpv_dclo.append(smiRV->getEventColLower(indx[jj]));
 		cpv_dcup.append(smiRV->getEventColUpper(indx[jj]));
 		cpv_dobj.append(smiRV->getEventObjective(indx[jj]));
 		cpv_drlo.append(smiRV->getEventRowLower(indx[jj]));
 		cpv_drup.append(smiRV->getEventRowUpper(indx[jj]));
-		
+
 		//TODO test smiModel code
 		CoinPackedMatrix m = smiRV->getEventMatrix(indx[jj]);
 		if (m.getNumElements()) assert(!m.isColOrdered());
 
 		if (matrix.getNumElements())
-		{			
+		{
 			for (int i=0; i<m.getNumRows(); ++i)
 			{
 				CoinPackedVector row=m.getVector(i);
@@ -657,7 +655,7 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 		}
 		else
 			matrix = m;
-		
+
     }
 
 
@@ -665,8 +663,8 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 	int anc = 0;
 	int branch = 1;
 	int	is = 0;
-	
-	if (!test) 
+
+	if (!test)
 		is=this->generateScenario(core,&matrix,&cpv_dclo,&cpv_dcup,&cpv_dobj,
 						&cpv_drlo,&cpv_drup,branch,anc,dp);
 	else
@@ -681,15 +679,15 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 		}
 	}
 
-	
-	
+
+
 	SmiTreeNode<SmiScnNode *> *root = this->smiTree_.getRoot();
 	this->smiTree_.setChildLabels(root,label);
-	
+
 	/* sample space increment initialized to 1 */
     int *incr = (int *) malloc( nindp*sizeof(int) );
     for (jj=0;jj<nindp;jj++) incr[jj] = 1;
-	
+
 	/***** ...main loop to generate scenarios from discrete random variables
 	For each scenario index ii:
 	If the sample size nsamp[jj] divides the scenario index ii,
@@ -698,7 +696,7 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 	Increment the jj'th random variable by incr[jj]
 	and generate new sample data.
     ***** */
-	
+
     for (int iss=1;iss<ns;iss++) {
 		int iii=iss; jj=0;
 		while ( !(iii%nsamp[jj]) ) {
@@ -706,14 +704,14 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 			incr[jj] = -incr[jj];
 			jj++;
 		}
-		
+
 		SmiDiscreteRV *smiRV = smiDD->getDiscreteRV(jj);
-		
+
 		dp /= smiRV->getEventProb(indx[jj]);
 		indx[jj] += incr[jj];
 		dp *= smiRV->getEventProb(indx[jj]);
 
-		if (test) 
+		if (test)
 		{
 			double p;
 			p=0.5*nsamp[jj]*(nsamp[jj]+1);
@@ -724,23 +722,23 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 			*iLabel=0;
 
 		for(int jjj=0; jjj<nindp; jjj++)
-		{	
+		{
 			SmiDiscreteRV *s = smiDD->getDiscreteRV(jjj);
-			
+
 			label[s->getStage()] *= s->getNumEvents();
 			label[s->getStage()] += indx[jjj];
 		}
 
-		
+
 		// set data
-		//TODO -- should we declare NULL entries to have 0 entries?  
+		//TODO -- should we declare NULL entries to have 0 entries?
 		//this would eliminate these tests
 		replaceFirstWithSecond(cpv_dclo,smiRV->getEventColLower(indx[jj]));
 		replaceFirstWithSecond(cpv_dcup,smiRV->getEventColUpper(indx[jj]));
 		replaceFirstWithSecond(cpv_dobj,smiRV->getEventObjective(indx[jj]));
 		replaceFirstWithSecond(cpv_drlo,smiRV->getEventRowLower(indx[jj]));
 		replaceFirstWithSecond(cpv_drup,smiRV->getEventRowUpper(indx[jj]));
-		
+
 		//TODO test this code
 		CoinPackedMatrix m = smiRV->getEventMatrix(indx[jj]);
 		if (m.getNumElements()) assert(!m.isColOrdered());
@@ -757,18 +755,18 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 			}
 		}
 		else
-			matrix = m;		
-		
+			matrix = m;
+
 		// find ancestor node
 		SmiTreeNode<SmiScnNode *> *tnode = this->smiTree_.find(label);
 		anc = tnode->scenario();
 		branch = tnode->depth();
-		if (!test) 
+		if (!test)
 		{
 			is = this->generateScenario(core,&matrix,&cpv_dclo,&cpv_dcup,&cpv_dobj,&cpv_drlo,&cpv_drup,branch,anc,dp);
 		}
 		else
-		{	
+		{
 			assert(matrix.getNumElements()==4);
 			assert(cpv_dclo.getNumElements()==4);
 			for (int j=0;j<nindp;j++)
@@ -778,11 +776,11 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
 				assert(matrix.getCoefficient(j,indx[j])==(double)(j*indx[j]));
 			}
 		}
-		
+
 		this->smiTree_.setChildLabels(tnode,label);
-		
+
 	}
-	
+
 	free (incr);
 }
 
@@ -796,7 +794,7 @@ double SmiScnModel::getObjectiveValue(SmiScenarioIndex ns)
 
 	// start with leaf node
 	SmiScnNode *node = this->getLeafNode(ns);
-	
+
 	while (node != NULL)
 	{
 		double nodeSum = 0.0;
@@ -807,16 +805,16 @@ double SmiScnModel::getObjectiveValue(SmiScenarioIndex ns)
 		// getColStart returns the starting index of node in OSI model
 		for(int j=node->getColStart(); j<node->getColStart()+node->getNumCols(); ++j)
 		{
-			nodeSum += dobj[j]*dsoln[j];		
+			nodeSum += dobj[j]*dsoln[j];
 		}
 		nodeSum /= nodeProb;
 		scenSum += nodeSum;
-	
+
 		// get parent of node
 		node = node->getParent();
 	}
 
-	return scenSum;	
+	return scenSum;
 }
 
 
