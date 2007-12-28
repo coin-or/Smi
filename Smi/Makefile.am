@@ -48,6 +48,10 @@ clean-local:
 distclean-local:
 	if test -r test/Makefile; then cd test; $(MAKE) distclean; fi
 
+install-exec-local: install-doc
+
+uninstall-local: uninstall-doc
+
 .PHONY: test unitTest clean-test distclean-test
 
 ########################################################################
