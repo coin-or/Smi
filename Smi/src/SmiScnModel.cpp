@@ -209,6 +209,28 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 OsiSolverInterface *
 SmiScnModel::loadOsiSolverData()
 {
+	this->setupOsiSolverData();
+	this->gutsofloadOsiSolverData();
+	return osiStoch_;
+}
+
+void
+SmiScnModel::gutsofloadOsiSolverData()
+{
+	// loop to addNodes
+	for_each(smiTree_.treeBegin(),smiTree_.treeEnd(),SmiScnModelAddNode(this));
+
+	matrix_ = new CoinPackedMatrix(false,0,0);
+	int *len=NULL;
+	matrix_->assignMatrix(false,ncol_,nrow_,nels_,
+		dels_,indx_,rstrt_,len);
+
+	// pass data to osiStoch
+	// *THINK* why do I pass the matrix this way?
+	osiStoch_->loadProblem(CoinPackedMatrix(*matrix_),dclo_,dcup_,dobj_,drlo_,drup_);
+}
+void SmiScnModel::setupOsiSolverData()
+{
 	osiStoch_->reset();
 
 	// initialize arrays
@@ -228,22 +250,7 @@ SmiScnModel::loadOsiSolverData()
 	ncol_=0;
 	nrow_=0;
 	nels_=0;
-
-	// loop to addNodes
-	for_each(smiTree_.treeBegin(),smiTree_.treeEnd(),SmiScnModelAddNode(this));
-
-	matrix_ = new CoinPackedMatrix(false,0,0);
-	int *len=NULL;
-	matrix_->assignMatrix(false,ncol_,nrow_,nels_,
-		dels_,indx_,rstrt_,len);
-
-	// pass data to osiStoch
-	osiStoch_->loadProblem(CoinPackedMatrix(*matrix_),dclo_,dcup_,dobj_,drlo_,drup_);
-
-	return osiStoch_;
 }
-
-
 
 
 void

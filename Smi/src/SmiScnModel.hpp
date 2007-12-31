@@ -185,9 +185,12 @@ public:
 	// destructor
 	~SmiScnModel();
 
-	void addNode(SmiScnNode *node);
 
-private:
+	void addNode(SmiScnNode *node);
+protected:
+	void setupOsiSolverData();
+	void gutsofloadOsiSolverData();
+protected:
 	CoinMessageHandler *handler_;
 	SmiMessage *messages_;
 
@@ -225,6 +228,7 @@ private:
 class SmiScnNode
 {
 	friend class SmiScnModel;
+	friend class SmiLShapedModel;
 public:
 	int getCoreColIndex(int i);
 	int getCoreRowIndex(int i);
@@ -235,13 +239,15 @@ public:
 	inline int getNumCols(){ return node_->getCore()->getNumCols(node_->getStage());}
 	inline int getNumRows(){ return node_->getCore()->getNumRows(node_->getStage());}
 	inline double getModelProb(){return mdl_prob_;}
+	inline SmiScnModel *getModel() {return model_;}
+	inline void setModel(SmiScnModel *s) {model_=s;}
 	inline SmiScnNode * getParent(){ return parent_;}
         // So can delete root node
         inline void zapNode() {node_=NULL;}
 
         ~SmiScnNode(){delete node_;}
 
-private:
+public:
 	inline void setRowOffset(int r) {roffset_ = r;}
 	inline void setParent(SmiScnNode * g) {parent_=g;}
 	inline void setColOffset(int c) {coffset_ = c;}
@@ -250,7 +256,7 @@ private:
 	inline void setProb(double p){prob_=p;}
 	inline void setModelProb(double p){mdl_prob_=p;}
 	inline SmiNodeData *getNode() {return node_;}
-	SmiScnNode(SmiNodeData *&node)	{node_=node;prob_=0;parent_=NULL;}
+	SmiScnNode(SmiNodeData *&node)	{node_=node;prob_=0;parent_=NULL;model_=NULL;}
 
 private:
 	SmiNodeData *node_;
@@ -260,6 +266,7 @@ private:
 	int coffset_;
 	int roffset_;
 	SmiScenarioIndex scen_;
+	SmiScnModel *model_;
 };
 
 // function object for addnode loop
