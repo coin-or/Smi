@@ -227,6 +227,12 @@ public:
 		return (int) leaf_.size();
 	}
 
+	/** get number of nodes */
+	int getNumNodes()
+	{
+		return (int) node_data.size();
+	}
+
 
 	/** Get node identified by longest match to array of labels */
 	SmiTreeNode<T> *find(vector<int> &label)

@@ -161,6 +161,10 @@ public:
 	double *getColSolution(SmiScenarioIndex ns, int *length);
 	double *getRowSolution(SmiScenarioIndex ns, int *length);
 
+	// get offsets by node_id
+	inline int getColOffset(int id) { return coffset_[id]; }
+	inline int getRowOffset(int id) { return roffset_[id]; }
+
 	// OsiSolverInterface
 	void setOsiSolverHandle(OsiSolverInterface &osi)
 	{
@@ -178,6 +182,8 @@ public:
 	// constructor
 	SmiScnModel():
 		osiStoch_(NULL),
+		nrow_(0),ncol_(0),nels_(0),nels_max(0),nnodes_(0),
+		coffset_(NULL),roffset_(NULL),
 		drlo_(NULL), drup_(NULL), dobj_(NULL), dclo_(NULL), dcup_(NULL), matrix_(NULL),
 		solve_synch_(false),totalProb_(0),core_(NULL)
 	{ }
@@ -201,6 +207,9 @@ protected:
 	int ncol_;
 	int nels_;
 	int nels_max;
+	int nnodes_;
+	int *coffset_;
+	int *roffset_;
 	// data pointers used in AddNode
 	double *drlo_;
 	double *drup_;
@@ -234,8 +243,8 @@ public:
 	int getCoreRowIndex(int i);
 	inline void setScenarioIndex(SmiScenarioIndex i){ scen_=i;}
         inline SmiScenarioIndex getScenarioIndex() {return scen_;}
-	inline int  getColStart() {return coffset_;}
-	inline int  getRowStart() {return roffset_;}
+	inline int  getColStart() {return model_->getColOffset(node_id_);}
+	inline int  getRowStart() {return model_->getRowOffset(node_id_);}
 	inline int getNumCols(){ return node_->getCore()->getNumCols(node_->getStage());}
 	inline int getNumRows(){ return node_->getCore()->getNumRows(node_->getStage());}
 	inline double getModelProb(){return mdl_prob_;}
@@ -248,25 +257,29 @@ public:
         ~SmiScnNode(){delete node_;}
 
 public:
-	inline void setRowOffset(int r) {roffset_ = r;}
+
 	inline void setParent(SmiScnNode * g) {parent_=g;}
-	inline void setColOffset(int c) {coffset_ = c;}
 	inline double addProb(double prob){ return prob_+=prob;}
 	inline double getProb(){return prob_;}
 	inline void setProb(double p){prob_=p;}
 	inline void setModelProb(double p){mdl_prob_=p;}
 	inline SmiNodeData *getNode() {return node_;}
-	SmiScnNode(SmiNodeData *&node)	{node_=node;prob_=0;parent_=NULL;model_=NULL;}
+	inline int getNodeId() {return node_id_;}
+	inline void setNodeId(int id) {node_id_=id;}
+	
+	SmiScnNode(SmiNodeData *&node)	{node_id_=0;node_=node;prob_=0;parent_=NULL;model_=NULL;}
 
 private:
 	SmiNodeData *node_;
 	SmiScnNode *parent_;
 	double prob_;
 	double mdl_prob_;
-	int coffset_;
-	int roffset_;
 	SmiScenarioIndex scen_;
+
+	// used to access Osi information, such as offsets, etc.
+	// nodes can be put into Osi models owned by other ScnModels -- as in the LS method
 	SmiScnModel *model_;
+	int node_id_;
 };
 
 // function object for addnode loop

@@ -17,19 +17,27 @@ int
 SmiScnNode::getCoreColIndex(int i)
 {
 	SmiCoreData *core = node_->getCore();
-	return core->getColExternalIndex(i-coffset_+core->getColStart(node_->getStage()));
+	int coffset = this->getColStart();
+	return core->getColExternalIndex(i-coffset+core->getColStart(node_->getStage()));
 }
 
 int
 SmiScnNode::getCoreRowIndex(int i){
 	SmiCoreData *core = node_->getCore();
-	return core->getRowExternalIndex(i-roffset_+core->getRowStart(node_->getStage()));
+	int roffset = this->getRowStart();
+	return core->getRowExternalIndex(i-roffset+core->getRowStart(node_->getStage()));
 }
 
 SmiScnModel::~SmiScnModel()
 {
 	if (osiStoch_)
 		delete osiStoch_;
+
+	if (roffset_)
+		delete roffset_;
+
+	if (coffset_)
+		delete coffset_;
 
 	if (core_)
 		delete core_;
@@ -82,6 +90,7 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 		// generate root node
 		SmiNodeData *node = core->getNode(0);
 		SmiScnNode *tnode = new SmiScnNode(node);
+		
 		node_vec.push_back(tnode);
 		this->ncol_ = core->getNumCols(0);
 		this->nrow_ = core->getNumRows(0);
@@ -105,15 +114,16 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 		SmiNodeData *node = new SmiNodeData(t,core,matrix,
 			v_dclo,v_dcup,v_dobj,v_drlo,v_drup);
 		node->setCoreCombineRule(r);
+
 		// generate new tree node
 		SmiScnNode *tnode = new SmiScnNode(node);
+	
 		node_vec.push_back(tnode);
 
 		this->ncol_ += core->getNumCols(t);
 		this->nrow_ += core->getNumRows(t);
 		this->nels_ += core->getNode(t)->getNumMatrixElements() + node->getNumMatrixElements();
 	}
-
 
 	int scen = smiTree_.addPathtoLeaf(anc,branch,node_vec);
 
@@ -240,6 +250,9 @@ void SmiScnModel::setupOsiSolverData()
 	this->drlo_ = new double[this->nrow_];
 	this->drup_ = new double[this->nrow_];
 
+	this->roffset_ = new int[this->smiTree_.getNumNodes()];
+	this->coffset_ = new int[this->smiTree_.getNumNodes()];
+
 	// initialize row-ordered matrix arrays
 	this->dels_ = new double[this->nels_];
 	this->indx_ = new int[this->nels_];
@@ -250,6 +263,7 @@ void SmiScnModel::setupOsiSolverData()
 	ncol_=0;
 	nrow_=0;
 	nels_=0;
+	nnodes_=0;
 }
 
 
@@ -259,9 +273,13 @@ SmiScnModel::addNode(SmiScnNode *tnode)
 
 	SmiNodeData *node = tnode->getNode();
 
+	tnode->setNodeId(nnodes_);
+	tnode->setModel(this);
+	nnodes_++;
+
 	// set offsets for current node
-	tnode->setColOffset(ncol_);
-	tnode->setRowOffset(nrow_);
+	this->coffset_[tnode->getNodeId()] = ncol_;
+	this->roffset_[tnode->getNodeId()] = nrow_;
 
 	// OsiSolverInterface *osi = this->osiStoch_;
 	SmiCoreData *core = node->getCore();
