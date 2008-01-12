@@ -22,7 +22,7 @@
 #include <vector>
 using namespace std;
 
-// forward declaration of SmiScnNode
+// forward declarations
 class SmiScnNode;
 
 
@@ -193,6 +193,13 @@ public:
 
 
 	void addNode(SmiScnNode *node);
+	void normalizeProbability(SmiScnNode *node);
+	void normalizeProbability();
+	virtual int getNumNodes()
+	{
+		return smiTree_.getNumNodes();
+	}
+
 protected:
 	void setupOsiSolverData();
 	void gutsofloadOsiSolverData();
@@ -245,16 +252,16 @@ public:
         inline SmiScenarioIndex getScenarioIndex() {return scen_;}
 	inline int  getColStart() {return model_->getColOffset(node_id_);}
 	inline int  getRowStart() {return model_->getRowOffset(node_id_);}
-	inline int getNumCols(){ return node_->getCore()->getNumCols(node_->getStage());}
-	inline int getNumRows(){ return node_->getCore()->getNumRows(node_->getStage());}
+	inline int getNumCols(){ return nodeData_->getCore()->getNumCols(nodeData_->getStage());}
+	inline int getNumRows(){ return nodeData_->getCore()->getNumRows(nodeData_->getStage());}
 	inline double getModelProb(){return mdl_prob_;}
 	inline SmiScnModel *getModel() {return model_;}
 	inline void setModel(SmiScnModel *s) {model_=s;}
 	inline SmiScnNode * getParent(){ return parent_;}
         // So can delete root node
-        inline void zapNode() {node_=NULL;}
+        inline void zapNode() {nodeData_=NULL;}
 
-        ~SmiScnNode(){delete node_;}
+        ~SmiScnNode(){delete nodeData_;}
 
 public:
 
@@ -263,14 +270,14 @@ public:
 	inline double getProb(){return prob_;}
 	inline void setProb(double p){prob_=p;}
 	inline void setModelProb(double p){mdl_prob_=p;}
-	inline SmiNodeData *getNode() {return node_;}
+	inline SmiNodeData *getNodeData() {return nodeData_;}
 	inline int getNodeId() {return node_id_;}
 	inline void setNodeId(int id) {node_id_=id;}
 	
-	SmiScnNode(SmiNodeData *&node)	{node_id_=0;node_=node;prob_=0;parent_=NULL;model_=NULL;}
+	SmiScnNode(SmiNodeData *&nodeData)	{node_id_=0;nodeData_=nodeData;prob_=0;parent_=NULL;model_=NULL;}
 
 private:
-	SmiNodeData *node_;
+	SmiNodeData *nodeData_;
 	SmiScnNode *parent_;
 	double prob_;
 	double mdl_prob_;
@@ -291,6 +298,20 @@ public:
 	}
 
 	SmiScnModelAddNode(SmiScnModel *s) { s_ = s;}
+private:
+	SmiScnModel *s_;
+
+
+};
+// function object for normalize probability loop
+class SmiScnModelNormalizeProbability{
+public:
+	void operator() (SmiScnNode *node)
+	{
+		s_->normalizeProbability(node);
+	}
+
+	SmiScnModelNormalizeProbability(SmiScnModel *s) { s_ = s;}
 private:
 	SmiScnModel *s_;
 

@@ -16,16 +16,16 @@ using namespace std;
 int
 SmiScnNode::getCoreColIndex(int i)
 {
-	SmiCoreData *core = node_->getCore();
+	SmiCoreData *core = nodeData_->getCore();
 	int coffset = this->getColStart();
-	return core->getColExternalIndex(i-coffset+core->getColStart(node_->getStage()));
+	return core->getColExternalIndex(i-coffset+core->getColStart(nodeData_->getStage()));
 }
 
 int
 SmiScnNode::getCoreRowIndex(int i){
-	SmiCoreData *core = node_->getCore();
+	SmiCoreData *core = nodeData_->getCore();
 	int roffset = this->getRowStart();
-	return core->getRowExternalIndex(i-roffset+core->getRowStart(node_->getStage()));
+	return core->getRowExternalIndex(i-roffset+core->getRowStart(nodeData_->getStage()));
 }
 
 SmiScnModel::~SmiScnModel()
@@ -220,16 +220,22 @@ OsiSolverInterface *
 SmiScnModel::loadOsiSolverData()
 {
 	this->setupOsiSolverData();
-	this->gutsofloadOsiSolverData();
-	return osiStoch_;
-}
-
-void
-SmiScnModel::gutsofloadOsiSolverData()
-{
+	// loop to normalize probability
+	for_each(smiTree_.treeBegin(),smiTree_.treeEnd(),SmiScnModelNormalizeProbability(this));
 	// loop to addNodes
 	for_each(smiTree_.treeBegin(),smiTree_.treeEnd(),SmiScnModelAddNode(this));
 
+	this->gutsofloadOsiSolverData();
+	return osiStoch_;
+}
+void 
+SmiScnModel::normalizeProbability()
+{
+	for_each(smiTree_.treeBegin(),smiTree_.treeEnd(),SmiScnModelNormalizeProbability(this));
+}
+void
+SmiScnModel::gutsofloadOsiSolverData()
+{	
 	matrix_ = new CoinPackedMatrix(false,0,0);
 	int *len=NULL;
 	matrix_->assignMatrix(false,ncol_,nrow_,nels_,
@@ -250,8 +256,8 @@ void SmiScnModel::setupOsiSolverData()
 	this->drlo_ = new double[this->nrow_];
 	this->drup_ = new double[this->nrow_];
 
-	this->roffset_ = new int[this->smiTree_.getNumNodes()];
-	this->coffset_ = new int[this->smiTree_.getNumNodes()];
+	this->roffset_ = new int[this->getNumNodes()];
+	this->coffset_ = new int[this->getNumNodes()];
 
 	// initialize row-ordered matrix arrays
 	this->dels_ = new double[this->nels_];
@@ -266,12 +272,20 @@ void SmiScnModel::setupOsiSolverData()
 	nnodes_=0;
 }
 
+void 
+SmiScnModel::normalizeProbability(SmiScnNode *node)
+{
+	double prob = node->getProb()/this->totalProb_;
+
+	node->setModelProb(prob);
+}
+
 
 void
 SmiScnModel::addNode(SmiScnNode *tnode)
 {
 
-	SmiNodeData *node = tnode->getNode();
+	SmiNodeData *nodeData = tnode->getNodeData();
 
 	tnode->setNodeId(nnodes_);
 	tnode->setModel(this);
@@ -282,10 +296,10 @@ SmiScnModel::addNode(SmiScnNode *tnode)
 	this->roffset_[tnode->getNodeId()] = nrow_;
 
 	// OsiSolverInterface *osi = this->osiStoch_;
-	SmiCoreData *core = node->getCore();
+	SmiCoreData *core = nodeData->getCore();
 
 	// get stage and associated core node
-	int stg = node->getStage();
+	int stg = nodeData->getStage();
 	SmiNodeData *cnode = core->getNode(stg);
 
 	// pretty sure this is an error?
@@ -296,15 +310,14 @@ SmiScnModel::addNode(SmiScnNode *tnode)
 	core->copyObjective(dobj_+ncol_,stg);
 
 
-	node->copyColLower(dclo_+ncol_);
-	node->copyColUpper(dcup_+ncol_);
-	node->copyObjective(dobj_+ncol_);
-	node->copyRowLower(drlo_+nrow_);
-	node->copyRowUpper(drup_+nrow_);
+	nodeData->copyColLower(dclo_+ncol_);
+	nodeData->copyColUpper(dcup_+ncol_);
+	nodeData->copyObjective(dobj_+ncol_);
+	nodeData->copyRowLower(drlo_+nrow_);
+	nodeData->copyRowUpper(drup_+nrow_);
 
 	// multiply obj coeffs by node probability and normalize
-	double prob = tnode->getProb()/this->totalProb_;
-	tnode->setModelProb(prob);
+	double prob = tnode->getModelProb();
 
 	for(int j=ncol_; j<ncol_+core->getNumCols(stg); ++j)
 		dobj_[j] *= prob;
@@ -331,10 +344,10 @@ SmiScnModel::addNode(SmiScnNode *tnode)
 			// build row explicitly into sparse arrays
 			int rowStart=this->rstrt_[rowCount];
 			int rowNumEls=0;
-			if (node->getRowLength(i))
+			if (nodeData->getRowLength(i))
 			{
 				vector<double> *denseCoreRow = cnode->getDenseRow(i);
-				rowNumEls=node->combineWithDenseCoreRow(denseCoreRow,node->getRowLength(i),node->getRowIndices(i),node->getRowElements(i),dels_+rowStart,indx_+rowStart);
+				rowNumEls=nodeData->combineWithDenseCoreRow(denseCoreRow,nodeData->getRowLength(i),nodeData->getRowIndices(i),nodeData->getRowElements(i),dels_+rowStart,indx_+rowStart);
 			}
 			else
 			{
