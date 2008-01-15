@@ -29,7 +29,7 @@ int main()
 {
 
 	testingMessage( "Model generation using SMPS files for Cambridge-Watson problems.\n" );
-	SmpsIO("../../../../Data/Stochastic/wat_10_C_32");
+	SmpsIO("../../Data/Stochastic/wat_10_C_32");
 
 	testingMessage( "Model generation using scenario tree construction methods.\n");
 	ModelScenario("Dantzig-Ferguson Aircraft Allocation using Scenarios");
