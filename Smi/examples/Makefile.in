@@ -53,7 +53,7 @@ COININCDIR = @abs_include_dir@/coin
 COINLIBDIR = @abs_lib_dir@
 
 # Libraries necessary to link with Smi
-LIBS = -L$(COINLIBDIR) -lSmi -lOsiClp -lOsi -lClp -lCoinUtils \
+LIBS = -L$(COINLIBDIR) -lSmi -lFlopCpp -lOsiClp -lOsi -lClp -lCoinUtils \
 	`cat $(COINLIBDIR)/osi_addlibs.txt` \
 	`cat $(COINLIBDIR)/clp_addlibs.txt` \
 	`cat $(COINLIBDIR)/coinutils_addlibs.txt`

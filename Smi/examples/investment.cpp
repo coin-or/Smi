@@ -13,7 +13,7 @@
 	Note that the code is meant as an illustrative example that mixes different
 	styles to show more ways of doing things, something you most likely do \e not
 	want to do in a real code. In addition, in a real code one would probably
-	make the members private and write get/set functions where needed. This has
+	make the members private and write get/set methods where needed. This has
 	been omitted here to make the example shorter.
 */
 
@@ -31,7 +31,7 @@ using namespace flopc;
 /// This is the generic base class for describing a node.
 class StageNodeBase {
 public:
-	
+
 		StageNodeBase *ptParent;          ///< pointer to parent node
 		vector<StageNodeBase *> children; ///< pointers to children of this node
 		int nodeNmb;                  ///< node number - used only for reporting
@@ -63,10 +63,10 @@ public:
 			}
 		}
 protected:
-			
+
 		/// Create the objective function expression, recursively for all children
-		/** This function is private, as it only makes sense to call it in the root,
-		    to create the complete objective function. **/
+		/** This function is protected, as it only makes sense to call it in
+		    the root, to create the complete objective function. **/
 		virtual void make_obj_function_() {
 			assert (children.size() > 0 && "Leaves should never call this function");
 			// Create the objective recursively for all descendants of the node
@@ -96,18 +96,18 @@ class StageNode : public StageNodeBase
 		          const double condProb)
 				  : StageNodeBase(ptPred,nodeN,condProb),ASSETS(nmbAssets), x(ASSETS){}
 
-		/// getParent() function.  
+		/// getParent() function.
 		/** The parent is a base class object.  To access the members ASSETS and x()
 		    we need to cast it to the derived class. **/
 		StageNode *getParent() {return (StageNode *)ptParent;}
 
 		virtual ~StageNode() {}
 
-		
+
 		MP_set ASSETS;                ///< set of assets
 		MP_index a;                   ///< index used in formulas
 		MP_variable x;                ///< the "buy" variable, defined on ASSETS
-		
+
 		/// A common way to access the balance constraints in the derived classes
 		/** Two of the derived classes have a cash-flow balance constraint with
 		    the \a Return values in it. These constraints have to be accessed when
@@ -164,7 +164,7 @@ class RootNode : public StageNode {
 			balance_constraint = NULL;
 		}
 
-		/// This is the public interface to the private \c make_obj_function_()
+		/// This is the public interface to the protected \c make_obj_function_()
 		/** This is to prevent the user to call \c make_obj_function_() for other
 		    nodes than the root, which does not make sense. **/
 		void make_objective_function() {
@@ -278,19 +278,22 @@ class ScenTreeStruct {
 
 /// Class for balanced binary trees
 class BinTreeStruct : public ScenTreeStruct {
+	protected:
+		int nmbStages;
+
 	public:
-		/// Constructs the object
-		BinTreeStruct(const int nNodes, const int firstL)
-		: ScenTreeStruct(nNodes, firstL) {}
+		/// Constructs the object - 2^T-1 nodes, first leaf is 2^(T-1)-1
+		BinTreeStruct(const int T)
+		: ScenTreeStruct((int) pow(2.0, T) - 1, (int) pow(2.0, T-1) - 1),
+			nmbStages(T)
+		{}
 
 		int get_parent(int n) const {
 			return (n-1) / 2;    // This gives: get_parent(0) = 0
 		}
 
 		int get_nmb_stages() const {
-			double x = log((double)nmbNodes+1);
-			x /= log((double)2);
-			return (int) ceil(x);
+			return nmbStages;
 		}
 };
 
@@ -300,8 +303,10 @@ class BinTreeStruct : public ScenTreeStruct {
 int main()
 {
 	// DATA - This would be normally read from some external file
-	// scenario tree with 15 nodes (0..14); 0 is the root and 7..14 are leaves
-	BinTreeStruct scTree(15, 7);
+
+	// binary scenario tree with 4 stages: 15 nodes, firstLeaf = 7
+	const int nmbStages = 4;
+	BinTreeStruct scTree(nmbStages);
 
 	// model parameters
 	enum {stocks, bonds, nmbAssets}; // assets to invest to; sets nmbAssets = 2
@@ -336,7 +341,8 @@ int main()
 	coreModel.silent(); // less output
 
 	int i, j, n, t;
-	int nmbStages = scTree.get_nmb_stages();
+	assert (nmbStages == scTree.get_nmb_stages()
+	        && "Checking that get_nmb_stages() returns what it should.");
 
 	vector<int> scenNodeNmb(nmbStages); // nodes (indices) in a scenario
 	n = scTree.firstLeaf;               // leaf of the first scenario
@@ -497,7 +503,7 @@ int main()
 	/* Even if we use a deterministic solver, we can still get information about
 	   the solution on the scenario tree, using the SMI (stochastic) model */
 	cout << endl << "The stochastic model has " << stochModel.getNumScenarios()
-	     << " scenarios." << nmbScen << endl;
+	     << " scenarios." << endl;
 	assert (stochModel.getNumScenarios() == nmbScen && "Check number of scens.");
 
 	// We will report the wealth at each node of the tree, plus the obj. value
