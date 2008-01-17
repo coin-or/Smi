@@ -2,6 +2,8 @@
 // Corporation and others.  All Rights Reserved.
 
 
+#include <string>
+
 #include "SmiScnModel.hpp"
 #include "OsiClpSolverInterface.hpp"
 
@@ -21,9 +23,25 @@ void testingMessage( const char * const msg )
        <<endl <<msg <<endl;
 }
 
-void
-SmiScenarioTreeUnitTest()
+void myAssert(const char * file, const int line, bool c ) 
 {
+	if(!c)
+	{
+		char l[10];
+		itoa(line,l,10);
+		string e("[Smi] Error thrown from file ");
+		e+=file;
+		e+=", line ";
+		e+=l;
+		cout << e << endl;
+		exit(1);
+	}
+}
+
+void
+SmiScenarioTreeUnitTest() 
+{
+
 
 	int  *i1 = new int(1);
 	int  *i2= new int(12);
@@ -137,110 +155,112 @@ SmiScenarioTreeUnitTest()
 
 
 	vector<int *> vec1 = s.getScenario(is1);
-	assert( vec1[0] == i1 );
-	assert( vec1[1] == i2 );
-	assert( vec1[2] == i4 );
+	myAssert(__FILE__,__LINE__, vec1[0] == i1 );
+	myAssert(__FILE__,__LINE__, vec1[1] == i2 );
+	myAssert(__FILE__,__LINE__, vec1[2] == i4 );
 
 	vector<int *> vec11 = s1.getScenario(is11);
-	assert( vec11[0] == ii1 );
-	assert( vec11[1] == ii2 );
-	assert( vec11[2] == ii4 );
+	myAssert(__FILE__,__LINE__, vec11[0] == ii1 );
+	myAssert(__FILE__,__LINE__, vec11[1] == ii2 );
+	myAssert(__FILE__,__LINE__, vec11[2] == ii4 );
 
 	vector<int *>::iterator vbeg = s.scenBegin(is1);
 	vector<int *>::iterator vend = s.scenEnd(is1);
-	assert( *vbeg++ == i1 );
-	assert( *vbeg++ == i2 );
-	assert( *vbeg++ == i4 );
-	assert( vbeg == vend );
+	myAssert(__FILE__,__LINE__, *vbeg++ == i1 );
+	myAssert(__FILE__,__LINE__, *vbeg++ == i2 );
+	myAssert(__FILE__,__LINE__, *vbeg++ == i4 );
+	myAssert(__FILE__,__LINE__, vbeg == vend );
 
 	vector<int *>::iterator vbeg1 = s1.scenBegin(is11);
 	vector<int *>::iterator vend1 = s1.scenEnd(is11);
-	assert( *vbeg1++ == ii1 );
-	assert( *vbeg1++ == ii2 );
-	assert( *vbeg1++ == ii4 );
-	assert( vbeg1 == vend1 );
+	myAssert(__FILE__,__LINE__, *vbeg1++ == ii1 );
+	myAssert(__FILE__,__LINE__, *vbeg1++ == ii2 );
+	myAssert(__FILE__,__LINE__, *vbeg1++ == ii4 );
+	myAssert(__FILE__,__LINE__, vbeg1 == vend1 );
 
 
 	vector<int *> vec2 = s.getScenario(is2);
-	assert( vec2[0] == i1 );
-	assert( vec2[1] == i2 );
-	assert( vec2[2] == i5 );
+	myAssert(__FILE__,__LINE__, vec2[0] == i1 );
+	myAssert(__FILE__,__LINE__, vec2[1] == i2 );
+	myAssert(__FILE__,__LINE__, vec2[2] == i5 );
 
 
 	vector<int *> vec12 = s1.getScenario(is12);
-	assert( vec12[0] == ii1 );
-	assert( vec12[1] == ii2 );
-	assert( vec12[2] == ii5 );
+	myAssert(__FILE__,__LINE__, vec12[0] == ii1 );
+	myAssert(__FILE__,__LINE__, vec12[1] == ii2 );
+	myAssert(__FILE__,__LINE__, vec12[2] == ii5 );
 
 	vector<int *> vec3 = s.getScenario(is3);
-	assert( vec3[0] == i1 );
-	assert( vec3[1] == i3 );
-	assert( vec3[2] == i6 );
+	myAssert(__FILE__,__LINE__, vec3[0] == i1 );
+	myAssert(__FILE__,__LINE__, vec3[1] == i3 );
+	myAssert(__FILE__,__LINE__, vec3[2] == i6 );
 
 	vector<int *> vec13 = s1.getScenario(is13);
-	assert( vec13[0] == ii1 );
-	assert( vec13[1] == ii3 );
-	assert( vec13[2] == ii6 );
+	myAssert(__FILE__,__LINE__, vec13[0] == ii1 );
+	myAssert(__FILE__,__LINE__, vec13[1] == ii3 );
+	myAssert(__FILE__,__LINE__, vec13[2] == ii6 );
 
 	vector<int *> vec4 = s.getScenario(is4);
-	assert( vec4[0] == i1 );
-	assert( vec4[1] == i3 );
-	assert( vec4[2] == i7 );
+	myAssert(__FILE__,__LINE__, vec4[0] == i1 );
+	myAssert(__FILE__,__LINE__, vec4[1] == i3 );
+	myAssert(__FILE__,__LINE__, vec4[2] == i7 );
 
 
 	vector<int *> vec14 = s1.getScenario(is14);
-	assert( vec14[0] == ii1 );
-	assert( vec14[1] == ii3 );
-	assert( vec14[2] == ii7 );
+	myAssert(__FILE__,__LINE__, vec14[0] == ii1 );
+	myAssert(__FILE__,__LINE__, vec14[1] == ii3 );
+	myAssert(__FILE__,__LINE__, vec14[2] == ii7 );
 
 	vector<int *> vec5 = s.getScenario(is5);
-	assert( vec5[0] == i1 );
-	assert( vec5[1] == i3 );
-	assert( vec5[2] == i8 );
+	myAssert(__FILE__,__LINE__, vec5[0] == i1 );
+	myAssert(__FILE__,__LINE__, vec5[1] == i3 );
+	myAssert(__FILE__,__LINE__, vec5[2] == i8 );
 
 
 	vector<int *> vec15 = s1.getScenario(is15);
-	assert( vec15[0] == ii1 );
-	assert( vec15[1] == ii3 );
-	assert( vec15[2] == ii8 );
+	myAssert(__FILE__,__LINE__, vec15[0] == ii1 );
+	myAssert(__FILE__,__LINE__, vec15[1] == ii3 );
+	myAssert(__FILE__,__LINE__, vec15[2] == ii8 );
 
 	vector<int*>::iterator i;
 	i=s.treeBegin();
-	assert(*i==i1);
+	myAssert(__FILE__,__LINE__,*i==i1);
 	i++;
-	assert(*i==i2);
+	myAssert(__FILE__,__LINE__,*i==i2);
 	i = s.treeEnd();
 	i--;
-	assert(*i==i8);
+	myAssert(__FILE__,__LINE__,*i==i8);
 
 	vector<int*>::iterator ii;
 	ii=s1.treeBegin();
-	assert(*ii==ii1);
+	myAssert(__FILE__,__LINE__,*ii==ii1);
 	ii++;
-	assert(*ii==ii2);
+	myAssert(__FILE__,__LINE__,*ii==ii2);
 	ii = s1.treeEnd();
 	ii--;
-	assert(*ii==ii8);
+	myAssert(__FILE__,__LINE__,*ii==ii8);
 
 	vbeg = s.scenBegin(is1);
 	vend = s.scenEnd(is1);
-	assert( *vbeg++ == i1 );
-	assert( *vbeg++ == i2 );
-	assert( *vbeg++ == i4 );
-	assert( vbeg == vend );
+	myAssert(__FILE__,__LINE__, *vbeg++ == i1 );
+	myAssert(__FILE__,__LINE__, *vbeg++ == i2 );
+	myAssert(__FILE__,__LINE__, *vbeg++ == i4 );
+	myAssert(__FILE__,__LINE__, vbeg == vend );
 
 	vbeg1 = s1.scenBegin(is11);
 	vend1 = s1.scenEnd(is11);
-	assert( *vbeg1++ == ii1 );
-	assert( *vbeg1++ == ii2 );
-	assert( *vbeg1++ == ii4 );
-	assert( vbeg1 == vend1 );
+	myAssert(__FILE__,__LINE__, *vbeg1++ == ii1 );
+	myAssert(__FILE__,__LINE__, *vbeg1++ == ii2 );
+	myAssert(__FILE__,__LINE__, *vbeg1++ == ii4 );
+	myAssert(__FILE__,__LINE__, vbeg1 == vend1 );
+	
+
 
 
 }
 
 void
-SmiTreeNodeUnitTest()
+SmiTreeNodeUnitTest() 
 {
 
 	int  *i1 = new int(1);
@@ -270,50 +290,53 @@ SmiTreeNodeUnitTest()
 	n7 = n3->addChild(i7,3);
 	n8 = n3->addChild(i8,4);
 
-	assert( n1->depth() == 0 );
-	assert( n2->depth() == 1 );
-	assert( n3->depth() == 1 );
-	assert( n4->depth() == 2 );
-	assert( n5->depth() == 2 );
-	assert( n6->depth() == 2 );
-	assert( n7->depth() == 2 );
-	assert( n8->depth() == 2 );
+	myAssert(__FILE__,__LINE__, n1->depth() == 0 );
+	myAssert(__FILE__,__LINE__, n2->depth() == 1 );
+	myAssert(__FILE__,__LINE__, n3->depth() == 1 );
+	myAssert(__FILE__,__LINE__, n4->depth() == 2 );
+	myAssert(__FILE__,__LINE__, n5->depth() == 2 );
+	myAssert(__FILE__,__LINE__, n6->depth() == 2 );
+	myAssert(__FILE__,__LINE__, n7->depth() == 2 );
+	myAssert(__FILE__,__LINE__, n8->depth() == 2 );
 
 	// parents point to last children
-	assert( n1->getChild() == n3 );
-	assert( n3->getChild() == n8 );
+	myAssert(__FILE__,__LINE__, n1->getChild() == n3 );
+	myAssert(__FILE__,__LINE__, n3->getChild() == n8 );
 
 	// siblings
-	assert( n3->hasSibling() );
-	assert( n3->getSibling() == n2 );
-	assert( !n2->hasSibling() );
+	myAssert(__FILE__,__LINE__, n3->hasSibling() );
+	myAssert(__FILE__,__LINE__, n3->getSibling() == n2 );
+	myAssert(__FILE__,__LINE__, !n2->hasSibling() );
 
 	// sibling and cousin pointers are a linked list
 	// for same level nodes
-	assert( n8->hasSibling() );
-	assert( n8->getSibling() == n7 );
-	assert( n7->hasSibling() );
-	assert( n7->getSibling() == n6 );
-	assert( !n6->hasSibling());
+	myAssert(__FILE__,__LINE__, n8->hasSibling() );
+	myAssert(__FILE__,__LINE__, n8->getSibling() == n7 );
+	myAssert(__FILE__,__LINE__, n7->hasSibling() );
+	myAssert(__FILE__,__LINE__, n7->getSibling() == n6 );
+	myAssert(__FILE__,__LINE__, !n6->hasSibling());
 
-	assert( n6->getParent()->getSibling()  == n2 );
-	assert( n2->getChild() == n5 );
-	assert( n5->hasSibling() );
-	assert( n5->getSibling() == n4 );
+	myAssert(__FILE__,__LINE__, n6->getParent()->getSibling()  == n2 );
+	myAssert(__FILE__,__LINE__, n2->getChild() == n5 );
+	myAssert(__FILE__,__LINE__, n5->hasSibling() );
+	myAssert(__FILE__,__LINE__, n5->getSibling() == n4 );
 	// last element of same level list
-	assert( !n4->hasSibling());
+	myAssert(__FILE__,__LINE__, !n4->hasSibling());
 
 	vector<SmiTreeNode<int *> *> *vec1 = n1->getChildren();
 	assert ((*vec1)[0] == n2 );
 	assert ((*vec1)[1] == n3 );
 	delete vec1;
+	
+
 }
 
 
 
 
-void SmiScnSmpsIOUnitTestReplace()
+void SmiScnSmpsIOUnitTestReplace() 
 {
+
   	std::string dataDir="../../Data/Stochastic";
 	int nrows, ncols;
 
@@ -326,15 +349,17 @@ void SmiScnSmpsIOUnitTestReplace()
 
 		nrows = osiStoch->getNumRows();
 		ncols = osiStoch->getNumCols();
-		assert(nrows==129);
-		assert(ncols==268);
+		myAssert(__FILE__,__LINE__,nrows==129);
+		myAssert(__FILE__,__LINE__,ncols==268);
 
 		osiStoch->initialSolve();
-		assert(fabs(osiStoch->getObjValue()-44.66666) < 0.0001);
+		myAssert(__FILE__,__LINE__,fabs(osiStoch->getObjValue()-44.66666) < 0.0001);
 		printf(" *** Successfully tested SMPS interfaces on app0110 with Replace option.\n");
+	
 }
-void SmiScnSmpsIOUnitTestAdd()
+void SmiScnSmpsIOUnitTestAdd() 
 {
+
 	std::string dataDir="../../Data/Stochastic";
 	int nrows, ncols;
 
@@ -347,16 +372,17 @@ void SmiScnSmpsIOUnitTestAdd()
 
 		nrows = osiStoch->getNumRows();
 		ncols = osiStoch->getNumCols();
-		assert(nrows==129);
-		assert(ncols==268);
+		myAssert(__FILE__,__LINE__,nrows==129);
+		myAssert(__FILE__,__LINE__,ncols==268);
 
 		osiStoch->initialSolve();
-		assert(fabs(osiStoch->getObjValue()-44.66666) < 0.0001);
+		myAssert(__FILE__,__LINE__,fabs(osiStoch->getObjValue()-44.66666) < 0.0001);
 		printf(" *** Successfully tested SMPS interfaces on app0110 with Add option.\n");
 
 
+
 }
-void SmiScnModelScenarioUnitTest()
+void SmiScnModelScenarioUnitTest() 
 {
 
 
@@ -510,37 +536,37 @@ void SmiScnModelScenarioUnitTest()
 	// test Core Model
 	SmiCoreData *osiCore = new SmiCoreData(ohoh,3,cstg,rstg);
 
-	assert(osiCore->getNumCols(0) == n_first_stg_cols);
-	assert(osiCore->getNumCols(1) == n_second_stg_cols);
-	assert(osiCore->getNumCols(2) == ncol - n_first_stg_cols - n_second_stg_cols);
+	myAssert(__FILE__,__LINE__,osiCore->getNumCols(0) == n_first_stg_cols);
+	myAssert(__FILE__,__LINE__,osiCore->getNumCols(1) == n_second_stg_cols);
+	myAssert(__FILE__,__LINE__,osiCore->getNumCols(2) == ncol - n_first_stg_cols - n_second_stg_cols);
 
-	assert(osiCore->getNumRows(0) == n_first_stg_rows);
-	assert(osiCore->getNumRows(1) == n_second_stg_rows);
-	assert(osiCore->getNumRows(2) == nrow - n_first_stg_rows - n_second_stg_rows);
+	myAssert(__FILE__,__LINE__,osiCore->getNumRows(0) == n_first_stg_rows);
+	myAssert(__FILE__,__LINE__,osiCore->getNumRows(1) == n_second_stg_rows);
+	myAssert(__FILE__,__LINE__,osiCore->getNumRows(2) == nrow - n_first_stg_rows - n_second_stg_rows);
 
-	assert(osiCore->getColStart(0) == 0);
-	assert(osiCore->getColStart(1) == n_first_stg_cols );
-	assert(osiCore->getColStart(2) == n_first_stg_cols + n_second_stg_cols);
-	assert(osiCore->getColStart(3) == ncol);
+	myAssert(__FILE__,__LINE__,osiCore->getColStart(0) == 0);
+	myAssert(__FILE__,__LINE__,osiCore->getColStart(1) == n_first_stg_cols );
+	myAssert(__FILE__,__LINE__,osiCore->getColStart(2) == n_first_stg_cols + n_second_stg_cols);
+	myAssert(__FILE__,__LINE__,osiCore->getColStart(3) == ncol);
 
-	assert(osiCore->getRowStart(0) == 0);
-	assert(osiCore->getRowStart(1) == n_first_stg_rows );
-	assert(osiCore->getRowStart(2) == n_first_stg_rows + n_second_stg_rows);
-	assert(osiCore->getRowStart(3) == nrow);
+	myAssert(__FILE__,__LINE__,osiCore->getRowStart(0) == 0);
+	myAssert(__FILE__,__LINE__,osiCore->getRowStart(1) == n_first_stg_rows );
+	myAssert(__FILE__,__LINE__,osiCore->getRowStart(2) == n_first_stg_rows + n_second_stg_rows);
+	myAssert(__FILE__,__LINE__,osiCore->getRowStart(3) == nrow);
 
 	for (ii = 0; ii < n_first_stg_cols ; ii++)
-		assert(cstg[osiCore->getColExternalIndex(ii)] == 0);
+		myAssert(__FILE__,__LINE__,cstg[osiCore->getColExternalIndex(ii)] == 0);
 	for (ii = n_first_stg_cols; ii < n_first_stg_cols + n_second_stg_cols ; ii++)
-		assert(cstg[osiCore->getColExternalIndex(ii)] == 1);
+		myAssert(__FILE__,__LINE__,cstg[osiCore->getColExternalIndex(ii)] == 1);
 	for (ii = n_first_stg_cols + n_second_stg_cols; ii < ncol ; ii++)
-		assert(cstg[osiCore->getColExternalIndex(ii)] == 2);
+		myAssert(__FILE__,__LINE__,cstg[osiCore->getColExternalIndex(ii)] == 2);
 
 	for (ii = 0; ii < n_first_stg_rows ; ii++)
-		assert(rstg[osiCore->getRowExternalIndex(ii)] == 0);
+		myAssert(__FILE__,__LINE__,rstg[osiCore->getRowExternalIndex(ii)] == 0);
 	for (ii = n_first_stg_rows; ii < n_first_stg_rows + n_second_stg_rows ; ii++)
-		assert(rstg[osiCore->getRowExternalIndex(ii)] == 1);
+		myAssert(__FILE__,__LINE__,rstg[osiCore->getRowExternalIndex(ii)] == 1);
 	for (ii = n_first_stg_rows + n_second_stg_rows; ii < nrow ; ii++)
-		assert(rstg[osiCore->getRowExternalIndex(ii)] == 2);
+		myAssert(__FILE__,__LINE__,rstg[osiCore->getRowExternalIndex(ii)] == 2);
 
 	const CoinPackedMatrix *origCore = ohoh->getMatrixByRow();
   int t;
@@ -564,23 +590,23 @@ void SmiScnModelScenarioUnitTest()
 			ic = osiCore->getColExternalIndex(ii);
 			elt1 = cpvdclo[ii];
 			elt2 = dclo[ic];
-			assert(elt1==elt2);
+			myAssert(__FILE__,__LINE__,elt1==elt2);
 			elt1 = cpvdcup[ii];
 			elt2 = dcup[ic];
-			assert(elt1==elt2);
+			myAssert(__FILE__,__LINE__,elt1==elt2);
 			elt1 = cpvdobj[ii];
 			elt2 = dobj[ic];
-			assert(elt1==elt2);
+			myAssert(__FILE__,__LINE__,elt1==elt2);
 		}
 		for(ii=osiCore->getRowStart(t);ii<osiCore->getRowStart(t+1);ii++)
 		{
-			assert(cpvdrlo[ii]==drlo[osiCore->getRowExternalIndex(ii)]);
-			assert(cpvdrup[ii]==drup[osiCore->getRowExternalIndex(ii)]);
-			assert(core_drlo[ii-osiCore->getRowStart(t)] ==drlo[osiCore->getRowExternalIndex(ii)]);
+			myAssert(__FILE__,__LINE__,cpvdrlo[ii]==drlo[osiCore->getRowExternalIndex(ii)]);
+			myAssert(__FILE__,__LINE__,cpvdrup[ii]==drup[osiCore->getRowExternalIndex(ii)]);
+			myAssert(__FILE__,__LINE__,core_drlo[ii-osiCore->getRowStart(t)] ==drlo[osiCore->getRowExternalIndex(ii)]);
 
 			CoinPackedVector row1(n->getRowLength(ii),n->getRowIndices(ii),n->getRowElements(ii));
 			const CoinPackedVector row2 = origCore->getVector(osiCore->getRowExternalIndex(ii));
-			assert(row1.getNumElements() == row2.getNumElements());
+			myAssert(__FILE__,__LINE__,row1.getNumElements() == row2.getNumElements());
 			int *indx = row1.getIndices();
 			double *els = row1.getElements();
 			for (int j=0; j<row1.getNumElements(); j++)
@@ -588,7 +614,7 @@ void SmiScnModelScenarioUnitTest()
 				elt1 = els[j];
 				ic = osiCore->getColExternalIndex(indx[j]);
 				elt2 = row2[ic];
-				assert(elt1==elt2);
+				myAssert(__FILE__,__LINE__,elt1==elt2);
 			}
 		}
 	}
@@ -626,7 +652,7 @@ void SmiScnModelScenarioUnitTest()
 									&cpv_rlo,&cpv_rup,branch,anc,dp);
 
 
-	assert(smiModel->getNumScenarios()==1);
+	myAssert(__FILE__,__LINE__,smiModel->getNumScenarios()==1);
 
 	// test first scenario
 
@@ -657,13 +683,13 @@ void SmiScnModelScenarioUnitTest()
 			ic = osiCore->getColExternalIndex(ii);
 			elt1 = stochdclo[ii];
 			elt2 = dclo[ic];
-			assert(elt1==elt2);
+			myAssert(__FILE__,__LINE__,elt1==elt2);
 			elt1 = stochdcup[ii];
 			elt2 = dcup[ic];
-			assert(elt1==elt2);
+			myAssert(__FILE__,__LINE__,elt1==elt2);
 			elt1 = stochdobj[ii];
 			elt2 = dobj[ic];
-			assert(elt1==elt2);
+			myAssert(__FILE__,__LINE__,elt1==elt2);
 		}
 		int ir;
 		for(ii=osiCore->getRowStart(t);ii<osiCore->getRowStart(t+1);ii++)
@@ -671,12 +697,12 @@ void SmiScnModelScenarioUnitTest()
 
 			ir = osiCore->getRowExternalIndex(ii);
 
-			assert(stochdrlo[ii]==drlo[ir]);
-			assert(stochdrup[ii]==drup[ir]);
+			myAssert(__FILE__,__LINE__,stochdrlo[ii]==drlo[ir]);
+			myAssert(__FILE__,__LINE__,stochdrup[ii]==drup[ir]);
 
 			const CoinPackedVector row1 = stochmat->getVector(ii);
 			const CoinPackedVector row2 = origmat->getVector(ir);
-			assert(row1.getNumElements() == row2.getNumElements());
+			myAssert(__FILE__,__LINE__,row1.getNumElements() == row2.getNumElements());
 			const int *indx = row1.getIndices();
 			const double *els = row1.getElements();
 			for (int j=0; j<row1.getNumElements(); j++)
@@ -684,7 +710,7 @@ void SmiScnModelScenarioUnitTest()
 				elt1 = els[j];
 				ic = osiCore->getColExternalIndex(indx[j]);
 				elt2 = row2[ic];
-				assert(elt1==elt2);
+				myAssert(__FILE__,__LINE__,elt1==elt2);
 			}
 		}
 	}
@@ -759,13 +785,13 @@ void SmiScnModelScenarioUnitTest()
 					ic = osiCore->getColExternalIndex(ii);
 					elt1 = stochdclo[ii-colOff];
 					elt2 = dclo[ic];
-					assert(elt1==elt2);
+					myAssert(__FILE__,__LINE__,elt1==elt2);
 					elt1 = stochdcup[ii-colOff];
 					elt2 = dcup[ic];
-					assert(elt1==elt2);
+					myAssert(__FILE__,__LINE__,elt1==elt2);
 					elt1 = stochdobj[ii-colOff];
 					elt2 = dobj[ic];
-					assert(fabs(elt1 - (elt2*dp/totalProb)) < 1.0e-8);
+					myAssert(__FILE__,__LINE__,fabs(elt1 - (elt2*dp/totalProb)) < 1.0e-8);
 				}
 				int ir,rowOff;
 				rowOff = osiCore->getRowStart(1);
@@ -774,12 +800,12 @@ void SmiScnModelScenarioUnitTest()
 
 					ir = osiCore->getRowExternalIndex(ii);
 
-					assert(stochdrlo[ii-rowOff]==drlo[ir]);
-					assert(stochdrup[ii-rowOff]==drup[ir]);
+					myAssert(__FILE__,__LINE__,stochdrlo[ii-rowOff]==drlo[ir]);
+					myAssert(__FILE__,__LINE__,stochdrup[ii-rowOff]==drup[ir]);
 
 					const CoinPackedVector row1 = stochmat->getVector(ii);
 					const CoinPackedVector row2 = origmat->getVector(ir);
-					assert(row1.getNumElements() == row2.getNumElements());
+					myAssert(__FILE__,__LINE__,row1.getNumElements() == row2.getNumElements());
 					const int *indx = row1.getIndices();
 					const double *els = row1.getElements();
 					for (int j=0; j<row1.getNumElements(); j++)
@@ -787,7 +813,7 @@ void SmiScnModelScenarioUnitTest()
 						elt1 = els[j];
 						ic = osiCore->getColExternalIndex(indx[j]);
 						elt2 = row2[ic];
-						assert(elt1==elt2);
+						myAssert(__FILE__,__LINE__,elt1==elt2);
 					}
 				}
 			}
@@ -799,7 +825,7 @@ void SmiScnModelScenarioUnitTest()
 		}
 	}
 
-	assert(ns==smiModel->getNumScenarios());
+	myAssert(__FILE__,__LINE__,ns==smiModel->getNumScenarios());
 
 	// solve with decomp solver
 
@@ -814,7 +840,7 @@ void SmiScnModelScenarioUnitTest()
 	// solve using Osi Solver
 	smiOsi->initialSolve();
 	// test optimal value
-    assert(fabs(smiOsi->getObjValue()-1566.042)<0.01);
+    myAssert(__FILE__,__LINE__,fabs(smiOsi->getObjValue()-1566.042)<0.01);
 
 	// test solutions
 	const double *dsoln = smiOsi->getColSolution();
@@ -860,7 +886,7 @@ void SmiScnModelScenarioUnitTest()
 	}
 
 //	fclose(fp);
-	assert(fabs(smiOsi->getObjValue()-objSum) < 0.01);
+	myAssert(__FILE__,__LINE__,fabs(smiOsi->getObjValue()-objSum) < 0.01);
         free (incr);
         free (indx);
 	free( mrow) ;
@@ -873,6 +899,7 @@ void SmiScnModelScenarioUnitTest()
 	free( dobj) ;
 	free( cstg) ;
         delete smiModel;
+	
 }
 
 #if 0
@@ -956,10 +983,10 @@ void SmiDiscreteUnitTest()
 			SmiDiscreteEvent *e = new SmiDiscreteEvent(d,(i+1)/p);
 			s->events_.push_back(e);
 
-			assert(e->getColLower().getIndices()[0]==j);
-			assert(e->getRowLower().getIndices()[0]==i);
-			assert(e->getMatrix().getCoefficient(i,j)==(double)(j*i));
-			assert(e->getEventProb()==(i+1)/p);
+			myAssert(__FILE__,__LINE__,e->getColLower().getIndices()[0]==j);
+			myAssert(__FILE__,__LINE__,e->getRowLower().getIndices()[0]==i);
+			myAssert(__FILE__,__LINE__,e->getMatrix().getCoefficient(i,j)==(double)(j*i));
+			myAssert(__FILE__,__LINE__,e->getEventProb()==(i+1)/p);
 		}
 		smiDD->addDiscreteRV(s);
 	}
@@ -973,6 +1000,7 @@ void SmiDiscreteUnitTest()
 void replaceFirstWithSecond(CoinPackedVector &dfirst, const CoinPackedVector &dsecond);
 void SmiScnModelDiscreteUnitTest()
 {
+	
 	// test of direct interfaces for discrete distribution
 
 	OsiClpSolverInterface *osiClp1 = new OsiClpSolverInterface();
@@ -1138,24 +1166,24 @@ void SmiScnModelDiscreteUnitTest()
 			cpv_rlo.clear();
 			cpv_rup.clear();
 		}
-		assert(static_cast<int>(smiRV->getNumEvents())==nsamp[jj]);
+		myAssert(__FILE__,__LINE__,static_cast<int>(smiRV->getNumEvents())==nsamp[jj]);
 		for (ii=0;ii<nsamp[jj];ii++)
 		{
-			assert(smiRV->getEventColLower(ii).getNumElements()==0);
-			assert(smiRV->getEventColUpper(ii).getNumElements()==0);
-			assert(smiRV->getEventObjective(ii).getNumElements()==0);
-			assert(smiRV->getEventMatrix(ii).getNumElements()==cpm_mat->getNumElements());
-			assert(smiRV->getEventRowLower(ii).getElements()[0] == demand[index+ii]);
-			assert(smiRV->getEventRowLower(ii).getIndices()[0] == irow[n_first_stg_rows + jj]);
-			assert(smiRV->getEventRowUpper(ii).getElements()[0] == demand[index+ii]);
+			myAssert(__FILE__,__LINE__,smiRV->getEventColLower(ii).getNumElements()==0);
+			myAssert(__FILE__,__LINE__,smiRV->getEventColUpper(ii).getNumElements()==0);
+			myAssert(__FILE__,__LINE__,smiRV->getEventObjective(ii).getNumElements()==0);
+			myAssert(__FILE__,__LINE__,smiRV->getEventMatrix(ii).getNumElements()==cpm_mat->getNumElements());
+			myAssert(__FILE__,__LINE__,smiRV->getEventRowLower(ii).getElements()[0] == demand[index+ii]);
+			myAssert(__FILE__,__LINE__,smiRV->getEventRowLower(ii).getIndices()[0] == irow[n_first_stg_rows + jj]);
+			myAssert(__FILE__,__LINE__,smiRV->getEventRowUpper(ii).getElements()[0] == demand[index+ii]);
 			//printf("event prob %g\n",smiRV->getEventProb(ii));
-			assert(fabs(smiRV->getEventProb(ii) - dprobs[index+ii]) < 0.0000001);
+			myAssert(__FILE__,__LINE__,fabs(smiRV->getEventProb(ii) - dprobs[index+ii]) < 0.0000001);
 		}
 		smiDD->addDiscreteRV(smiRV);
 		index+=nsamp[jj];
 	}
 
-	assert(smiDD->getNumRV() == nindp);
+	myAssert(__FILE__,__LINE__,smiDD->getNumRV() == nindp);
 
 	// this is cut-pasted from
 	smiModel->processDiscreteDistributionIntoScenarios(smiDD);
@@ -1165,7 +1193,7 @@ void SmiScnModelDiscreteUnitTest()
 	SmiCoreData *core=smiDD->getCore();
 
 	int nindp = smiDD->getNumRV();
-	assert(nindp > 0);
+	myAssert(__FILE__,__LINE__,nindp > 0);
 
 	int ns=1;
 	double dp=1.0;
@@ -1221,7 +1249,7 @@ void SmiScnModelDiscreteUnitTest()
 
 		//TODO test smiModel code
 		CoinPackedMatrix m = smiRV->getEventMatrix(indx[jj]);
-		assert(!m.isColOrdered());
+		myAssert(__FILE__,__LINE__,!m.isColOrdered());
 		if (matrix.getNumElements())
 		{
 			for (int i=0; i<m.getNumRows(); ++i)
@@ -1231,7 +1259,7 @@ void SmiScnModelDiscreteUnitTest()
 				for (int j=m.getVectorFirst(i); j<m.getVectorLast(j); ++j)
 				{
 
-					assert(rrow[j] == 0.0);//tests duplicate index
+					myAssert(__FILE__,__LINE__,rrow[j] == 0.0);//tests duplicate index
 					matrix.modifyCoefficient(i,j,row[j],true);
 				}
 			}
@@ -1277,13 +1305,13 @@ void SmiScnModelDiscreteUnitTest()
 			ic = core->getColExternalIndex(ii);
 			elt1 = stochdclo[ii];
 			elt2 = dclo[ic];
-			assert(elt1==elt2);
+			myAssert(__FILE__,__LINE__,elt1==elt2);
 			elt1 = stochdcup[ii];
 			elt2 = dcup[ic];
-			assert(elt1==elt2);
+			myAssert(__FILE__,__LINE__,elt1==elt2);
 			elt1 = stochdobj[ii];
 			elt2 = dobj[ic];
-			assert(elt1==elt2);
+			myAssert(__FILE__,__LINE__,elt1==elt2);
 		}
 		int ir;
 		for(ii=core->getRowStart(t);ii<core->getRowStart(t+1);ii++)
@@ -1291,12 +1319,12 @@ void SmiScnModelDiscreteUnitTest()
 
 			ir = core->getRowExternalIndex(ii);
 
-			assert(stochdrlo[ii]==drlo[ir]);
-			assert(stochdrup[ii]==drup[ir]);
+			myAssert(__FILE__,__LINE__,stochdrlo[ii]==drlo[ir]);
+			myAssert(__FILE__,__LINE__,stochdrup[ii]==drup[ir]);
 
 			const CoinPackedVector row1 = stochmat->getVector(ii);
 			const CoinPackedVector row2 = origmat->getVector(ir);
-			assert(row1.getNumElements() == row2.getNumElements());
+			myAssert(__FILE__,__LINE__,row1.getNumElements() == row2.getNumElements());
 			const int *indx = row1.getIndices();
 			const double *els = row1.getElements();
 			for (int j=0; j<row1.getNumElements(); j++)
@@ -1304,7 +1332,7 @@ void SmiScnModelDiscreteUnitTest()
 				elt1 = els[j];
 				ic = core->getColExternalIndex(indx[j]);
 				elt2 = row2[ic];
-				assert(elt1==elt2);
+				myAssert(__FILE__,__LINE__,elt1==elt2);
 			}
 		}
 	}
@@ -1384,7 +1412,7 @@ void SmiScnModelDiscreteUnitTest()
 
 		//TODO test smiModel code
 		CoinPackedMatrix m = smiRV->getEventMatrix(indx[jj]);
-		assert(!m.isColOrdered());
+		myAssert(__FILE__,__LINE__,!m.isColOrdered());
 		if (matrix.getNumElements())
 		{
 			for (int i=0; i<m.getNumRows(); ++i)
@@ -1405,10 +1433,10 @@ void SmiScnModelDiscreteUnitTest()
 
 		// add scenario
 		anc = tnode->scenario();
-		assert(anc==0);
+		myAssert(__FILE__,__LINE__,anc==0);
 //		branch = tnode->depth()+1;
 		branch = tnode->depth();
-		assert(branch==1);
+		myAssert(__FILE__,__LINE__,branch==1);
 	    is = smiModel->generateScenario(core,&matrix,&cpv_dclo,&cpv_dcup,&cpv_dobj,
 									&cpv_drlo,&cpv_drup,branch,anc,dp);
 
@@ -1445,13 +1473,13 @@ void SmiScnModelDiscreteUnitTest()
 					ic = core->getColExternalIndex(ii);
 					elt1 = stochdclo[ii-colOff];
 					elt2 = dclo[ic];
-					assert(elt1==elt2);
+					myAssert(__FILE__,__LINE__,elt1==elt2);
 					elt1 = stochdcup[ii-colOff];
 					elt2 = dcup[ic];
-					assert(elt1==elt2);
+					myAssert(__FILE__,__LINE__,elt1==elt2);
 					elt1 = stochdobj[ii-colOff];
 					elt2 = dobj[ic];
-					assert(fabs(elt1 - (elt2*dp/totalProb)) < 1.0e-8);
+					myAssert(__FILE__,__LINE__,fabs(elt1 - (elt2*dp/totalProb)) < 1.0e-8);
 				}
 				int ir,rowOff;
 				rowOff = core->getRowStart(1);
@@ -1460,12 +1488,12 @@ void SmiScnModelDiscreteUnitTest()
 
 					ir = core->getRowExternalIndex(ii);
 
-					assert(stochdrlo[ii-rowOff]==drlo[ir]);
-					assert(stochdrup[ii-rowOff]==drup[ir]);
+					myAssert(__FILE__,__LINE__,stochdrlo[ii-rowOff]==drlo[ir]);
+					myAssert(__FILE__,__LINE__,stochdrup[ii-rowOff]==drup[ir]);
 
 					const CoinPackedVector row1 = stochmat->getVector(ii);
 					const CoinPackedVector row2 = origmat->getVector(ir);
-					assert(row1.getNumElements() == row2.getNumElements());
+					myAssert(__FILE__,__LINE__,row1.getNumElements() == row2.getNumElements());
 					const int *indx = row1.getIndices();
 					const double *els = row1.getElements();
 					for (int j=0; j<row1.getNumElements(); j++)
@@ -1473,7 +1501,7 @@ void SmiScnModelDiscreteUnitTest()
 						elt1 = els[j];
 						ic = core->getColExternalIndex(indx[j]);
 						elt2 = row2[ic];
-						assert(elt1==elt2);
+						myAssert(__FILE__,__LINE__,elt1==elt2);
 					}
 				}
 			}
@@ -1510,7 +1538,7 @@ void SmiScnModelDiscreteUnitTest()
 	// solve using Osi Solver
 	smiOsi->initialSolve();
 	// test optimal value
-    assert(fabs(smiOsi->getObjValue()-1566.042)<0.01);
+    myAssert(__FILE__,__LINE__,fabs(smiOsi->getObjValue()-1566.042)<0.01);
 
 	// test solutions
 	const double *dsoln = smiOsi->getColSolution();
@@ -1553,14 +1581,16 @@ void SmiScnModelDiscreteUnitTest()
 	}
 
 //	fclose(fp);
-	assert(fabs(smiOsi->getObjValue()-objSum) < 0.01);
+	myAssert(__FILE__,__LINE__,fabs(smiOsi->getObjValue()-objSum) < 0.01);
 
 	printf(" *** Completed all tests for SmiScnModel.\n");
         delete smiModel;
+	
 }
 
-void ModelBug()
+void ModelBug() 
 {
+	
 
 	OsiClpSolverInterface osi;
 	double INF=osi.getInfinity();
@@ -1717,12 +1747,13 @@ ENDATA
 		printf("Number of cols: %d\n",osiStoch->getNumCols());
 		printf("Optimal value: %g\n",osiStoch->getObjValue());
 
-		assert(osiStoch->getObjValue()== 0.5);
+		myAssert(__FILE__,__LINE__,osiStoch->getObjValue()== 0.5);
 
 }
 
 void SmpsBug()
 {
+	
 		SmiScnModel smi;
 
 		std::string dataDir="../../Data/Stochastic";
@@ -1752,12 +1783,14 @@ void SmpsBug()
 		printf("Number of rows: %d\n",osiStoch->getNumRows());
 		printf("Number of cols: %d\n",osiStoch->getNumCols());
 		printf("Optimal value: %g\n",osiStoch->getObjValue());
-		assert(osiStoch->getObjValue()== 0.5);
+		myAssert(__FILE__,__LINE__,osiStoch->getObjValue()== 0.5);
 
+	
 }
 
-void Smps20()
+void Smps20() 
 {
+	
 		SmiScnModel smi;
 
 		std::string dataDir="data";
@@ -1787,12 +1820,14 @@ void Smps20()
 		printf("Number of rows: %d\n",osiStoch->getNumRows());
 		printf("Number of cols: %d\n",osiStoch->getNumCols());
 		printf("Optimal value: %g\n",osiStoch->getObjValue());
-		//assert(osiStoch->getObjValue()== 0.5);
+		myAssert(__FILE__,__LINE__,osiStoch->getObjValue()== 0.5);
 
+	
 }
 
 int main()
 {
+	
 
 	testingMessage( "Testing SmiTreeNode \n");
 	SmiTreeNodeUnitTest();
@@ -1820,7 +1855,7 @@ int main()
 
 
 	testingMessage( "*** Done! *** \n");
-
+	
 
   return 0;
 }
