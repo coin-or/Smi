@@ -38,7 +38,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "exampleFlopCpp", "exampleFl
 		{59EBCEDA-5685-4483-B9CE-97AA8E3FEA08} = {59EBCEDA-5685-4483-B9CE-97AA8E3FEA08}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libflopc", "..\..\..\FlopC++\MSVisualStudio\v8\libflopc.vcproj", "{98885124-894A-48BF-9C20-D9F389C92275}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libflopc", "..\..\..\FlopCpp\MSVisualStudio\v8\libflopc.vcproj", "{98885124-894A-48BF-9C20-D9F389C92275}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
