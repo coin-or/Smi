@@ -28,7 +28,7 @@ void myAssert(const char * file, const int line, bool c )
 	if(!c)
 	{
 		char l[10];
-		itoa(line,l,10);
+		sprintf(l,"%d",line);
 		string e("[Smi] Error thrown from file ");
 		e+=file;
 		e+=", line ";
