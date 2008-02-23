@@ -23,6 +23,7 @@ Smi/MSVisualStudio/v9/unitTestSmi/bug_gen.mps -text
 Smi/MSVisualStudio/v9/unitTestSmi/smiUnitTest.vcproj -text
 Smi/Makefile.am -text
 Smi/Makefile.in -text
+Smi/README -text
 Smi/configure -text
 Smi/configure.ac -text
 Smi/examples/Makefile.in -text
