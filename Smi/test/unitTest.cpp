@@ -337,12 +337,13 @@ SmiTreeNodeUnitTest()
 void SmiScnSmpsIOUnitTestReplace() 
 {
 
-  	std::string dataDir="../../Data/Stochastic";
+  	std::string dataDir="../../Data/Sample";
 	int nrows, ncols;
 
 		// test SMPS files app0110R
 		SmiScnModel smi;
-		smi.readSmps((dataDir+"/app0110R").c_str());
+		myAssert(__FILE__,__LINE__,-1!=smi.readSmps((dataDir+"/app0110R").c_str()));
+
 		OsiClpSolverInterface *clp = new OsiClpSolverInterface();
 		smi.setOsiSolverHandle(*clp);
 		OsiSolverInterface *osiStoch = smi.loadOsiSolverData();
@@ -360,12 +361,12 @@ void SmiScnSmpsIOUnitTestReplace()
 void SmiScnSmpsIOUnitTestAdd() 
 {
 
-	std::string dataDir="../../Data/Stochastic";
+	std::string dataDir="../../Data/Sample";
 	int nrows, ncols;
 
 		// test SMPS files app0110 -- ADD scenario values
 		SmiScnModel smi;
-		smi.readSmps((dataDir+"/app0110").c_str());
+		myAssert(__FILE__,__LINE__,-1!=smi.readSmps((dataDir+"/app0110").c_str()));
 		OsiClpSolverInterface *clp = new OsiClpSolverInterface();
 		smi.setOsiSolverHandle(*clp);
 		OsiSolverInterface *osiStoch = smi.loadOsiSolverData();
@@ -902,99 +903,7 @@ void SmiScnModelScenarioUnitTest()
 	
 }
 
-#if 0
-void SmiDiscreteUnitTest()
-{
-	// 3 period model
-	//
-	// min S_0 X_0 + B_0 Y_0
-	// s.t.
-	//     S_1 X_1 + B_1 Y_1 - S_1 X_0 - B_1 Y_0 = 0
-	//     S_2 X_2 + B_2 Y_2 - S_2 X_1 - B_2 Y_2 = 0
-	//     S_2 X_2 + B_2 Y_2                     \ge max(S_2 - K, B_2 - K)
-	//
-	//  X_0, Y_0, X_1, Y_1, X_2, Y_2 free.
 
-	OsiClpSolverInterface *osiClp1 = new OsiClpSolverInterface();
-	double INF=osiClp1->getInfinity();
-
-    /* Model dimensions */
-    int ncol=6, nrow=3, nels=10;
-
-	/* Sparse matrix data...organized by row */
-    int cmcol[]={ 2, 3, 0, 1,
-				  4, 5, 2, 3,
-				  4, 5 };
-
-	int cmrow[]={ 0, 0, 0, 0,
-				  1, 1, 1, 1,
-				  2, 2 };
-
-
-    double cdels[] = { 100.0, 100.0, -100.0, -100.0,
-				      100.0, 100.0, -100.0, -100.0,
-					  100.0, 100.0 };
-    /* Objective */
-	double *cdobj[]={ 100.0, 100.0, 0.0, 0.0, 0.0, 0.0 };
-
-    /* Column bounds */
-    double cdclo[]={ INF, INF, INF, INF, INF, INF };
-    double cdcup[]={ INF, INF, INF, INF, INF, INF };
-
-    /* Row bounds */
-    double cdrlo[]={ 0.0, 0.0, 100.0 };
-    double cdrup[]={ 0.0, 0.0, INF };
-
-    /* Stages */
-	int crstg[]={ 0,1,2 };
-    int ccstg[]={ 0,0,1,1,2,2 };
-
-	// initialize SmiModel
-	SmiScnModel *smiModel = new SmiScnModel();
-
-	// set core model using Osi interface
-	OsiClpSolverInterface ocsi;
-	ocsi.loadProblem(CoinPackedMatrix( 1,cmrow,cmcol,cdels,nels),cdclo,cdcup,cdobj,cdrlo,cdrup);
-
-	// core model with 3 stages
-	SmiCoreData *smiCore = new SmiCoreData(&ocsi,3,ccstg,crstg);
-
-	SmiDiscreteDistribution *smiDD=new SmiDiscreteDistribution();
-
-	int nI = 4;
-	int ns[] = { 3, 3, 3, 3 };
-	int nt[] = { 1,2,1,2 };
-
-	for (int t=0; t<2; t++)
-	{
-		j = t+0;
-		SmiDiscreteRV *s=new SmiDiscreteRV(nt[j]);
-
-		double p = 0.5*ns[j]*(ns[j]+1);
-		for (int i=0; i<ns[j]; i++)
-		{
-			int cindx=j;
-			int rindx=i;
-			double elem=(double) (j*i);
-			CoinPackedVector c(1,&cindx,&elem);
-			CoinPackedVector r(1,&rindx,&elem);
-			CoinPackedMatrix m(false,&rindx,&cindx,&elem,1);
-			SmiLinearData d(m,c,c,c,r,r);
-			SmiDiscreteEvent *e = new SmiDiscreteEvent(d,(i+1)/p);
-			s->events_.push_back(e);
-
-			myAssert(__FILE__,__LINE__,e->getColLower().getIndices()[0]==j);
-			myAssert(__FILE__,__LINE__,e->getRowLower().getIndices()[0]==i);
-			myAssert(__FILE__,__LINE__,e->getMatrix().getCoefficient(i,j)==(double)(j*i));
-			myAssert(__FILE__,__LINE__,e->getEventProb()==(i+1)/p);
-		}
-		smiDD->addDiscreteRV(s);
-	}
-
-	SmiScnModel test;
-	test.processDiscreteDistributionIntoScenarios(smiDD,true);
-}
-#endif
 
 //forward declarations
 void replaceFirstWithSecond(CoinPackedVector &dfirst, const CoinPackedVector &dsecond);
@@ -1761,7 +1670,7 @@ void SmpsBug()
 		// read SMPS model from files
 		//	<name>.core, <name>.time, and <name>.stoch
 		// the argument myCombineRule overrides the combine rule specified in the Stoch file
-		smi.readSmps((dataDir+"/bug").c_str());
+		myAssert(__FILE__,__LINE__,-1!=smi.readSmps((dataDir+"/bug").c_str()));
 
 		// generate OSI solver object
 		// 	here we use OsiClp
@@ -1788,42 +1697,7 @@ void SmpsBug()
 	
 }
 
-void Smps20() 
-{
-	
-		SmiScnModel smi;
 
-		std::string dataDir="data";
-
-		// read SMPS model from files
-		//	<name>.core, <name>.time, and <name>.stoch
-		// the argument myCombineRule overrides the combine rule specified in the Stoch file
-		smi.readSmps((dataDir+"/20").c_str());
-
-		// generate OSI solver object
-		// 	here we use OsiClp
-		OsiClpSolverInterface *clp = new OsiClpSolverInterface();
-
-		// set solver object for SmiScnModel
-		smi.setOsiSolverHandle(*clp);
-
-		// load solver data
-		// 	this step generates the deterministic equivalent
-		//	and returns an OsiSolver object
-		OsiSolverInterface *osiStoch = smi.loadOsiSolverData();
-
-		// solve
-		osiStoch->initialSolve();
-
-		// print results
-		printf("Solved stochastic program 20\n");
-		printf("Number of rows: %d\n",osiStoch->getNumRows());
-		printf("Number of cols: %d\n",osiStoch->getNumCols());
-		printf("Optimal value: %g\n",osiStoch->getObjValue());
-		myAssert(__FILE__,__LINE__,osiStoch->getObjValue()== 0.5);
-
-	
-}
 
 int main()
 {
