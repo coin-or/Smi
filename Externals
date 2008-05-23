@@ -1,7 +1,7 @@
 BuildTools
 https://projects.coin-or.org/svn/BuildTools/stable/0.5
 Data/Sample
-https://projects.coin-or.org/svn/BuildTools/trunk/Data/Sample
+https://projects.coin-or.org/svn/BuildTools/Data/trunk/Sample
 Data/Stochastic
 https://projects.coin-or.org/svn/Data/stable/1.0/Stochastic
 CoinUtils
