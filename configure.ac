@@ -12,7 +12,7 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT([Smi],[0.81stable],[coin-smi@lists.coin-or.org])
+AC_INIT([Smi],[0.9stable],[coin-smi@lists.coin-or.org])
 
 AC_COPYRIGHT([
 Copyright 2006 International Business Machines and others.
@@ -44,9 +44,13 @@ AC_COIN_CREATE_LIBTOOL
 
 AC_COIN_MAIN_SUBDIRS(CoinUtils)
 AC_COIN_MAIN_SUBDIRS(Data/Stochastic)
+AC_COIN_MAIN_SUBDIRS(Data/Sample)
 AC_COIN_MAIN_SUBDIRS(Clp)
 AC_COIN_MAIN_SUBDIRS(Osi)
+AC_COIN_MAIN_SUBDIRS(Cgl)
+AC_COIN_MAIN_SUBDIRS(Cbc)
 AC_COIN_MAIN_SUBDIRS(Smi)
+AC_COIN_MAIN_SUBDIRS(FlopCpp)
 
 ##############################################################################
 #                   Finishing up by writing all the output                   #
