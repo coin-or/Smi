@@ -1,10 +1,19 @@
 /* inc/config_smi.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Define to 1 if the Cbc package is used */
+#undef COIN_HAS_CBC
+
+/* Define to 1 if the Cgl package is used */
+#undef COIN_HAS_CGL
+
 /* Define to 1 if the Clp package is used */
 #undef COIN_HAS_CLP
 
 /* Define to 1 if the CoinUtils package is used */
 #undef COIN_HAS_COINUTILS
+
+/* Define to 1 if the FlopCpp package is used */
+#undef COIN_HAS_FLOPCPP
 
 /* Define to 1 if the Osi package is used */
 #undef COIN_HAS_OSI

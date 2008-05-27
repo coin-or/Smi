@@ -56,10 +56,13 @@ AC_COIN_INIT_AUTO_TOOLS
 #                              COIN components                              #
 #############################################################################
 
+AC_COIN_HAS_PROJECT(Smi)
 AC_COIN_HAS_PROJECT(CoinUtils)
 AC_COIN_HAS_PROJECT(Clp)
+AC_COIN_HAS_PROJECT(Cgl)
+AC_COIN_HAS_PROJECT(Cbc)
 AC_COIN_HAS_PROJECT(Osi)
-AC_COIN_HAS_PROJECT(Smi)
+AC_COIN_HAS_PROJECT(FlopCpp)
 
 #############################################################################
 #                             Other dependencies                            #
