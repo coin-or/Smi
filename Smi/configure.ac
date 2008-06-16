@@ -74,6 +74,16 @@ AC_COIN_CHECK_GNU_READLINE
 #                   VPATH links for example input files                      #
 ##############################################################################
 
+AC_COIN_VPATH_LINK(test/SmiTestData/bug.cor)
+AC_COIN_VPATH_LINK(test/SmiTestData/bug.stoch)
+AC_COIN_VPATH_LINK(test/SmiTestData/bug.time)
+AC_COIN_VPATH_LINK(test/SmiTestData/app0110.cor)
+AC_COIN_VPATH_LINK(test/SmiTestData/app0110.stoch)
+AC_COIN_VPATH_LINK(test/SmiTestData/app0110.time)
+AC_COIN_VPATH_LINK(test/SmiTestData/app0110R.cor)
+AC_COIN_VPATH_LINK(test/SmiTestData/app0110R.stoch)
+AC_COIN_VPATH_LINK(test/SmiTestData/app0110R.time)
+
 # In case this is a VPATH configuration we need to make sure that the
 # input files for the examples are available in the VPATH directory.
 
