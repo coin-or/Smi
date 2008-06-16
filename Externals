@@ -1,9 +1,10 @@
-BuildTools      https://projects.coin-or.org/svn/BuildTools/trunk
-Data/Sample     https://projects.coin-or.org/svn/Data/trunk/Sample
-Data/Stochastic https://projects.coin-or.org/svn/Data/trunk/Stochastic
-CoinUtils       https://projects.coin-or.org/svn/CoinUtils/trunk/CoinUtils
-Clp             https://projects.coin-or.org/svn/Clp/trunk/Clp
-Osi             https://projects.coin-or.org/svn/Osi/trunk/Osi
-FlopCpp         https://projects.coin-or.org/svn/FlopC++/trunk/FlopCpp
-Cbc	        https://projects.coin-or.org/svn/Cbc/trunk/Cbc
-Cgl             https://projects.coin-or.org/svn/Cgl/trunk/Cgl
+BuildTools      https://projects.coin-or.org/svn/BuildTools/stable/0.5
+Data/Sample     https://projects.coin-or.org/svn/Data/stable/1.0/Sample
+Data/Stochastic https://projects.coin-or.org/svn/Data/stable/1.0/Stochastic
+CoinUtils       https://projects.coin-or.org/svn/CoinUtils/stable/2.2/CoinUtils
+Cbc             https://projects.coin-or.org/svn/Cbc/stable/2.1/Cbc
+Cgl             https://projects.coin-or.org/svn/Cgl/stable/0.52/Cgl
+Clp             https://projects.coin-or.org/svn/Clp/stable/1.7/Clp
+FlopCpp         https://projects.coin-or.org/svn/FlopC++/stable/1.0/FlopCpp
+Osi             https://projects.coin-or.org/svn/Osi/stable/0.98/Osi
+
