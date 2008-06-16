@@ -12,7 +12,7 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT([Smi],[0.81stable],[coin-smi@list.coin-or.org])
+AC_INIT([Smi],[0.91.0],[coin-smi@list.coin-or.org])
 
 AC_COPYRIGHT([
 Copyright 2006 International Business Machines and others.
@@ -73,6 +73,16 @@ AC_COIN_CHECK_GNU_READLINE
 ##############################################################################
 #                   VPATH links for example input files                      #
 ##############################################################################
+
+AC_COIN_VPATH_LINK(test/SmiTestData/bug.cor)
+AC_COIN_VPATH_LINK(test/SmiTestData/bug.stoch)
+AC_COIN_VPATH_LINK(test/SmiTestData/bug.time)
+AC_COIN_VPATH_LINK(test/SmiTestData/app0110.cor)
+AC_COIN_VPATH_LINK(test/SmiTestData/app0110.stoch)
+AC_COIN_VPATH_LINK(test/SmiTestData/app0110.time)
+AC_COIN_VPATH_LINK(test/SmiTestData/app0110R.cor)
+AC_COIN_VPATH_LINK(test/SmiTestData/app0110R.stoch)
+AC_COIN_VPATH_LINK(test/SmiTestData/app0110R.time)
 
 # In case this is a VPATH configuration we need to make sure that the
 # input files for the examples are available in the VPATH directory.
