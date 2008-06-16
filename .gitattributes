@@ -37,6 +37,15 @@ Smi/src/SmiMessage.cpp -text
 Smi/src/SmiMessage.hpp -text
 Smi/test/Makefile.am -text
 Smi/test/Makefile.in -text
+Smi/test/app0110.cor -text
+Smi/test/app0110.stoch -text
+Smi/test/app0110.time -text
+Smi/test/app0110R.cor -text
+Smi/test/app0110R.stoch -text
+Smi/test/app0110R.time -text
+Smi/test/bug.cor -text
+Smi/test/bug.stoch -text
+Smi/test/bug.time -text
 /config.guess -text
 /config.sub -text
 /configure -text
