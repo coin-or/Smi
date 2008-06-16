@@ -40,7 +40,7 @@ EXTRA_DIST = \
         test/SmiTestData/app0110R.time \
         test/SmiTestData/bug.stoch \
         test/SmiTestData/bug.cor \
-        test/SmiTestData/bug.time \
+        test/SmiTestData/bug.time 
 
 ########################################################################
 #                           Extra Targets                              #

@@ -278,7 +278,11 @@ SUBDIRS = src $(am__append_1)
 
 # Here we need include all files that are not mentioned in other Makefiles
 EXTRA_DIST = examples/Makefile.in examples/README examples/stoch.cpp \
-	$(am__append_2)
+	test/SmiTestData/app0110.stoch test/SmiTestData/app0110.cor \
+	test/SmiTestData/app0110.time test/SmiTestData/app0110R.stoch \
+	test/SmiTestData/app0110R.cor test/SmiTestData/app0110R.time \
+	test/SmiTestData/bug.stoch test/SmiTestData/bug.cor \
+	test/SmiTestData/bug.time $(am__append_2)
 
 ########################################################################
 #                         Maintainer Stuff                             #
@@ -489,7 +493,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/.. $(distdir)/../BuildTools $(distdir)/examples $(distdir)/inc
+	$(mkdir_p) $(distdir)/.. $(distdir)/../BuildTools $(distdir)/examples $(distdir)/inc $(distdir)/test/SmiTestData
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

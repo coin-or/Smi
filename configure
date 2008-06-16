@@ -21066,6 +21066,67 @@ echo "${ECHO_T}no" >&6
 
 
 
+
+##############################################################################
+#                   Links for data files                                     #
+##############################################################################
+
+echo "$as_me:$LINENO: checking whether this is a VPATH configuration" >&5
+echo $ECHO_N "checking whether this is a VPATH configuration... $ECHO_C" >&6
+if test `cd $srcdir; pwd` != `pwd`; then
+  coin_vpath_config=yes;
+else
+  coin_vpath_config=no;
+fi
+echo "$as_me:$LINENO: result: $coin_vpath_config" >&5
+echo "${ECHO_T}$coin_vpath_config" >&6
+
+
+if test $coin_vpath_config = yes; then
+  coin_vpath_link_files="$coin_vpath_link_files test/SmiTestData/bug.cor"
+fi
+
+
+if test $coin_vpath_config = yes; then
+  coin_vpath_link_files="$coin_vpath_link_files test/SmiTestData/bug.stoch"
+fi
+
+
+if test $coin_vpath_config = yes; then
+  coin_vpath_link_files="$coin_vpath_link_files test/SmiTestData/bug.time"
+fi
+
+
+if test $coin_vpath_config = yes; then
+  coin_vpath_link_files="$coin_vpath_link_files test/SmiTestData/app0110.cor"
+fi
+
+
+if test $coin_vpath_config = yes; then
+  coin_vpath_link_files="$coin_vpath_link_files test/SmiTestData/app0110.stoch"
+fi
+
+
+if test $coin_vpath_config = yes; then
+  coin_vpath_link_files="$coin_vpath_link_files test/SmiTestData/app0110.time"
+fi
+
+
+if test $coin_vpath_config = yes; then
+  coin_vpath_link_files="$coin_vpath_link_files test/SmiTestData/app0110R.cor"
+fi
+
+
+if test $coin_vpath_config = yes; then
+  coin_vpath_link_files="$coin_vpath_link_files test/SmiTestData/app0110R.stoch"
+fi
+
+
+if test $coin_vpath_config = yes; then
+  coin_vpath_link_files="$coin_vpath_link_files test/SmiTestData/app0110R.time"
+fi
+
+
 ##############################################################################
 #                   Finishing up by writing all the output                   #
 ##############################################################################
