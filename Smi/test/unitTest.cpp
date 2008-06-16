@@ -4,7 +4,7 @@
 
 #include <string>
 
-#define SMI_TEST_DATA_DIR  "../../Smi/test"
+#define SMI_TEST_DATA_DIR  "./SmiTestData"
 
 #include "SmiScnModel.hpp"
 #include "OsiClpSolverInterface.hpp"
