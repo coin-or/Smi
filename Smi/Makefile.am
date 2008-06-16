@@ -31,7 +31,16 @@ endif
 EXTRA_DIST = \
 	examples/Makefile.in \
 	examples/README \
-	examples/stoch.cpp
+	examples/stoch.cpp \
+        test/SmiTestData/app0110.stoch \
+        test/SmiTestData/app0110.cor \
+        test/SmiTestData/app0110.time \
+        test/SmiTestData/app0110R.stoch \
+        test/SmiTestData/app0110R.cor \
+        test/SmiTestData/app0110R.time \
+        test/SmiTestData/bug.stoch \
+        test/SmiTestData/bug.cor \
+        test/SmiTestData/bug.time \
 
 ########################################################################
 #                           Extra Targets                              #
