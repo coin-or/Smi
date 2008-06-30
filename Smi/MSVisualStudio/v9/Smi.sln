@@ -38,7 +38,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "exampleFlopCpp", "exampleFl
 		{59EBCEDA-5685-4483-B9CE-97AA8E3FEA08} = {59EBCEDA-5685-4483-B9CE-97AA8E3FEA08}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libflopc", "..\..\..\FlopCpp\MSVisualStudio\v8\libflopc.vcproj", "{98885124-894A-48BF-9C20-D9F389C92275}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libflopcpp", "..\..\..\FlopCpp\MSVisualStudio\v8\libflopc.vcproj", "{98885124-894A-48BF-9C20-D9F389C92275}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "liquidity", "liquidity\liquidity.vcproj", "{7207EF8D-ED29-42DD-8D62-6F881534997B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -82,6 +84,10 @@ Global
 		{98885124-894A-48BF-9C20-D9F389C92275}.Debug|Win32.Build.0 = Debug|Win32
 		{98885124-894A-48BF-9C20-D9F389C92275}.Release|Win32.ActiveCfg = Release|Win32
 		{98885124-894A-48BF-9C20-D9F389C92275}.Release|Win32.Build.0 = Release|Win32
+		{7207EF8D-ED29-42DD-8D62-6F881534997B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7207EF8D-ED29-42DD-8D62-6F881534997B}.Debug|Win32.Build.0 = Debug|Win32
+		{7207EF8D-ED29-42DD-8D62-6F881534997B}.Release|Win32.ActiveCfg = Release|Win32
+		{7207EF8D-ED29-42DD-8D62-6F881534997B}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
