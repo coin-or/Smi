@@ -30,6 +30,7 @@ Smi/configure -text
 Smi/configure.ac -text
 Smi/examples/Makefile.in -text
 Smi/examples/investment.cpp -text
+Smi/examples/liquidity.cpp -text
 Smi/examples/stoch.cpp -text
 Smi/inc/config_smi.h.in -text
 Smi/src/Makefile.am -text
