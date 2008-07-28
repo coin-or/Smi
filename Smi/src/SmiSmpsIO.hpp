@@ -91,7 +91,7 @@ private:
 	int nstag_;
 	int *cstag_;
 	int *rstag_;
-	typedef 	std::map<string,int> StringIntMap;
+	typedef 	std::map<const char *,int> StringIntMap;
 	StringIntMap periodMap_;
 	StringIntMap scenarioMap_;
 	bool iftime,ifstoch;
