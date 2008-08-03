@@ -26,7 +26,7 @@ unitTest_LDADD = \
 	$(COINUTILSOBJDIR)/src/libCoinUtils.la
 
 # List additional libraries
-LIBS += $(ADDLIBS)
+LIBS += $(ADDLIBS) `cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt`
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Cygwin
