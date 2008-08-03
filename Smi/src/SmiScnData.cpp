@@ -554,6 +554,10 @@ SmiNodeData::~SmiNodeData()
 
 	for (iRowMap=rowMap.begin(); iRowMap!=rowMap.end(); ++iRowMap)
 	  delete iRowMap->second;
+	
+	SmiDenseRowMap::iterator idRowMap;
+	for (idRowMap=dRowMap.begin(); idRowMap!=dRowMap.end(); ++idRowMap)
+	  delete idRowMap->second;
 
 	deleteMemory();
 }

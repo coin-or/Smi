@@ -19,7 +19,7 @@ lib_LTLIBRARIES = libSmi.la
 # List all source files for this library, including headers
 libSmi_la_SOURCES = \
 	SmiCoreCombineRule.cpp SmiCoreCombineRule.hpp \
-	SmiDiscreteDistribution.hpp \
+	SmiDiscreteDistribution.cpp SmiDiscreteDistribution.hpp \
 	SmiLinearData.hpp \
 	SmiScenarioTree.hpp \
 	SmiScnData.cpp SmiScnData.hpp \

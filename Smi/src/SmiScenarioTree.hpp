@@ -131,7 +131,7 @@ public:
    {
 	   delete sibling_;
 	   delete child_;
-	   //delete ptr_ ;
+//	   delete ptr_ ;
    }
  
    //@}

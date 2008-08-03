@@ -121,7 +121,10 @@ public:
 	inline void setStage(int p) {stg_=p;}
 	SmiDiscreteRV(){prob_=0.0; stg_=-1;}
 	SmiDiscreteRV(int p) {prob_=0.0; stg_=p;}
-	~SmiDiscreteRV(){}
+	~SmiDiscreteRV(){
+		for (size_t i=0; i<events_.size(); ++i)
+			delete events_[i];
+	}
 private:
 	vector<SmiDiscreteEvent *> events_;
 	SmiStageIndex  stg_;
