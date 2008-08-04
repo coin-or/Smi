@@ -19,6 +19,12 @@ SmiCoreCombineReplace* SmiCoreCombineReplace::Instance()
 	return _instance;
 }
 
+void SmiCoreCombineReplace::ClearInstance()
+{
+	delete _instance;
+	_instance = NULL;
+}
+
 CoinPackedVector *  SmiCoreCombineReplace::Process(CoinPackedVector *cr,CoinPackedVector *nr, char *type)
 {	
 	
@@ -142,6 +148,12 @@ SmiCoreCombineAdd* SmiCoreCombineAdd::Instance()
 		_instance = new SmiCoreCombineAdd;
 	}
 	return _instance;
+}
+
+void SmiCoreCombineAdd::ClearInstance()
+{
+	delete _instance;
+	_instance = NULL;
 }
 
 CoinPackedVector *SmiCoreCombineAdd::Process(CoinPackedVector *cr,CoinPackedVector *nr, char *type)
