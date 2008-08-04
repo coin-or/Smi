@@ -1782,6 +1782,8 @@ int main()
 	testingMessage("Read SMPS version of simple model Bug");
 	SmpsBug();
 
+	SmiCoreCombineReplace::ClearInstance();
+	SmiCoreCombineAdd::ClearInstance();
 
 	testingMessage( "*** Done! *** \n");
 
