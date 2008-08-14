@@ -65,11 +65,14 @@ public:
 						   drlo_(drlo),
 						   drup_(drup)
 	{}
-    SmiLinearData(OsiSolverInterface &osi):matrix_((*osi.getMatrixByCol())),
-		dclo_(osi.getColLower()),dcup_(osi.getColUpper()),
-		dobj_(osi.getObjCoefficients()),
-		drlo_(osi.getRowLower()),drup_(osi.getRowUpper())
-	{}
+	SmiLinearData(OsiSolverInterface &osi):matrix_((*osi.getMatrixByCol()))
+	{
+		dclo_=CoinPackedVector(matrix_.getNumCols(),osi.getColLower());
+		dcup_=CoinPackedVector(matrix_.getNumCols(),osi.getColUpper());
+		dobj_=CoinPackedVector(matrix_.getNumCols(),osi.getObjCoefficients());
+		drlo_=CoinPackedVector(matrix_.getNumRows(),osi.getRowLower());
+		drup_=CoinPackedVector(matrix_.getNumRows(),osi.getRowUpper());
+	}
 				
 	~SmiLinearData(){}
 private:
