@@ -29,6 +29,7 @@ Smi/configure.ac -text
 Smi/examples/Makefile.in -text
 Smi/examples/investment.cpp -text
 Smi/examples/stoch.cpp -text
+Smi/flopcpp_examples/investment/investment.cpp -text
 Smi/inc/config_smi.h.in -text
 Smi/src/Makefile.am -text
 Smi/src/Makefile.in -text
