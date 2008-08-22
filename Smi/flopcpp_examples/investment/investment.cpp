@@ -57,7 +57,7 @@ public:
 				ptParent->children.push_back(this); // Register with the parent
 			}
 		}
-		~StageNodeBase() {
+		virtual ~StageNodeBase() {
 			for (int a = 0; a < (int) all_variables.size(); a++) {
 				delete all_variables[a];
 			}
@@ -274,19 +274,29 @@ class ScenTreeStruct {
 
 		/// Get the number of stages
 		virtual int get_nmb_stages() const = 0;
+
 };
 
 /// Class for balanced binary trees
 class BinTreeStruct : public ScenTreeStruct {
 	protected:
 		int nmbStages;
+		int * scenNodeNmb;
+		int nextLeaf;
+
 
 	public:
 		/// Constructs the object - 2^T-1 nodes, first leaf is 2^(T-1)-1
 		BinTreeStruct(const int T)
 		: ScenTreeStruct((int) pow(2.0, T) - 1, (int) pow(2.0, T-1) - 1),
 			nmbStages(T)
-		{}
+		{
+			scenNodeNmb = new int[T];
+			nextLeaf = this->firstLeaf;
+		}
+		~BinTreeStruct(){
+			delete scenNodeNmb;
+		}
 
 		int get_parent(int n) const {
 			return (n-1) / 2;    // This gives: get_parent(0) = 0
@@ -294,6 +304,40 @@ class BinTreeStruct : public ScenTreeStruct {
 
 		int get_nmb_stages() const {
 			return nmbStages;
+		}
+
+		int * getCoreScenario(){
+			int n = this->firstLeaf;
+			for (int t = nmbStages; t > 0; t--) {
+				scenNodeNmb[t-1] = n;
+				n = this->get_parent(n);
+			}
+			return scenNodeNmb;
+		}
+
+		int * getNextScenario(int *scen, int* parentScen, int *branchStage, double *prob){
+			if (nextLeaf == nmbNodes)
+				return NULL;
+			int n = nextLeaf;
+			int t = nmbStages-1;
+			// For each scenario, start by adding the leaf and then go up, as long as
+			// the nodes are different from the previous (parent) scenario
+			while (n != scenNodeNmb[t]) {
+				assert (n > 0 && t > 0 && "All scenarios must end in a common root");
+				scenNodeNmb[t] = n; // add the current node to the list
+				n = this->get_parent(n);
+				t--;
+			}
+			*scen = nextLeaf - this->firstLeaf;         // scenario index
+			*parentScen = (*scen == 0 ? 0 : *scen - 1); // parent scenario
+			*branchStage = (*scen == 0 ? 1 : t+1);      // branching scenario
+		 	*prob = 1.0 / this->getNmbScen();           // equiprobable scen.
+		 	nextLeaf++;
+			return scenNodeNmb;
+		}
+
+		inline int getNmbScen()	{
+			return this->nmbNodes - this->firstLeaf;
 		}
 };
 
@@ -340,16 +384,12 @@ int main()
 	coreModel.setSolver(new OSI_SOLVER_INTERFACE);
 	coreModel.verbose(); // less output
 
-	int i, j, n, t;
+	int i, j, t;
 	assert (nmbStages == scTree.get_nmb_stages()
 	        && "Checking that get_nmb_stages() returns what it should.");
 
-	vector<int> scenNodeNmb(nmbStages); // nodes (indices) in a scenario
-	n = scTree.firstLeaf;               // leaf of the first scenario
-	for (t = nmbStages; t > 0; t--) {
-		scenNodeNmb[t-1] = n;
-		n = scTree.get_parent(n);
-	}
+	// Get the node numbers for the Core
+	int * scenNodeNmb = scTree.getCoreScenario();
 
 	// Create scenario tree for the core model, using data for the 1st scenario
 	vector<StageNode *> coreNodes(nmbStages);
@@ -439,40 +479,28 @@ int main()
 	// row-ordering; it would be done automatically later, but this is faster...
 	ADiff.reverseOrdering();
 
-	int nmbScen = scTree.nmbNodes - scTree.firstLeaf; // number of scenarios
- 	double scenProb = 1.0 / nmbScen;                  // equiprobable scen.
-
 	// Add scenarios, one by one.
-	// For each scenario, start by adding the leaf and then go up, as long as
-	// the nodes are different from the previous (parent) scenario
-	for (int leaf = scTree.firstLeaf; leaf < scTree.nmbNodes; leaf++) {
-		int scen = leaf - scTree.firstLeaf; // scenario index
-		n = leaf;                           // the current node to be added
-		t = nmbStages-1;                    // stage of node n
-		cout << "Nodes in scenario " << scen + 1 << ": ";
+	int scen,parentScen,branchStage;
+	double scenProb;
+	while(scenNodeNmb = scTree.getNextScenario(&scen,&parentScen,&branchStage,&scenProb)){
 		ADiff.clear(); // clean the matrix of differences - must reset dimensions!
 		ADiff.setDimensions(nmbCoreRows, nmbCoreCols);
-		while (n != scenNodeNmb[t]) {
-			assert (n > 0 && t > 0 && "All scenarios must end in a common root");
-			cout << setw(2) << n << " ";
-			scenNodeNmb[t] = n; // add the current node to the list
-			coreNodes[t]->loadModifiedMatrix(ADiff,retData[n-1]);  // load modified data into ADiff
-			// Move one node up in the scenario tree
-			n = scTree.get_parent(n);
-			t--;
+		cout << "Nodes in scenario " << scen + 1 << ": ";
+		for (t=branchStage; t<nmbStages; t++){
+				cout << setw(2) << scenNodeNmb[t] << " ";
+				// load modified data into ADiff
+				coreNodes[t]->loadModifiedMatrix(ADiff,retData[scenNodeNmb[t]-1]);
 		}
 		cout << endl;
 
-		// Add the scenario to the Smi model
-		int branchStage = (scen == 0 ? 1 : t+1);
-		int parentScen = (scen == 0 ? 0 : scen - 1); // parent scenario
 		#ifdef NDEBUG
 			stochModel.generateScenario(&stochCore, &ADiff,
-																	NULL, NULL, NULL, NULL, NULL,
-																	branchStage, parentScen, scenProb);
+					NULL, NULL, NULL, NULL, NULL,
+					branchStage, parentScen, scenProb);
 		#else
 			int scenIndx = stochModel.generateScenario(&stochCore, &ADiff,
-				NULL, NULL, NULL, NULL, NULL,branchStage, parentScen,scenProb);
+					NULL, NULL, NULL, NULL, NULL,
+					branchStage, parentScen,scenProb);
 			assert (scenIndx == scen && "Check index of the new scenario");
 		#endif
 	}
@@ -504,7 +532,7 @@ int main()
 	   the solution on the scenario tree, using the SMI (stochastic) model */
 	cout << endl << "The stochastic model has " << stochModel.getNumScenarios()
 	     << " scenarios." << endl;
-	assert (stochModel.getNumScenarios() == nmbScen && "Check number of scens.");
+	assert (stochModel.getNumScenarios() == scTree.getNmbScen() && "Check number of scens.");
 
 	// We will report the wealth at each node of the tree, plus the obj. value
 	vector<double> nodeWealth(nmbStages, 0);
@@ -514,7 +542,7 @@ int main()
 	const double *ptOsiSolution = ptDetEqModel->getColSolution();
 
 	// Compute the wealth at each node, by traversing the tree from leafs up
-	for (SmiScenarioIndex sc = 0; sc < nmbScen; sc ++) {
+	for (SmiScenarioIndex sc = 0; sc < scTree.getNmbScen(); sc ++) {
 		// Get the leaf node of scenario sc:
 		SmiScnNode *ptNode = stochModel.getLeafNode(sc);
 		int nodeStage = nmbStages;
