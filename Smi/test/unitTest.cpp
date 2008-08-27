@@ -262,7 +262,23 @@ SmiScenarioTreeUnitTest()
 
 
 
-
+	delete i1;
+	delete i2;
+	delete i3;
+	delete i4;
+	delete i5;
+	delete i6;
+	delete i7;
+	delete i8;
+	
+	delete ii1;
+	delete ii2;
+	delete ii3;
+	delete ii4;
+	delete ii5;
+	delete ii6;
+	delete ii7;
+	delete ii8;
 }
 
 void
@@ -335,7 +351,16 @@ SmiTreeNodeUnitTest()
 	assert ((*vec1)[1] == n3 );
 	delete vec1;
 
-
+	delete i1;
+	delete i2;
+	delete i3;
+	delete i4;
+	delete i5;
+	delete i6;
+	delete i7;
+	delete i8;
+	
+	delete n1;
 }
 
 
@@ -364,6 +389,8 @@ void SmiScnSmpsIOUnitTestReplace()
 	myAssert(__FILE__,__LINE__,fabs(osiStoch->getObjValue()-
 		44.66666) < 0.0001);
 	printf(" *** Successfully tested SMPS interfaces on app0110	with Replace option.\n");
+	
+	delete clp;
 
 }
 void SmiScnSmpsIOUnitTestAdd()
@@ -389,7 +416,7 @@ void SmiScnSmpsIOUnitTestAdd()
 		44.66666) < 0.0001);
 	printf(" *** Successfully tested SMPS interfaces on app0110	with Add option.\n");
 
-
+	delete clp;
 
 }
 void SmiScnModelScenarioUnitTest()
@@ -637,7 +664,10 @@ void SmiScnModelScenarioUnitTest()
 				myAssert(__FILE__,__LINE__,elt1==elt2);
 			}
 		}
+		delete[] core_drlo;
 	}
+	
+	delete ohoh; ohoh = NULL;
 
 	printf(" *** Successfully tested SmiScnCoreModel.\n");
 
@@ -913,7 +943,11 @@ void SmiScnModelScenarioUnitTest()
 	free( dobj) ;
 	free( cstg) ;
 	delete smiModel;
-
+	
+	delete osiClp1;
+	delete osiCore;
+	delete origmat;
+	delete cpm_mat;
 }
 
 
@@ -1475,13 +1509,20 @@ void SmiScnModelDiscreteUnitTest()
 
 		}
 
-		delete incr;
+		free( incr) ;
 		free( drlo) ;
 		free( drup) ;
 		free( rstg) ;
 		free( dclo) ;
 		free( dcup) ;
-		free( dobj) ;
+		free( cstg) ;
+
+	} else { // if (0)
+		free( drlo) ;
+		free( drup) ;
+		free( rstg) ;
+		free( dclo) ;
+		free( dcup) ;
 		free( cstg) ;
 	}
 
@@ -1544,7 +1585,15 @@ void SmiScnModelDiscreteUnitTest()
 
 	printf(" *** Completed all tests for SmiScnModel.\n");
 	delete smiModel;
+	delete osiClp1;
+	delete smiCore;
+	delete cpm_mat;
+	delete smiDD;
+	delete origmat;
 
+	free( dobj) ;
+	free( mrow) ;
+	free( mcol) ;
 }
 
 void ModelBug()
@@ -1712,7 +1761,12 @@ void ModelBug()
 	printf("Optimal value: %g\n",osiStoch->getObjValue());
 
 	myAssert(__FILE__,__LINE__,osiStoch->getObjValue()== 0.5);
-
+	
+	delete smiModel;
+	delete osiCore;
+	
+	delete rlo0;
+	delete rlo1;
 }
 
 void SmpsBug()
@@ -1749,7 +1803,7 @@ void SmpsBug()
 	printf("Optimal value: %g\n",osiStoch->getObjValue());
 	myAssert(__FILE__,__LINE__,osiStoch->getObjValue()== 0.5);
 
-
+	delete clp;
 }
 
 
@@ -1782,6 +1836,8 @@ int main()
 	testingMessage("Read SMPS version of simple model Bug");
 	SmpsBug();
 
+	SmiCoreCombineReplace::ClearInstance();
+	SmiCoreCombineAdd::ClearInstance();
 
 	testingMessage( "*** Done! *** \n");
 

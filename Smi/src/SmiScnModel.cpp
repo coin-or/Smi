@@ -80,6 +80,7 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 		branch = 0;
 
 		// generate root node
+		//TODO: tnode is currently not cleared by the SmiScenarioTree destructor !!! memory leak!!
 		SmiNodeData *node = core->getNode(0);
 		SmiScnNode *tnode = new SmiScnNode(node);
 		node_vec.push_back(tnode);
@@ -106,6 +107,7 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 			v_dclo,v_dcup,v_dobj,v_drlo,v_drup);
 		node->setCoreCombineRule(r);
 		// generate new tree node
+		//TODO: tnode is currently not cleared by the SmiScenarioTree destructor !!! memory leak!!
 		SmiScnNode *tnode = new SmiScnNode(node);
 		node_vec.push_back(tnode);
 
@@ -211,13 +213,20 @@ SmiScnModel::loadOsiSolverData()
 {
 	osiStoch_->reset();
 
+	delete[] dclo_;
+	delete[] dcup_;
+	delete[] dobj_;
+	delete[] drlo_;
+	delete[] drup_;
+	delete matrix_;
+
 	// initialize arrays
 	this->dclo_ = new double[this->ncol_];
 	this->dcup_ = new double[this->ncol_];
 	this->dobj_ = new double[this->ncol_];
 	this->drlo_ = new double[this->nrow_];
 	this->drup_ = new double[this->nrow_];
-
+	
 	// initialize row-ordered matrix arrays
 	this->dels_ = new double[this->nels_];
 	this->indx_ = new int[this->nels_];
@@ -552,6 +561,8 @@ SmiScnModel::readSmps(const char *c, SmiCoreCombineRule *r)
 	}
 
 	delete smiSmpsIO;
+	
+	core_ = smiCore;
 	return 0;
 }
 

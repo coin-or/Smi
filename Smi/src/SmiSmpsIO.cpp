@@ -87,7 +87,8 @@ SmiSmpsIO::readTimeFile(SmiScnModel *smi, const char *c, const char *ext)
 		
 			cstag_ = new int[this->getNumCols()];
 			rstag_ = new int[this->getNumRows()];
-			periodMap_.insert(make_pair(smpsCardReader_->periodName(),nstag_));
+			std::string SunStudioNeedsThis = smpsCardReader_->periodName() ;
+			periodMap_.insert(make_pair(SunStudioNeedsThis,nstag_));
 		}
 		else
 			return NULL;
@@ -104,7 +105,8 @@ SmiSmpsIO::readTimeFile(SmiScnModel *smi, const char *c, const char *ext)
 				colEnd = this->columnIndex(smpsCardReader_->columnName());
 				rowEnd = this->rowIndex(smpsCardReader_->rowName());
 				
-				periodMap_.insert(make_pair(smpsCardReader_->periodName(),nstag_+1));
+				std::string SunStudioNeedsThis = smpsCardReader_->periodName() ;
+				periodMap_.insert(make_pair(SunStudioNeedsThis,nstag_+1));
 				
 				int i;
 				for(i=colStart;i<colEnd;++i)
@@ -356,7 +358,8 @@ SmiSmpsIO::readStochFile(SmiScnModel *smi,SmiCoreData *core, const char *c, cons
 
 					}
 
-					scenarioMap_.insert(make_pair(smpsCardReader_->scenarioNew(),scen++));
+					std::string SunStudioNeedsThis = smpsCardReader_->scenarioNew() ;
+					scenarioMap_.insert(make_pair(SunStudioNeedsThis,scen++));
 					prob = smpsCardReader_->value();
 					if (!strncmp(smpsCardReader_->scenarioAnc(),"ROOT",4))
 						anc = 0;

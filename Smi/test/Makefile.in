@@ -156,7 +156,8 @@ LIBEXT = @LIBEXT@
 LIBOBJS = @LIBOBJS@
 
 # List additional libraries
-LIBS = @LIBS@ $(ADDLIBS)
+LIBS = @LIBS@ $(ADDLIBS) `cat \
+	$(COINUTILSOBJDIR)/coinutils_addlibs.txt`
 LIBTOOL = @LIBTOOL@
 LIBTOOLM4 = @LIBTOOLM4@
 LN_S = @LN_S@

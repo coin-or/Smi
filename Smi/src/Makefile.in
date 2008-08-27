@@ -64,8 +64,9 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includecoindir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libSmi_la_LIBADD =
-am_libSmi_la_OBJECTS = SmiCoreCombineRule.lo SmiScnData.lo \
-	SmiScnModel.lo SmiMessage.lo SmiSmpsIO.lo
+am_libSmi_la_OBJECTS = SmiCoreCombineRule.lo \
+	SmiDiscreteDistribution.lo SmiScnData.lo SmiScnModel.lo \
+	SmiMessage.lo SmiSmpsIO.lo
 libSmi_la_OBJECTS = $(am_libSmi_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -272,7 +273,7 @@ lib_LTLIBRARIES = libSmi.la
 # List all source files for this library, including headers
 libSmi_la_SOURCES = \
 	SmiCoreCombineRule.cpp SmiCoreCombineRule.hpp \
-	SmiDiscreteDistribution.hpp \
+	SmiDiscreteDistribution.cpp SmiDiscreteDistribution.hpp \
 	SmiLinearData.hpp \
 	SmiScenarioTree.hpp \
 	SmiScnData.cpp SmiScnData.hpp \
@@ -390,6 +391,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SmiCoreCombineRule.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SmiDiscreteDistribution.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SmiMessage.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SmiScnData.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SmiScnModel.Plo@am__quote@
