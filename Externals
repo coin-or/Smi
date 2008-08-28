@@ -1,8 +1,8 @@
 BuildTools      https://projects.coin-or.org/svn/BuildTools/stable/0.5
 CoinUtils       https://projects.coin-or.org/svn/CoinUtils/stable/2.3/CoinUtils
-Cbc             https://projects.coin-or.org/svn/Cbc/stable/2.1/Cbc
-Cgl             https://projects.coin-or.org/svn/Cgl/stable/0.52/Cgl
+Cbc             https://projects.coin-or.org/svn/Cbc/stable/2.2/Cbc
+Cgl             https://projects.coin-or.org/svn/Cgl/stable/0.53/Cgl
 Clp             https://projects.coin-or.org/svn/Clp/stable/1.8/Clp
 FlopCpp         https://projects.coin-or.org/svn/FlopC++/stable/1.0/FlopCpp
-Osi             https://projects.coin-or.org/svn/Osi/stable/0.98/Osi
+Osi             https://projects.coin-or.org/svn/Osi/stable/0.99/Osi
 
