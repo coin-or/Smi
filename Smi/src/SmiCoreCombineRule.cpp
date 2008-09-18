@@ -26,9 +26,9 @@ void SmiCoreCombineReplace::ClearInstance()
 }
 
 CoinPackedVector *  SmiCoreCombineReplace::Process(CoinPackedVector *cr,CoinPackedVector *nr, char *type)
-{	
-	
-	
+{
+
+
 	CoinPackedVector *newrow=NULL;
 
 	if (!cr && nr)
@@ -41,18 +41,18 @@ CoinPackedVector *  SmiCoreCombineReplace::Process(CoinPackedVector *cr,CoinPack
 		newrow = new CoinPackedVector(*cr);
 	}
 
-	
+
 	if (cr && nr)
 	{
 		// merge using denseVector
 
 		// get max entries
 		int maxentries = CoinMax(cr->getMaxIndex(),nr->getMaxIndex());
-		
+
 		double* dense = cr->denseVector(maxentries+1);
 		double* elt_nr = nr->getElements();
 		int* ind_nr = nr->getIndices();
-		
+
 		int j;
 
 			for (j=0; j<nr->getNumElements(); ++j)
@@ -74,34 +74,35 @@ CoinPackedVector *  SmiCoreCombineReplace::Process(CoinPackedVector *cr,CoinPack
 
 	return newrow;
 
-	
+
 }
 
 void SmiCoreCombineReplace::Process(double *d, int o, const CoinPackedVector &cpv, char *type)
 {
 	const double *cd = cpv.getElements();
 	const int *ci = cpv.getIndices();
-	
-	for (int j=0; j < cpv.getNumElements(); ++j) 
+
+	for (int j=0; j < cpv.getNumElements(); ++j)
 		d[ci[j]-o] = cd[j];
 
 }
 void SmiCoreCombineReplace::Process(double *d, int o, const int len, const int *ci, const double *cd, char *type)
 {
-	for (int j=0; j < len; ++j) 
+	for (int j=0; j < len; ++j)
 		d[ci[j]-o] = cd[j];
 
 }
-int SmiCoreCombineReplace::Process(vector<double> *dr,CoinPackedVector *cpv,double *dels,int *indx)
+int SmiCoreCombineReplace::Process(double *dr,const int dr_len,CoinPackedVector *cpv,double *dels,int *indx)
 {
 
 	int numels=0;
 	double *cpv_els=cpv->getElements();
 	int *cpv_ind=cpv->getIndices();
 
-	for (int j=0; j<(int)dr->size(); ++j)
+//	for (int j=0; j<(int)dr->size(); ++j)
+	for (int j=0; j<dr_len; ++j)
 	{
-		dels[numels] = (*dr)[j];
+		dels[numels] = dr[j];
 		if (*cpv_ind == j)
 		{
 			dels[numels] = *cpv_els;
@@ -116,17 +117,18 @@ int SmiCoreCombineReplace::Process(vector<double> *dr,CoinPackedVector *cpv,doub
 	}
 	return numels;
 }
-int SmiCoreCombineReplace::Process(vector<double> *dr,const int nels, const int* cpv_ind,const double *cpv_els,double *dels,int *indx)
+int SmiCoreCombineReplace::Process(double *dr,const int dr_len,const int nels, const int* cpv_ind,const double *cpv_els,double *dels,int *indx)
 {
 
 	int numels=0;
 
 	for (int i=0; i<nels; i++)
-		(*dr)[cpv_ind[i]] = cpv_els[i];
+		dr[cpv_ind[i]] = cpv_els[i];
 
-	for (int j=0; j<(int)dr->size(); ++j)
+	//for (int j=0; j<(int)dr->size(); ++j)
+	for (int j=0; j<dr_len; ++j)
 	{
-		dels[numels] = (*dr)[j];
+		dels[numels] = dr[j];
 		if (dels[numels])
 		{
 			indx[numels]=j;
@@ -170,7 +172,7 @@ CoinPackedVector *SmiCoreCombineAdd::Process(CoinPackedVector *cr,CoinPackedVect
 		newrow = new CoinPackedVector(*cr);
 	}
 
-	
+
 	if (cr && nr)
 	{
 		//newrow = new CoinPackedVector(*cr + *nr);
@@ -178,11 +180,11 @@ CoinPackedVector *SmiCoreCombineAdd::Process(CoinPackedVector *cr,CoinPackedVect
 
 		// get max entries
 		int maxentries = CoinMax(cr->getMaxIndex(),nr->getMaxIndex());
-		
+
 		double* dense = cr->denseVector(maxentries+1);
 		double* elt_nr = nr->getElements();
 		int* ind_nr = nr->getIndices();
-		
+
 		int j;
 
 			for (j=0; j<nr->getNumElements(); ++j)
@@ -209,28 +211,29 @@ void SmiCoreCombineAdd::Process(double *d1, int o1, const CoinPackedVector &cpv2
 {
 	const double *cd = cpv2.getElements();
 	const int *ci = cpv2.getIndices();
-	
-	for (int j=0; j < cpv2.getNumElements(); ++j) 
+
+	for (int j=0; j < cpv2.getNumElements(); ++j)
 		d1[ci[j]-o1] += cd[j];
 
 }
 
 void SmiCoreCombineAdd::Process(double *d, int o, const int len, const int *ci, const double *cd, char *type)
 {
-	for (int j=0; j < len; ++j) 
+	for (int j=0; j < len; ++j)
 		d[ci[j]-o] += cd[j];
 
 }
-int SmiCoreCombineAdd::Process(vector<double> *dr,CoinPackedVector *cpv,double *dels,int *indx)
+int SmiCoreCombineAdd::Process(double *dr,const int dr_len,CoinPackedVector *cpv,double *dels,int *indx)
 {
 
 	int numels=0;
 	double *cpv_els=cpv->getElements();
 	int *cpv_ind=cpv->getIndices();
 
-	for (int j=0; j<(int)dr->size(); ++j)
+	//for (int j=0; j<(int)dr->size(); ++j)
+	for (int j=0; j<dr_len; ++j)
 	{
-		dels[numels] = (*dr)[j];
+		dels[numels] = dr[j];
 		if (*cpv_ind == j)
 		{
 			dels[numels] += *cpv_els;
@@ -245,18 +248,19 @@ int SmiCoreCombineAdd::Process(vector<double> *dr,CoinPackedVector *cpv,double *
 	}
 	return numels;
 }
-int SmiCoreCombineAdd::Process(vector<double> *dr,const int nels, const int *cpv_ind, const double *cpv_els,double *dels,int *indx)
+int SmiCoreCombineAdd::Process(double *dr,const int dr_len,const int nels, const int *cpv_ind, const double *cpv_els,double *dels,int *indx)
 {
 
 	int numels=0;
 
-	
-	for (int i=0; i<nels; i++)
-		(*dr)[cpv_ind[i]] += cpv_els[i];
 
-	for (int j=0; j<(int)dr->size(); ++j)
+	for (int i=0; i<nels; i++)
+		dr[cpv_ind[i]] += cpv_els[i];
+
+	//for (int j=0; j<(int)dr->size(); ++j)
+	for (int j=0; j<dr_len; ++j)
 	{
-		dels[numels] = (*dr)[j];
+		dels[numels] = dr[j];
 		if (dels[numels])
 		{
 			indx[numels]=j;

@@ -31,6 +31,8 @@ Smi/examples/investment.cpp -text
 Smi/examples/stoch.cpp -text
 Smi/flopcpp_examples/investment/investment.cpp -text
 Smi/inc/config_smi.h.in -text
+Smi/src/.cproject -text
+Smi/src/.project -text
 Smi/src/Makefile.am -text
 Smi/src/Makefile.in -text
 Smi/src/SmiDiscreteDistribution.cpp -text

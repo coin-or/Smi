@@ -226,7 +226,7 @@ SmiScnModel::loadOsiSolverData()
 	this->dobj_ = new double[this->ncol_];
 	this->drlo_ = new double[this->nrow_];
 	this->drup_ = new double[this->nrow_];
-	
+
 	// initialize row-ordered matrix arrays
 	this->dels_ = new double[this->nels_];
 	this->indx_ = new int[this->nels_];
@@ -317,7 +317,7 @@ SmiScnModel::addNode(SmiScnNode *tnode)
 			int rowNumEls=0;
 			if (node->getRowLength(i))
 			{
-				vector<double> *denseCoreRow = cnode->getDenseRow(i);
+				double *denseCoreRow = cnode->getDenseRow(i);
 				rowNumEls=node->combineWithDenseCoreRow(denseCoreRow,node->getRowLength(i),node->getRowIndices(i),node->getRowElements(i),dels_+rowStart,indx_+rowStart);
 			}
 			else
@@ -561,7 +561,7 @@ SmiScnModel::readSmps(const char *c, SmiCoreCombineRule *r)
 	}
 
 	delete smiSmpsIO;
-	
+
 	core_ = smiCore;
 	return 0;
 }

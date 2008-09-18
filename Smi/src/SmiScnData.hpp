@@ -32,7 +32,7 @@ class SmiNodeData
 {
 public:
 	typedef map<int,CoinPackedVector *> SmiRowMap;
-	typedef map<int,vector<double> *> SmiDenseRowMap;
+	typedef map<int,double *> SmiDenseRowMap;
 	void setCoreNode();
 	/*
 	CoinPackedVector * getRow(int i) {
@@ -40,7 +40,7 @@ public:
 		if (r!=rowMap.end()) return r->second;
 		else return NULL;}
 	*/
-	vector<double> * getDenseRow(int i);
+	double * getDenseRow(int i);
 
 	inline SmiCoreData * getCore() { return core_;}
 	inline int getStage() { return stg_;}
@@ -106,8 +106,8 @@ public:
 
 
 	CoinPackedVector * combineWithCoreRow(CoinPackedVector *cr, CoinPackedVector *nr);
-	int combineWithDenseCoreRow(vector<double> *dr,CoinPackedVector *cpv,double *dels,int *indx);
-	int combineWithDenseCoreRow(vector<double> *dr,const int nels,const int *inds, const double *dels, double *dest_dels,int *dest_indx);
+	int combineWithDenseCoreRow(double *dr,CoinPackedVector *cpv,double *dels,int *indx);
+	int combineWithDenseCoreRow(double *dr,const int nels,const int *inds, const double *dels, double *dest_dels,int *dest_indx);
 
 	SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 				 const CoinPackedMatrix *const matrix,

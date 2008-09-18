@@ -4,7 +4,7 @@
 // SmiCoreCombineRule.hpp: interface for the SmiCoreCombineRule classes.
 //
 //
-// Alan King 
+// Alan King
 // 9 March 2004
 //////////////////////////////////////////////////////////////////////
 
@@ -14,7 +14,7 @@
 #include "CoinPragma.hpp"
 #include "CoinPackedVector.hpp"
 #include <string>
-#include <vector>
+//#include <vector>
 using namespace std;
 
 /** This deals with combining Core and Stochastic data.
@@ -25,7 +25,7 @@ using namespace std;
 	So, in a sense, the stochastic data is really a "diff" between
 	the scenario and the core data. This class specifies how
 	to perform the "undiff", that is, how to combine core
-	and stochastic data. 
+	and stochastic data.
 
 	And of course, a complete implementation specifies the
 	"diff" part as well.  Now during a fit of original confusion
@@ -33,20 +33,20 @@ using namespace std;
 	default combine rule "replace", which has a rather special
 	"diff", but we've learned to live with it.
 
-	There only needs to be one of these classes. so they're 
+	There only needs to be one of these classes. so they're
 	singletons.
 	*/
-class SmiCoreCombineRule  
+class SmiCoreCombineRule
 {
 public:
   /**@name Virtual Functions: Process and Diff */
   //@{
-  /// Process 
+  /// Process
 	virtual void Process(double *d1, int o1, const CoinPackedVector &cpv2, char *type=0)=0;
 	virtual void Process(double *d1, int o1, const int len, const int* inds, const double *dels, char *type=0)=0;
 	virtual CoinPackedVector * Process(CoinPackedVector *cpv1, CoinPackedVector *cpv2, char *type=0)=0;
-	virtual int Process(vector<double> *dr,CoinPackedVector *cpv,double *dels,int *indx)=0;
-	virtual int Process(vector<double> *dr,const int cpv_nels,const int* cpv_ind,const double *cpv_els,double *dels,int *indx)=0;
+	virtual int Process(double *dr,const int dr_len,CoinPackedVector *cpv,double *dels,int *indx)=0;
+	virtual int Process(double *dr,const int dr_len,const int cpv_nels,const int* cpv_ind,const double *cpv_els,double *dels,int *indx)=0;
 	virtual ~SmiCoreCombineRule(){}
 };
 
@@ -62,8 +62,8 @@ public:
 	virtual void Process(double *d1, int o1, const CoinPackedVector &cpv2, char *type=0);
 	virtual void Process(double *d1, int o1, const int len, const int* inds, const double *dels, char *type=0);
 	virtual CoinPackedVector * Process(CoinPackedVector *cpv1, CoinPackedVector *cpv2, char *type=0);
-	virtual int Process(vector<double> *dr,CoinPackedVector *cpv,double *dels,int *indx);
-	virtual int Process(vector<double> *dr,const int nels, const int* cpv_ind,const double *cpv_els,double *dels,int *indx);
+	virtual int Process(double *dr,const int dr_len,CoinPackedVector *cpv,double *dels,int *indx);
+	virtual int Process(double *dr,const int dr_len,const int nels, const int* cpv_ind,const double *cpv_els,double *dels,int *indx);
 protected:
 	SmiCoreCombineReplace(){}
 private:
@@ -82,8 +82,8 @@ public:
 	virtual void Process(double *d1, int o1, const CoinPackedVector &cpv2, char* type=0);
 	virtual void Process(double *d1, int o1, const int len, const int* inds, const double *dels, char *type=0);
 	virtual CoinPackedVector * Process(CoinPackedVector *cpv1, CoinPackedVector *cpv2, char* type=0);
-	virtual int Process(vector<double> *dr,CoinPackedVector *cpv,double *dels,int *indx);
-	virtual int Process(vector<double> *dr,const int nels, const int* cpv_ind,const double *cpv_els,double *dels,int *indx);
+	virtual int Process(double *dr,const int dr_len,CoinPackedVector *cpv,double *dels,int *indx);
+	virtual int Process(double *dr,const int dr_len,const int nels, const int* cpv_ind,const double *cpv_els,double *dels,int *indx);
 protected:
 	SmiCoreCombineAdd(){}
 private:
