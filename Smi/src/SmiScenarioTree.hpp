@@ -127,11 +127,10 @@ public:
 
    /// Destructor 
    
-   ~SmiTreeNode()
+   ~SmiTreeNode<T>()
    {
 	   delete sibling_;
 	   delete child_;
-//	   delete ptr_ ;
    }
  
    //@}

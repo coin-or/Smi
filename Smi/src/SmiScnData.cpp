@@ -2,7 +2,7 @@
 #include "CoinHelperFunctions.hpp"
 #include "OsiSolverInterface.hpp"
 #include "CoinPackedMatrix.hpp"
-
+#include <iostream>
 #include <vector>
 
 using namespace std;
@@ -268,7 +268,7 @@ SmiCoreData::~SmiCoreData()
 	delete [] cdclo_;
 	delete [] cdcup_;
 	delete [] cdobj_;
-	for (unsigned int i=0; i<nodes_.size(); ++i)
+	for (unsigned int i=1; i<nodes_.size(); ++i)
 	  delete nodes_[i];
 
 }
@@ -491,13 +491,13 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 
 }
 
-int SmiNodeData::combineWithDenseCoreRow(vector<double> *dr,const int nels,const int *inds, const double *dels, double *dest_dels,int *dest_indx)
+int SmiNodeData::combineWithDenseCoreRow(double *dr,const int nels,const int *inds, const double *dels, double *dest_dels,int *dest_indx)
 {
-	return this->getCoreCombineRule()->Process(dr,nels,inds,dels,dest_dels,dest_indx);
+	return this->getCoreCombineRule()->Process(dr,this->getCore()->getNumCols(), nels,inds,dels,dest_dels,dest_indx);
 }
-int SmiNodeData::combineWithDenseCoreRow(vector<double> *dr,CoinPackedVector *cpv,double *dels,int *indx)
+int SmiNodeData::combineWithDenseCoreRow(double *dr,CoinPackedVector *cpv,double *dels,int *indx)
 {
-	return getCoreCombineRule()->Process(dr,cpv,dels,indx);
+	return getCoreCombineRule()->Process(dr,this->getCore()->getNumCols(),cpv,dels,indx);
 }
 
 CoinPackedVector * SmiNodeData::combineWithCoreRow(CoinPackedVector *cr, CoinPackedVector *nr)
@@ -552,27 +552,31 @@ SmiNodeData::~SmiNodeData()
 {
 	SmiRowMap::iterator iRowMap;
 
-	for (iRowMap=rowMap.begin(); iRowMap!=rowMap.end(); ++iRowMap)
-	  delete iRowMap->second;
-	
+//	for (iRowMap=rowMap.begin(); iRowMap!=rowMap.end(); ++iRowMap)
+//	  iRowMap->second;
+
 	SmiDenseRowMap::iterator idRowMap;
 	for (idRowMap=dRowMap.begin(); idRowMap!=dRowMap.end(); ++idRowMap)
-	  delete idRowMap->second;
+	  delete[] idRowMap->second;
 
 	deleteMemory();
 }
 
-vector<double> *
+double *
 SmiNodeData::getDenseRow(int i) {
 		if ( dRowMap[i] == NULL )
 		{
 			const int  len = this->getRowLength(i);
 			const int *ind = this->getRowIndices(i);
 			const double *els = this->getRowElements(i);
-			CoinPackedVector cpv_row(len,ind,els);
-			double * dbeg=cpv_row.denseVector(this->getCore()->getNumCols());
-			double * dend=dbeg+this->getCore()->getNumCols();
-			dRowMap[i] = new vector<double>(dbeg,dend);
+
+			int denseSize=this->getCore()->getNumCols();
+			double * dv = new double[denseSize];
+			CoinFillN(dv, denseSize, 0.0);
+			for (int j = 0; j < len; ++j)
+			    dv[ind[j]] = els[j];
+
+			dRowMap[i] = dv;
 		}
 		return dRowMap[i];
 }
@@ -591,7 +595,19 @@ SmiNodeData::assignMemory()
 void
 SmiNodeData::deleteMemory()
 {
-	free(this->dels_);
-	free(this->inds_);
-	free(this->strt_);
+	if (this->dels_)
+	{
+		free(this->dels_);
+		this->dels_=NULL;
+	}
+	if (this->inds_)
+	{
+		free(this->inds_);
+		this->inds_=NULL;
+	}
+	if (this->strt_)
+	{
+		free(this->strt_);
+		this->strt_=NULL;
+	}
 }

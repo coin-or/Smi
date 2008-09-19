@@ -186,7 +186,7 @@ public:
 	~SmiScnModel();
 
 	void addNode(SmiScnNode *node);
-
+	void deleteNode(SmiScnNode *tnode);
 private:
 	CoinMessageHandler *handler_;
 	SmiMessage *messages_;
@@ -239,7 +239,14 @@ public:
         // So can delete root node
         inline void zapNode() {node_=NULL;}
 
-        ~SmiScnNode(){delete node_;}
+        ~SmiScnNode()
+        {
+        	if (node_)
+        	{
+        		delete node_;
+        		node_= NULL;
+        	}
+        }
 
 private:
 	inline void setRowOffset(int r) {roffset_ = r;}
@@ -250,7 +257,7 @@ private:
 	inline void setProb(double p){prob_=p;}
 	inline void setModelProb(double p){mdl_prob_=p;}
 	inline SmiNodeData *getNode() {return node_;}
-	SmiScnNode(SmiNodeData *&node)	{node_=node;prob_=0;parent_=NULL;}
+	SmiScnNode(SmiNodeData *&node)	{node_=node;prob_=0;parent_=NULL;scen_=-1;}
 
 private:
 	SmiNodeData *node_;
@@ -277,5 +284,19 @@ private:
 
 };
 
+// function object for deleteNode loop
+class SmiScnModelDeleteNode{
+public:
+	void operator() (SmiScnNode *node)
+	{
+		s_->deleteNode(node);
+	}
+
+	SmiScnModelDeleteNode(SmiScnModel *s) { s_ = s;}
+private:
+	SmiScnModel *s_;
+
+
+};
 
 #endif //#define SmiScnModel_HPP
