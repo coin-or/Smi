@@ -268,7 +268,7 @@ SmiCoreData::~SmiCoreData()
 	delete [] cdclo_;
 	delete [] cdcup_;
 	delete [] cdobj_;
-	for (unsigned int i=0; i<nodes_.size(); ++i)
+	for (unsigned int i=1; i<nodes_.size(); ++i)
 	  delete nodes_[i];
 
 }
@@ -552,12 +552,12 @@ SmiNodeData::~SmiNodeData()
 {
 	SmiRowMap::iterator iRowMap;
 
-	for (iRowMap=rowMap.begin(); iRowMap!=rowMap.end(); ++iRowMap)
-	  delete iRowMap->second;
+//	for (iRowMap=rowMap.begin(); iRowMap!=rowMap.end(); ++iRowMap)
+//	  iRowMap->second;
 
 	SmiDenseRowMap::iterator idRowMap;
 	for (idRowMap=dRowMap.begin(); idRowMap!=dRowMap.end(); ++idRowMap)
-	  delete idRowMap->second;
+	  delete[] idRowMap->second;
 
 	deleteMemory();
 }
@@ -595,7 +595,19 @@ SmiNodeData::assignMemory()
 void
 SmiNodeData::deleteMemory()
 {
-	free(this->dels_);
-	free(this->inds_);
-	free(this->strt_);
+	if (this->dels_)
+	{
+		free(this->dels_);
+		this->dels_=NULL;
+	}
+	if (this->inds_)
+	{
+		free(this->inds_);
+		this->inds_=NULL;
+	}
+	if (this->strt_)
+	{
+		free(this->strt_);
+		this->strt_=NULL;
+	}
 }

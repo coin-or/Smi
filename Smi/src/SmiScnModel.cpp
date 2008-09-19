@@ -28,6 +28,9 @@ SmiScnNode::getCoreRowIndex(int i){
 
 SmiScnModel::~SmiScnModel()
 {
+	// loop to deleteNodes
+	for_each(smiTree_.treeBegin(),smiTree_.treeEnd(),SmiScnModelDeleteNode(this));
+
 	if (osiStoch_)
 		delete osiStoch_;
 
@@ -117,7 +120,7 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 	}
 
 
-	int scen = smiTree_.addPathtoLeaf(anc,branch,node_vec);
+	SmiScenarioIndex scen = smiTree_.addPathtoLeaf(anc,branch,node_vec);
 
 	// add probability to all scenario nodes in path
 	SmiTreeNode<SmiScnNode *> *child = smiTree_.getLeaf(scen);
@@ -129,6 +132,8 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 		SmiScnNode *tnode = child->getDataPtr();
 		tnode->addProb(prob);
 		tnode->setParent(parent->getDataPtr());
+		if (tnode->getScenarioIndex()==-1)
+			tnode->setScenarioIndex(scen);
 		child = parent;
 		parent = child->getParent();
 	}
@@ -253,7 +258,12 @@ SmiScnModel::loadOsiSolverData()
 }
 
 
-
+void
+SmiScnModel::deleteNode(SmiScnNode *tnode)
+{
+	//cout << "Deleting node from scenario " << tnode->getScenarioIndex() << " Stage " <<  tnode->getNode()->getStage() << endl;
+	delete tnode;
+}
 
 void
 SmiScnModel::addNode(SmiScnNode *tnode)
