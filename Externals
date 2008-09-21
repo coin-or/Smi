@@ -1,8 +1,7 @@
-BuildTools      https://projects.coin-or.org/svn/BuildTools/stable/0.5
-CoinUtils       https://projects.coin-or.org/svn/CoinUtils/stable/2.3/CoinUtils
-Cbc             https://projects.coin-or.org/svn/Cbc/stable/2.2/Cbc
-Cgl             https://projects.coin-or.org/svn/Cgl/stable/0.53/Cgl
-Clp             https://projects.coin-or.org/svn/Clp/stable/1.8/Clp
-FlopCpp         https://projects.coin-or.org/svn/FlopC++/stable/1.0/FlopCpp
-Osi             https://projects.coin-or.org/svn/Osi/stable/0.99/Osi
-
+BuildTools  https://projects.coin-or.org/svn/BuildTools/releases/0.5.26
+CoinUtils  https://projects.coin-or.org/svn/CoinUtils/releases/2.3.3/CoinUtils
+Cbc  https://projects.coin-or.org/svn/Cbc/releases/2.2.1/Cbc
+Cgl  https://projects.coin-or.org/svn/Cgl/releases/0.53.1/Cgl
+Clp  https://projects.coin-or.org/svn/Clp/releases/1.8.2/Clp
+FlopCpp  https://projects.coin-or.org/svn/FlopC++/releases/1.0.5/FlopCpp
+Osi  https://projects.coin-or.org/svn/Osi/releases/0.99.1/Osi
