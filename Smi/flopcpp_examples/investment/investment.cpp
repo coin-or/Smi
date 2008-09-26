@@ -32,8 +32,8 @@ using namespace flopc;
 class StageNodeBase {
 public:
 
-		StageNodeBase *ptParent;          ///< pointer to parent node
-		vector<StageNodeBase *> children; ///< pointers to children of this node
+		StageNodeBase *ptParent;      ///< pointer to parent node
+		StageNodeBase *ptChild;       ///< pointers to children of this node
 		int nodeNmb;                  ///< node number - used only for reporting
 		double prob;                  ///< probability (unconditional) of the node
 		MP_expression objFunction;    ///< objective function at this node
@@ -50,11 +50,11 @@ public:
 
 
 		StageNodeBase(StageNodeBase *ptPred, const int nodeN, const double condProb)
-		:  ptParent(ptPred), nodeNmb(nodeN), prob(condProb)
+		:  ptParent(ptPred), nodeNmb(nodeN), prob(condProb),ptChild(NULL)
 		{
 			if (ptParent != NULL) {
 				prob *= ptParent->prob;             // Compute the total probability
-				ptParent->children.push_back(this); // Register with the parent
+				ptParent->ptChild = this;           // Register with the parent
 			}
 		}
 		virtual ~StageNodeBase() {
@@ -68,17 +68,11 @@ protected:
 		/** This function is protected, as it only makes sense to call it in
 		    the root, to create the complete objective function. **/
 		virtual void make_obj_function_() {
-			assert (children.size() > 0 && "Leaves should never call this function");
+			assert (ptChild != NULL && "Leaves should never call this function");
 			// Create the objective recursively for all descendants of the node
-			for (int i=0; i < (int) children.size(); i++) {
-				children[i]->make_obj_function_();
-			}
-			// No objective at non-leaf nodes, so the objective value at this node
-			// and all its descendants is a sum of obj. values of the children.
-			objFunction = children[0]->objFunction;
-			for (int i=1; i < (int) children.size(); i++) {
-				objFunction = objFunction + children[i]->objFunction;
-			}
+			if (ptChild)
+				ptChild->make_obj_function_();
+			objFunction = ptChild->objFunction;
 		}
 };
 
