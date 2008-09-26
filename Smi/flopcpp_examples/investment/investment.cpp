@@ -34,8 +34,6 @@ public:
 
 		StageNodeBase *ptParent;      ///< pointer to parent node
 		StageNodeBase *ptChild;       ///< pointers to children of this node
-		int nodeNmb;                  ///< node number - used only for reporting
-		double prob;                  ///< probability (unconditional) of the node
 		MP_expression objFunction;    ///< objective function at this node
 
 		/// \name References to variables and constraints
@@ -45,17 +43,15 @@ public:
 		    Without these new objects, we would have to access all the derived
 		    classes independently, cluttering the code. **/
 		///@{
-		vector<VariableRef *> all_variables;     ///< references to all variables
-		vector<MP_constraint *> all_constraints; ///< references to all constraints
+		vector<VariableRef *>   all_variables;     ///< references to all variables
+		vector<MP_constraint *> all_constraints;   ///< references to all constraints
 
 
-		StageNodeBase(StageNodeBase *ptPred, const int nodeN, const double condProb)
-		:  ptParent(ptPred), nodeNmb(nodeN), prob(condProb),ptChild(NULL)
+		StageNodeBase(StageNodeBase *ptPred)
+		:  ptParent(ptPred), ptChild(NULL)
 		{
-			if (ptParent != NULL) {
-				prob *= ptParent->prob;             // Compute the total probability
+			if (ptParent != NULL)
 				ptParent->ptChild = this;           // Register with the parent
-			}
 		}
 		virtual ~StageNodeBase() {
 			for (int a = 0; a < (int) all_variables.size(); a++) {
@@ -86,9 +82,8 @@ protected:
 class StageNode : public StageNodeBase
 {
 	public:
-		StageNode(StageNode *ptPred, const int nmbAssets, const int nodeN,
-		          const double condProb)
-				  : StageNodeBase(ptPred,nodeN,condProb),ASSETS(nmbAssets), x(ASSETS){}
+		StageNode(StageNode *ptPred, const int nmbAssets)
+				  : StageNodeBase(ptPred),ASSETS(nmbAssets), x(ASSETS){}
 
 		/// getParent() function.
 		/** The parent is a base class object.  To access the members ASSETS and x()
@@ -147,7 +142,7 @@ class RootNode : public StageNode {
 		MP_constraint initialBudget; ///< initial budget constraint
 
 		RootNode(const int nmbAssets, const double initWealth)
-		: StageNode(NULL, nmbAssets, 0, 1.0)
+		: StageNode(NULL, nmbAssets)
 		{
 			initialBudget() = sum(ASSETS, x(ASSETS)) == initWealth;
 
@@ -179,9 +174,8 @@ class MidStageNode : public StageNode {
 		    build the OSI object (using the \c attach method), the constraints will
 		    be changed as well - and if the external array is deallocated, the
 		    program will crash on calling the \c attach method! **/
-		MidStageNode(StageNode *ptPred, const int nodeN, const double condProb,
-		             double *ptRetVect)
-		: StageNode(ptPred, ptPred->ASSETS.size(), nodeN, condProb),
+		MidStageNode(StageNode *ptPred, double *ptRetVect)
+		: StageNode(ptPred, ptPred->ASSETS.size()),
 		  Return(ptRetVect, ASSETS)
 		{
 			// This shows the use of MP_index in a formula
@@ -210,9 +204,8 @@ class LeafNode : public StageNode {
 		    i.e. the return values in the constraints are copied from the \a retVect
 		    array to the constraints. This means that the \a retVect array can be
 		    safely changed or deleted afterwards. **/
-		LeafNode(StageNode *ptPred, const int nodeN, const double condProb,
-		         const double *ptRetVect, const double capTg)
-		: StageNode(ptPred, ptPred->ASSETS.size(), nodeN, condProb), Return(ASSETS),
+		LeafNode(StageNode *ptPred, const double *ptRetVect, const double capTg)
+		: StageNode(ptPred, ptPred->ASSETS.size()), Return(ASSETS),
 		  capTarget(capTg)
 		{
 			Return.value(ptRetVect); // Copy values from retVect to Return
@@ -241,7 +234,7 @@ class LeafNode : public StageNode {
 	protected:
 		/// version of \a make_obj_function_() for the leaves - no recursion
 		void make_obj_function_() {
-			objFunction = prob * (1.3 * w() - 1.1 * y());
+			objFunction = 1.3 * w() - 1.1 * y();
 		}
 };
 
@@ -389,11 +382,11 @@ int main()
 	vector<StageNode *> coreNodes(nmbStages);
 	coreNodes[0] = new RootNode(nmbAssets, InitBudget);
 	for (t = 1; t < nmbStages-1; t++) {
-		coreNodes[t] = new MidStageNode(coreNodes[t-1], t, 1.0,
+		coreNodes[t] = new MidStageNode(coreNodes[t-1],
 		                                retData[scenNodeNmb[t]-1]);
 	}
 	assert (t == nmbStages-1 && "t should be nmbStages-1 after the loop");
-	coreNodes[t] = new LeafNode(coreNodes[t-1], t, 1.0, retData[scenNodeNmb[t]-1],
+	coreNodes[t] = new LeafNode(coreNodes[t-1], retData[scenNodeNmb[t]-1],
 	                            CapTarget);
 
 	// create a "shortcut object" for the root
