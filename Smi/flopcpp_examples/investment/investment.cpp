@@ -82,8 +82,23 @@ protected:
 class StageNode : public StageNodeBase
 {
 	public:
+		MP_set ASSETS;                ///< set of assets
+		MP_index a;                   ///< index used in formulas
+		MP_variable x;                ///< the "buy" variable, defined on ASSETS
+		MP_variable wealth;           ///< the wealth at each period
+		MP_constraint wealth_defn;    ///< the equation defining wealth
+
 		StageNode(StageNode *ptPred, const int nmbAssets)
-				  : StageNodeBase(ptPred),ASSETS(nmbAssets), x(ASSETS){}
+				  : StageNodeBase(ptPred),ASSETS(nmbAssets), x(ASSETS)
+		{
+			wealth_defn = sum(ASSETS(a), x(a)) == wealth();
+
+			all_variables.push_back(new VariableRef(wealth()));
+			for (int a = 0; a < nmbAssets; a++) {
+				all_variables.push_back(new VariableRef(x(a)));
+			}
+            all_constraints.push_back(&wealth_defn);
+		}
 
 		/// getParent() function.
 		/** The parent is a base class object.  To access the members ASSETS and x()
@@ -91,11 +106,6 @@ class StageNode : public StageNodeBase
 		StageNode *getParent() {return (StageNode *)ptParent;}
 
 		virtual ~StageNode() {}
-
-
-		MP_set ASSETS;                ///< set of assets
-		MP_index a;                   ///< index used in formulas
-		MP_variable x;                ///< the "buy" variable, defined on ASSETS
 
 		/// A common way to access the balance constraints in the derived classes
 		/** Two of the derived classes have a cash-flow balance constraint with
@@ -116,10 +126,15 @@ class StageNode : public StageNodeBase
 		virtual double get_wealth(const double *variableValues, const int nmbVars) {
 			assert (nmbVars == (int) all_variables.size()
 			        && "Check that we have values of all variables");
-			double wealth = 0;
-			for (int i = 0; i < nmbVars; i++)
-				wealth += variableValues[i];
-			return wealth;
+			double w = 0;
+			for (int i = 0; i < ASSETS.size(); i++)
+			{
+				int j = x(i).getColumn();
+				w += variableValues[j];
+			}
+			assert(w == variableValues[wealth().getColumn()]
+			                                && "Wealth should equal sum of position values.");
+			return variableValues[wealth().getColumn()];
 		}
 
 
@@ -144,11 +159,8 @@ class RootNode : public StageNode {
 		RootNode(const int nmbAssets, const double initWealth)
 		: StageNode(NULL, nmbAssets)
 		{
-			initialBudget() = sum(ASSETS, x(ASSETS)) == initWealth;
+			initialBudget() = wealth() == initWealth;
 
-			for (int a = 0; a < nmbAssets; a++) {
-				all_variables.push_back(new VariableRef(x(a)));
-			}
 			all_constraints.push_back(&initialBudget);
 			balance_constraint = NULL;
 		}
@@ -179,58 +191,31 @@ class MidStageNode : public StageNode {
 		  Return(ptRetVect, ASSETS)
 		{
 			// This shows the use of MP_index in a formula
-			cashFlowBalance = sum(ASSETS(a), getParent()->x(a) * Return(a))
-			                  == sum(ASSETS(a), x(a));
+			cashFlowBalance = sum(ASSETS(a), getParent()->x(a) * Return(a)) == wealth();
 
-			for (int a = 0; a < ASSETS.size(); a++) {
-				all_variables.push_back(new VariableRef(x(a)));
-			}
 			all_constraints.push_back(&cashFlowBalance);
 			balance_constraint = &cashFlowBalance;
 		}
 };
 
 /// This is the class for the leaves, i.e. the last-stage nodes
-class LeafNode : public StageNode {
+class LeafNode : public MidStageNode {
 	public:
 		MP_variable w;              ///< shortage variable
 		MP_variable y;              ///< surplus variable
-		MP_constraint finalBalance; ///< constraint for the final balance
-		MP_data Return;             ///< returns of the assets at this node
-		double capTarget;           ///< the capital target parameter
+		MP_constraint penalty;      ///< equation defining the surplus and shortage
 
 		/// Constructs a \a LeafNode object
-		/** In this case, we use a <em>deep copy</em> for the \c MP_data \a Return,
-		    i.e. the return values in the constraints are copied from the \a retVect
-		    array to the constraints. This means that the \a retVect array can be
-		    safely changed or deleted afterwards. **/
-		LeafNode(StageNode *ptPred, const double *ptRetVect, const double capTg)
-		: StageNode(ptPred, ptPred->ASSETS.size()), Return(ASSETS),
-		  capTarget(capTg)
+		/** A LeafNode is a MidStageNode with a penalty for the capital target. **/
+		LeafNode(StageNode *ptPred, double *ptRetVect, const double capTarget)
+		: MidStageNode(ptPred, ptRetVect)
 		{
-			Return.value(ptRetVect); // Copy values from retVect to Return
-			// This shows a formula without using an additional MP_index
-			finalBalance = sum(ASSETS, getParent()->x(ASSETS) * Return(ASSETS))
-			               + w() - y() == capTarget;
+			penalty = wealth() + w() - y() == capTarget;
 
 			all_variables.push_back(new VariableRef(w()));
 			all_variables.push_back(new VariableRef(y()));
-			all_constraints.push_back(&finalBalance);
-			balance_constraint = &finalBalance;
+			all_constraints.push_back(&penalty);
 		}
-
-		/// get the wealth at the leaf - has to override the default from StageNode
-		double get_wealth() {
-			return -w.level() + y.level() + capTarget;
-		}
-
-		/// In the leaves, the wealth is computed as: -w + y + capTarget
-		double get_wealth(const double *variableValues, const int nmbVars) {
-			assert (nmbVars == (int) all_variables.size()
-			        && "Check that we have values of all variables");
-			return -variableValues[0] + variableValues[1] + capTarget;
-		}
-
 	protected:
 		/// version of \a make_obj_function_() for the leaves - no recursion
 		void make_obj_function_() {
@@ -525,11 +510,12 @@ int main()
 	vector<double> nodeWealth(nmbStages, 0);
 	double objValue = 0.0;
 
-	// Get vectors of variable values and their objective coefficients
-	const double *ptOsiSolution = ptDetEqModel->getColSolution();
-
 	// Compute the wealth at each node, by traversing the tree from leafs up
 	for (SmiScenarioIndex sc = 0; sc < scTree.getNmbScen(); sc ++) {
+		// Get the solution for scenario sc sorted into the original (FlopC++) order:
+		int nmbColsInScenario;
+		double *ptScenarioSolution = stochModel.getColSolution(sc,&nmbColsInScenario);
+
 		// Get the leaf node of scenario sc:
 		SmiScnNode *ptNode = stochModel.getLeafNode(sc);
 		int nodeStage = nmbStages;
@@ -541,20 +527,17 @@ int main()
 
 		// This loop traverses the tree, from the leaf to the root
 		while (ptNode != NULL) {
-			// info about columns of ptNode in the OSI model (ptDetEqModel)
-			int startColInOsi = ptNode->getColStart();
-			int nmbColsInOsi = ptNode->getNumCols();
-
-			// get the wealth, using nodes of the core model
+			// get number of columns in Node
+			int nmbColsInNode = ptNode->getNumCols();
+			// get the wealth from the scenario solution
 			nodeWealth[nodeStage-1]
-				= coreNodes[nodeStage-1]->get_wealth(&(ptOsiSolution[startColInOsi]),
-				                                     nmbColsInOsi);
-
+				= coreNodes[nodeStage-1]->get_wealth(ptScenarioSolution, nmbColsInNode);
 			// Get the parent node (Root will return NULL, stopping the loop)
 			ptNode = ptNode->getParent();
 			nodeStage--;
 		}
 
+		free(ptScenarioSolution);
 		printf (";  wealth:");
 		for (int t = 0; t<nmbStages-1; t++)
 			printf ("%6.2f ->", nodeWealth[t]);
