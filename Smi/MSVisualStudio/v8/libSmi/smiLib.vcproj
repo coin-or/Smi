@@ -43,6 +43,7 @@
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\..\..\Clp\src;..\..\..\..\Osi\src;..\..\..\..\CoinUtils\src;..\..\..\..\BuildTools\headers"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;OSLMSDLL"
+				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
