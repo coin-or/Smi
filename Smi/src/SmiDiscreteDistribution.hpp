@@ -59,7 +59,7 @@ public:
 		this->setCombineWithCoreRule(r);		
 	}
 
-	~SmiDiscreteDistribution();
+	~SmiDiscreteDistribution(){}
 
 private:
 	SmiDiscreteDistribution(){core_=NULL;}
