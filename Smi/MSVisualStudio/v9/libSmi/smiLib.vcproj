@@ -176,6 +176,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\SmiDiscreteDistribution.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\SmiMessage.cpp"
 				>
 			</File>
