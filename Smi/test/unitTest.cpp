@@ -40,6 +40,215 @@ void myAssert(const char * file, const int line, bool c )
 	}
 }
 
+void DecompUnitTest()
+{
+
+
+	OsiClpSolverInterface osi;
+	double INF=osi.getInfinity();
+
+	/* Problem Statement:
+	 *
+	 *    minimize x01 + x02 + x03 + 1/2 E[ x04 + x05 + x06 ]
+	 *
+	 *    subject to:
+	 *      xN =>  0
+	 *      0  <=  x01 + x02 + x03
+	 *      C1 <=  x01 + x02 +              x04 + x05
+	 *      C2 <=      + x02 + x03                x05 + x06
+	 *      C3 <=  x01       + x03          x04 +     + x06
+	 *
+	 *    (C1, C2, C3) = ( 1, 1, 0) wp 1/2
+	 *    (C1, C2, C3) = ( 0, 1, 0) wp 1/2
+	 */
+
+
+	int nCoreRows=4;
+	double dCoreRup[] = { INF, INF, INF, INF };
+
+	int nCoreCols=6;
+	double dCoreClo[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+	double dCoreCup[] = {INF, INF, INF, INF, INF, INF};
+	double dCoreObj[] = {1.0, 1.0, 1.0, 0.5, 0.5, 0.5};
+
+	int iCoreColStarts[] = {0,
+		3,
+		6,
+		9,
+		11,
+		13,
+		15};
+	int iCoreRowIndice[] = {3,1,0,
+		2,1,0,
+		3,2,0,
+		3,1,
+		2,1,
+		3,2};
+	double dCoreMatEntries[] = {1.0, 1.0, 1.0,
+		1.0, 1.0, 1.0,
+		1.0, 1.0, 1.0,
+		1.0, 1.0,
+		1.0, 1.0,
+		1.0, 1.0 };
+	double dCoreRlo[] = { 0.0, 1.0, 1.0, 1.0 };
+
+	int nCoreStages = 2;
+	int iColStages[] = {0,0,0,1,1,1};
+	int iRowStages[] = {0,1,1,1};
+
+	int iBranchStage[] = {1,1};
+
+	int iAncestorScn[] = {0,0};
+	double dProbScn[] = {0.5, 0.5};
+
+	double drlo0[] = {1.0, 1.0, 0.0 };
+	int indices[]  = {1, 2, 3};
+	CoinPackedVector *rlo0 = new CoinPackedVector(3, indices,drlo0);
+	double drlo1[] = {0.0, 1.0, 0.0 };
+	CoinPackedVector *rlo1 = new CoinPackedVector(3, indices,drlo1);
+
+	// generate Core model
+
+	osi.loadProblem(nCoreCols,
+		nCoreRows,iCoreColStarts,iCoreRowIndice,dCoreMatEntries,dCoreClo,
+		dCoreCup,dCoreObj,
+		dCoreRlo,dCoreRup);
+	SmiCoreData *osiCore = new
+		SmiCoreData(&osi,nCoreStages,iColStages,iRowStages);
+
+	// initialize SmiScnModel
+	SmiScnModel *smiModel = new SmiScnModel();
+
+	// Add Scenarios
+	int	is = smiModel->generateScenario(osiCore,NULL,NULL,NULL,NULL,
+		rlo0,NULL,iBranchStage[0],
+		iAncestorScn[0],dProbScn[0]);
+
+	is = smiModel->generateScenario(osiCore,NULL,NULL,NULL,NULL,
+		rlo1,NULL,iBranchStage[1],
+		iAncestorScn[1],dProbScn[1]);
+
+
+	/*
+	 *  set up vector of submodels, one for each scenario
+	 */
+	vector<SmiScnModel *> submodel;
+	for( int jj=0; jj<smiModel->getNumScenarios(); jj++)
+	{
+		submodel.push_back(new SmiScnModel());
+		submodel[jj]->setOsiSolverHandle(new OsiClpSolverInterface());
+	}
+
+
+	// add root node to submodel[0]
+	myAssert(__FILE__,__LINE__,1 == submodel[0]->addNodeToSubmodel(smiModel->getRootNode()) );
+
+	// add leaf node to submodel[0]
+	myAssert(__FILE__,__LINE__,1 == submodel[0]->addNodeToSubmodel(smiModel->getLeafNode(0)) );
+	submodel[is]->setModelProb(1.0);
+
+	vector<SmiScnNode *> vecSub0 = submodel[0]->smiTree_.wholeTree();
+	submodel[1]->setModelProb(1.0);
+
+	myAssert(__FILE__,__LINE__,    !vecSub0[0]->isVirtualNode() );
+	myAssert(__FILE__,__LINE__,     vecSub0[0]->getNumCols() == 3 );
+	myAssert(__FILE__,__LINE__,     vecSub0[0]->getNumRows() == 1 );
+	myAssert(__FILE__,__LINE__,     vecSub0[0]->getProb() == 1.0 );
+
+	myAssert(__FILE__,__LINE__,    !vecSub0[1]->isVirtualNode() );
+	myAssert(__FILE__,__LINE__,     vecSub0[1]->getNumCols() == 3 );
+	myAssert(__FILE__,__LINE__,     vecSub0[1]->getNumRows() == 3 );
+	myAssert(__FILE__,__LINE__,     vecSub0[1]->getProb() == 0.5 );
+
+	// add leaf node to submodel[1]
+	myAssert(__FILE__,__LINE__,2 == submodel[1]->addNodeToSubmodel(smiModel->getLeafNode(1)) );
+	submodel[1]->setModelProb(1.0);
+
+	vector<SmiScnNode *> vecSub1 = submodel[1]->smiTree_.wholeTree();
+
+	myAssert(__FILE__,__LINE__,     vecSub1[0]->isVirtualNode() );
+	myAssert(__FILE__,__LINE__,     vecSub1[0]->getNumCols() == 3 );
+
+	myAssert(__FILE__,__LINE__,    !vecSub1[1]->isVirtualNode() );
+	myAssert(__FILE__,__LINE__,     vecSub1[1]->getNumCols() == 3 );
+	myAssert(__FILE__,__LINE__,     vecSub1[1]->getNumRows() == 3 );
+	myAssert(__FILE__,__LINE__,     vecSub1[1]->getProb() == 0.5 );
+
+	/*
+	 * set up vector of OSI models, one for each submodel
+	 */
+	vector<OsiSolverInterface *> osiSubmodel;
+	osiSubmodel.reserve(submodel.size());
+
+	myAssert(__FILE__,__LINE__,     osiSubmodel[0]=submodel[0]->loadOsiSolverData());
+	myAssert(__FILE__,__LINE__,     osiSubmodel[1]=submodel[1]->loadOsiSolverData());
+
+
+	myAssert(__FILE__,__LINE__,    !vecSub0[0]->isVirtualNode() );
+	myAssert(__FILE__,__LINE__, vecSub0[0]->getNumCols() == 3 );
+	myAssert(__FILE__,__LINE__, vecSub0[0]->getNumRows() == 1 );
+	myAssert(__FILE__,__LINE__, vecSub0[0]->getColStart() == 0 );
+	myAssert(__FILE__,__LINE__,     vecSub0[0]->getRowStart() == 0 );
+	myAssert(__FILE__,__LINE__,     vecSub0[0]->getProb() == 1.0 );
+
+	myAssert(__FILE__,__LINE__,    !vecSub0[1]->isVirtualNode() );
+	myAssert(__FILE__,__LINE__,     vecSub0[1]->getNumCols() == 3 );
+	myAssert(__FILE__,__LINE__,     vecSub0[1]->getNumRows() == 3 );
+	myAssert(__FILE__,__LINE__,     vecSub0[1]->getColStart() == 3 );
+	myAssert(__FILE__,__LINE__,     vecSub0[1]->getRowStart() == 1 );
+	myAssert(__FILE__,__LINE__,     vecSub0[1]->getProb() == 0.5 );
+
+
+
+	myAssert(__FILE__,__LINE__,     vecSub1[0]->isVirtualNode() );
+	myAssert(__FILE__,__LINE__,     vecSub1[0]->getNumCols() == 3 );
+
+	myAssert(__FILE__,__LINE__,    !vecSub1[1]->isVirtualNode() );
+	myAssert(__FILE__,__LINE__,     vecSub1[1]->getNumCols() == 3 );
+	myAssert(__FILE__,__LINE__,     vecSub1[1]->getNumRows() == 3 );
+	myAssert(__FILE__,__LINE__,     vecSub1[1]->getColStart() == 3 );
+	myAssert(__FILE__,__LINE__,     vecSub1[1]->getRowStart() == 0 );
+	myAssert(__FILE__,__LINE__,     vecSub1[1]->getProb() == 0.5 );
+
+	 /* Submodels
+	 *
+	 * 1:   dobj = [1, 1, 1, 0.25, 0.25, 0.25]
+	 *      drlo = [0, 1, 1, 0 ],     drup = [inf, inf, inf, inf]
+	 *      dclo = [0,0,0,0,0,0],     dcup = [inf,inf,inf,inf,inf,inf]
+	 *      matrix = [ 1 1 1 0 0 0
+	 *                 1 1 0 1 1 0
+	 *                 0 1 1 0 1 1
+	 *                 1 0 1 1 0 1 ]
+	 *      nrows = 4
+	 *      ncols = 6
+	 *      coffset = 0
+	 *      roffset = 0
+	 *
+	 * 2:   dobj = [0, 0, 0, 0.25, 0.25, 0.25]
+	 *      drlo = [0, 1, 0],           drup = [inf, inf, inf]
+	 *      dclo = [inf,inf,inf,0,0,0], dcup = [inf, inf, inf, inf, inf, inf]
+	 *      matrix = [ 1 1 0 1 1 0
+	 *                 0 1 1 0 1 1
+	 *                 1 0 1 1 0 1 ]
+	 *      nrows = 3
+	 *      ncols = 6
+	 *      coffset = 3
+	 *      roffset = 0
+	 */
+
+	myAssert(__FILE__,__LINE__,osiSubmodel[0]->getNumCols()==6);
+	myAssert(__FILE__,__LINE__,osiSubmodel[0]->getNumRows()==4);
+
+	myAssert(__FILE__,__LINE__,osiSubmodel[1]->getNumCols()==6);
+	myAssert(__FILE__,__LINE__,osiSubmodel[1]->getNumRows()==3);
+
+	delete smiModel;
+	delete osiCore;
+
+	delete rlo0;
+	delete rlo1;
+}
+
 void
 SmiScenarioTreeUnitTest()
 {
@@ -270,7 +479,7 @@ SmiScenarioTreeUnitTest()
 	delete i6;
 	delete i7;
 	delete i8;
-	
+
 	delete ii1;
 	delete ii2;
 	delete ii3;
@@ -359,7 +568,7 @@ SmiTreeNodeUnitTest()
 	delete i6;
 	delete i7;
 	delete i8;
-	
+
 	delete n1;
 }
 
@@ -389,7 +598,7 @@ void SmiScnSmpsIOUnitTestReplace()
 	myAssert(__FILE__,__LINE__,fabs(osiStoch->getObjValue()-
 		44.66666) < 0.0001);
 	printf(" *** Successfully tested SMPS interfaces on app0110	with Replace option.\n");
-	
+
 	delete clp;
 
 }
@@ -569,7 +778,7 @@ void SmiScnModelScenarioUnitTest()
 		1,mrow,mcol,dels,corenels),dclo,dcup,dobj,drlo,drup);
 
 	OsiSolverInterface *ohoh= ocsi.clone();
-	
+
 	// test Core Model
 	SmiCoreData *osiCore = new SmiCoreData(ohoh,3,cstg,rstg);
 
@@ -666,7 +875,7 @@ void SmiScnModelScenarioUnitTest()
 		}
 		delete[] core_drlo;
 	}
-	
+
 	delete ohoh; ohoh = NULL;
 
 	printf(" *** Successfully tested SmiScnCoreModel.\n");
@@ -943,7 +1152,7 @@ void SmiScnModelScenarioUnitTest()
 	free( dobj) ;
 	free( cstg) ;
 	delete smiModel;
-	
+
 	delete osiClp1;
 	delete osiCore;
 	delete origmat;
@@ -1761,10 +1970,10 @@ void ModelBug()
 	printf("Optimal value: %g\n",osiStoch->getObjValue());
 
 	myAssert(__FILE__,__LINE__,osiStoch->getObjValue()== 0.5);
-	
+
 	delete smiModel;
 	delete osiCore;
-	
+
 	delete rlo0;
 	delete rlo1;
 }
@@ -1811,7 +2020,7 @@ void SmpsBug()
 int main()
 {
 
-
+#if 1
 	testingMessage( "Testing SmiTreeNode \n");
 	SmiTreeNodeUnitTest();
 
@@ -1825,7 +2034,7 @@ int main()
 	SmiScnSmpsIOUnitTestAdd();
 
 	testingMessage( "Testing base data structures for SmiScnModel\n");
-	SmiScnModelScenarioUnitTest();
+    SmiScnModelScenarioUnitTest();
 
 	testingMessage( "Testing SmiScnModel Discrete Distribution\n" );
 	SmiScnModelDiscreteUnitTest();
@@ -1836,10 +2045,15 @@ int main()
 	testingMessage("Read SMPS version of simple model Bug");
 	SmpsBug();
 
+#endif
+
+	testingMessage("Unit test for decomposition.");
+	DecompUnitTest();
+
 	SmiCoreCombineReplace::ClearInstance();
 	SmiCoreCombineAdd::ClearInstance();
 
-	testingMessage( "*** Done! *** \n");
+    testingMessage( "*** Done! *** \n");
 
 
 	return 0;
