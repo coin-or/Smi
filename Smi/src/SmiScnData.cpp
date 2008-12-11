@@ -294,7 +294,8 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 				 nrow_(core->getNumRows(stg_)),
 				 ncol_(core->getNumCols(stg_)),
 				 rowbeg_(core->getRowStart(stg_)),
-				 colbeg_(core->getColStart(stg_))
+				 colbeg_(core->getColStart(stg_)),
+				 ptr_count(0)  // used for counted pointer
 {
 	// count an upper bound for number elements
 	nels_ = 0;
@@ -550,6 +551,9 @@ void SmiNodeData::copyObjective(double * d){
 
 SmiNodeData::~SmiNodeData()
 {
+	if (--ptr_count)
+		return;
+
 	SmiRowMap::iterator iRowMap;
 
 //	for (iRowMap=rowMap.begin(); iRowMap!=rowMap.end(); ++iRowMap)

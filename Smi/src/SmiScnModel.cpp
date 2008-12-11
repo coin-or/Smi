@@ -12,7 +12,6 @@
 
 using namespace std;
 
-
 int
 SmiScnNode::getCoreColIndex(int i)
 {
@@ -83,9 +82,9 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 		branch = 0;
 
 		// generate root node
-		//TODO: tnode is currently not cleared by the SmiScenarioTree destructor !!! memory leak!!
 		SmiNodeData *node = core->getNode(0);
 		SmiScnNode *tnode = new SmiScnNode(node);
+		tnode->setScenarioIndex(0);
 		node_vec.push_back(tnode);
 		this->ncol_ = core->getNumCols(0);
 		this->nrow_ = core->getNumRows(0);
@@ -110,7 +109,6 @@ SmiScnModel::generateScenario(SmiCoreData *core,
 			v_dclo,v_dcup,v_dobj,v_drlo,v_drup);
 		node->setCoreCombineRule(r);
 		// generate new tree node
-		//TODO: tnode is currently not cleared by the SmiScenarioTree destructor !!! memory leak!!
 		SmiScnNode *tnode = new SmiScnNode(node);
 		node_vec.push_back(tnode);
 
@@ -274,6 +272,13 @@ SmiScnModel::addNode(SmiScnNode *tnode)
 	// set offsets for current node
 	tnode->setColOffset(ncol_);
 	tnode->setRowOffset(nrow_);
+
+	if (tnode->isVirtualNode())
+	{
+		// update column count
+		ncol_ += tnode->getNumCols();
+		return;
+	}
 
 	// OsiSolverInterface *osi = this->osiStoch_;
 	SmiCoreData *core = node->getCore();
@@ -836,6 +841,74 @@ double SmiScnModel::getObjectiveValue(SmiScenarioIndex ns)
 	}
 
 	return scenSum;
+}
+
+int
+SmiScnModel::addNodeToSubmodel(SmiScnNode * smiScnNode)
+{
+	// stage
+	int stg=smiScnNode->getStage();
+
+	// vector of nodes
+	SmiScnNode ** vecNode = (SmiScnNode **)malloc((stg+1)*sizeof(SmiScnNode*));
+
+	// vector of labels -- the node's scenario index
+	int * label = (int *) malloc((stg+1)*sizeof(int));
+
+	// temporaries
+	SmiScnNode *s=smiScnNode;
+
+	// place incoming label into vectors offset by stage location
+	vecNode[stg] = smiScnNode;
+	label[stg]   = smiScnNode->getScenarioIndex();
+
+	// fill in vector up to root
+	int t=stg;
+	while (s = s->getParent())
+	{
+		vecNode[--t] = s;
+		label[t]   = s->getScenarioIndex();
+	}
+
+	//assert(t==-1);
+
+	// Search the tree for the labels
+	SmiTreeNode<SmiScnNode *> *tnode = this->smiTree_.find(label,stg+1);
+
+	// Set starting stage for new vector of SmiScnNodes
+	int start_stg=0;
+	if (tnode)
+		start_stg=tnode->getDataPtr()->getStage()+1;
+
+	if (start_stg<stg+1)
+	{
+		vector<SmiScnNode *> nwVecNode;
+		SmiScnNode *nwNode;
+		for (t=start_stg; t<stg+1; t++)
+		{
+			nwNode = new SmiScnNode(vecNode[t]->getNode());
+			nwNode->setProb(vecNode[t]->getProb());
+			nwVecNode.push_back(nwNode);
+			nwNode->setIncludeOff();
+			this->ncol_ += nwNode->getNumCols();
+			this->nrow_ += nwNode->getNumRows();
+			if (t)
+				this->nels_ += nwNode->getNode()->getNumMatrixElements() + nwNode->getNode()->getCore()->getNode(t)->getNumMatrixElements();
+			else
+				this->nels_ += smiScnNode->getNode()->getNumMatrixElements();
+
+
+		}
+		this->smiTree_.addNodesToTree(tnode,0,nwVecNode,0);
+
+		// Last node in path is the copy of the incoming node -- set Include on.
+		nwNode->setIncludeOn();
+	}
+
+	free(vecNode);
+	free(label);
+
+	return (stg+1 - start_stg);
 }
 
 

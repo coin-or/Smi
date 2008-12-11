@@ -53,6 +53,7 @@ class SmiScnNode;
 class SmiScnModel
 {
 	friend void SmiScnModelDiscreteUnitTest();
+	friend void DecompUnitTest();
 public:
 
     /**@name Read SMPS files.
@@ -87,6 +88,10 @@ public:
 
 	/// generate scenarios from discrete distribution
 	void processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s, bool test=false);
+
+	void setModelProb(double p) {totalProb_=p; }
+
+	int addNodeToSubmodel(SmiScnNode * smiScnNode);
 
 	/** generate scenario with ancestor/branch node identification
 
@@ -177,7 +182,7 @@ public:
 
 	// constructor
 	SmiScnModel():
-		osiStoch_(NULL),
+		osiStoch_(NULL), nrow_(0), ncol_(0), nels_(0),
 		drlo_(NULL), drup_(NULL), dobj_(NULL), dclo_(NULL), dcup_(NULL), matrix_(NULL),
 		solve_synch_(false),totalProb_(0),core_(NULL)
 	{ }
@@ -225,17 +230,21 @@ private:
 class SmiScnNode
 {
 	friend class SmiScnModel;
+	friend void DecompUnitTest();
 public:
 	int getCoreColIndex(int i);
 	int getCoreRowIndex(int i);
 	inline void setScenarioIndex(SmiScenarioIndex i){ scen_=i;}
-        inline SmiScenarioIndex getScenarioIndex() {return scen_;}
+    inline SmiScenarioIndex getScenarioIndex() {return scen_;}
 	inline int  getColStart() {return coffset_;}
 	inline int  getRowStart() {return roffset_;}
 	inline int getNumCols(){ return node_->getCore()->getNumCols(node_->getStage());}
 	inline int getNumRows(){ return node_->getCore()->getNumRows(node_->getStage());}
 	inline double getModelProb(){return mdl_prob_;}
+	inline SmiStageIndex getStage() { return node_->getStage(); }
 	inline SmiScnNode * getParent(){ return parent_;}
+
+	inline bool isVirtualNode() { return !include_; }
         // So can delete root node
         inline void zapNode() {node_=NULL;}
 
@@ -257,7 +266,19 @@ private:
 	inline void setProb(double p){prob_=p;}
 	inline void setModelProb(double p){mdl_prob_=p;}
 	inline SmiNodeData *getNode() {return node_;}
-	SmiScnNode(SmiNodeData *&node)	{node_=node;prob_=0;parent_=NULL;scen_=-1;}
+	inline void setIncludeOff() { include_=false; }
+	inline void setIncludeOn()  { include_=true; }
+	inline bool getInclude() { return include_; }
+
+	inline SmiScnNode(SmiNodeData *node)
+	{
+		node_=node;
+		node->addPtr();
+		prob_=0;
+		parent_=NULL;
+		scen_=-1;
+		include_=true;
+	}
 
 private:
 	SmiNodeData *node_;
@@ -267,6 +288,7 @@ private:
 	int coffset_;
 	int roffset_;
 	SmiScenarioIndex scen_;
+	bool include_;
 };
 
 // function object for addnode loop

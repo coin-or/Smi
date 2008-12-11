@@ -116,6 +116,9 @@ public:
 				 CoinPackedVector *dobj,
 				 CoinPackedVector *drlo,
 				 CoinPackedVector *drup);
+
+	int addPtr() { return ++ptr_count; }
+
 	~SmiNodeData();
 
 protected:
@@ -172,6 +175,8 @@ private:
 	double * dels_;
 	int    * inds_;
 	int    * strt_;
+
+	int ptr_count;
 };
 
 
