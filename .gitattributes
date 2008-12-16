@@ -55,7 +55,7 @@ Smi/test/SmiTestData/bug.time -text
 /configure.ac -text
 /depcomp -text
 doxydoc/doxygen.conf -text
-eclipse/Externals -text
+eclipse_project/Externals -text
 /install-sh -text
 /ltmain.sh -text
 /missing -text
