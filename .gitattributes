@@ -38,6 +38,8 @@ Smi/src/Makefile.in -text
 Smi/src/SmiDiscreteDistribution.cpp -text
 Smi/src/SmiMessage.cpp -text
 Smi/src/SmiMessage.hpp -text
+Smi/test/.cproject -text
+Smi/test/.project -text
 Smi/test/Makefile.am -text
 Smi/test/Makefile.in -text
 Smi/test/SmiTestData/app0110.cor -text
