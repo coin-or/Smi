@@ -1,12 +1,4 @@
-CoinBase              https://projects.coin-or.org/svn/Smi/trunk/Smi
-CoinBase/BuildTools   https://projects.coin-or.org/svn/BuildTools/stable/0.5
-CoinBase/CoinUtils    https://projects.coin-or.org/svn/CoinUtils/stable/2.3/CoinUtils
-CoinBase/Cbc          https://projects.coin-or.org/svn/Cbc/stable/2.2/Cbc
-CoinBase/Cgl          https://projects.coin-or.org/svn/Cgl/stable/0.53/Cgl
-CoinBase/Clp          https://projects.coin-or.org/svn/Clp/stable/1.8/Clp
-CoinBase/FlopCpp      https://projects.coin-or.org/svn/FlopC++/trunk/FlopCpp
-CoinBase/Osi          https://projects.coin-or.org/svn/Osi/stable/0.99/Osi
-
+CoinBase              https://projects.coin-or.org/svn/Smi/trunk
 Smi                   https://projects.coin-or.org/svn/Smi/trunk/Smi/src
 unitTest              https://projects.coin-or.org/svn/Smi/trunk/Smi/test
 
