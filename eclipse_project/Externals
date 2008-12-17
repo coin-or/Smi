@@ -1,4 +1,4 @@
-CoinBase              https://projects.coin-or.org/svn/BuildTools/stable/0.5
+CoinBase              https://projects.coin-or.org/svn/Smi/trunk/Smi
 CoinBase/BuildTools   https://projects.coin-or.org/svn/BuildTools/stable/0.5
 CoinBase/CoinUtils    https://projects.coin-or.org/svn/CoinUtils/stable/2.3/CoinUtils
 CoinBase/Cbc          https://projects.coin-or.org/svn/Cbc/stable/2.2/Cbc
