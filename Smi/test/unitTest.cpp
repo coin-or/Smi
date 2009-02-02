@@ -180,8 +180,10 @@ void DecompUnitTest()
 	vector<OsiSolverInterface *> osiSubmodel;
 	osiSubmodel.reserve(submodel.size());
 
-	myAssert(__FILE__,__LINE__,     osiSubmodel[0]=submodel[0]->loadOsiSolverData());
-	myAssert(__FILE__,__LINE__,     osiSubmodel[1]=submodel[1]->loadOsiSolverData());
+	//myAssert(__FILE__,__LINE__,     osiSubmodel[0]=submodel[0]->loadOsiSolverData());
+	//myAssert(__FILE__,__LINE__,     osiSubmodel[1]=submodel[1]->loadOsiSolverData());
+	osiSubmodel.push_back(submodel[0]->loadOsiSolverData());
+	osiSubmodel.push_back(submodel[1]->loadOsiSolverData());
 
 
 	myAssert(__FILE__,__LINE__,    !vecSub0[0]->isVirtualNode() );
