@@ -20429,7 +20429,6 @@ LT_LDFLAGS=
 
 echo "$as_me:$LINENO: checking for COIN project Smi" >&5
 echo $ECHO_N "checking for COIN project Smi... $ECHO_C" >&6
-
 # First check, if the sub-project is actually available (ToDo: allow
 # other locations)
 
@@ -20595,7 +20594,6 @@ fi
 
 echo "$as_me:$LINENO: checking for COIN project CoinUtils" >&5
 echo $ECHO_N "checking for COIN project CoinUtils... $ECHO_C" >&6
-
 # First check, if the sub-project is actually available (ToDo: allow
 # other locations)
 
@@ -20761,7 +20759,6 @@ fi
 
 echo "$as_me:$LINENO: checking for COIN project Clp" >&5
 echo $ECHO_N "checking for COIN project Clp... $ECHO_C" >&6
-
 # First check, if the sub-project is actually available (ToDo: allow
 # other locations)
 
@@ -20927,7 +20924,6 @@ fi
 
 echo "$as_me:$LINENO: checking for COIN project Cgl" >&5
 echo $ECHO_N "checking for COIN project Cgl... $ECHO_C" >&6
-
 # First check, if the sub-project is actually available (ToDo: allow
 # other locations)
 
@@ -21093,7 +21089,6 @@ fi
 
 echo "$as_me:$LINENO: checking for COIN project Cbc" >&5
 echo $ECHO_N "checking for COIN project Cbc... $ECHO_C" >&6
-
 # First check, if the sub-project is actually available (ToDo: allow
 # other locations)
 
@@ -21259,7 +21254,6 @@ fi
 
 echo "$as_me:$LINENO: checking for COIN project Osi" >&5
 echo $ECHO_N "checking for COIN project Osi... $ECHO_C" >&6
-
 # First check, if the sub-project is actually available (ToDo: allow
 # other locations)
 
@@ -21425,7 +21419,6 @@ fi
 
 echo "$as_me:$LINENO: checking for COIN project FlopCpp" >&5
 echo $ECHO_N "checking for COIN project FlopCpp... $ECHO_C" >&6
-
 # First check, if the sub-project is actually available (ToDo: allow
 # other locations)
 
