@@ -13,7 +13,7 @@
 #include "CoinPackedVector.hpp"
 #include "CoinMpsIO.hpp"
 #include "SmiCoreCombineRule.hpp"
-#include "SmiLinearData.hpp"
+//#include "SmiLinearData.hpp"
 
 #include <map>
 #include <vector>
@@ -71,6 +71,7 @@ public:
 	 const int getColLowerLength()   {return getLength(this->getCloStart());}
 	 const int getColUpperLength()   {return getLength(this->getCupStart());}
 	 const int getObjectiveLength()  {return getLength(this->getObjStart());}
+     const bool isCoreNode() { return isCoreNode_; }
 
 	 const int *getRowIndices(int irow){
 		 if (this->has_matrix_)
@@ -94,6 +95,13 @@ public:
 		 else
 			 return NULL;
 	 }
+
+	 const int *getRowStarts(int irow){
+		if (this->has_matrix_)
+			return &strt_[this->getMatStart()+irow-this->rowbeg_];
+		else
+			return NULL;
+		 }
 	 double *getMutableRowElements(int irow){
 		 // using const_cast to stop warnings about cast-away constness
 		 return const_cast<double *>(getRowElements(irow));
@@ -138,63 +146,69 @@ protected:
 	 const int getObjStart() { return obj_strt_;}
 
 	//Access to stored memory
+	 //Return number of Elements in row/bounds/ranges/objective istart
 	 const int getLength  (int istart){
 		return this->strt_[istart+1] - this->strt_[istart];
 	}
+	 //Return index array that starts at row/bounds/ranges/objective istart
 	 const int * getIndices (int istart){
 		return this->inds_+this->strt_[istart];
 	}
+	 //Return double array that starts at row/bounds/ranges/objective istart
 	 const double *getElements(int istart){
 		return this->dels_+this->strt_[istart];
 	}
 
+
 private:
 
-	SmiStageIndex stg_;
-	SmiRowMap rowMap;
-	SmiDenseRowMap dRowMap;
+	SmiStageIndex stg_; //Stage to which the node belongs
+	SmiRowMap rowMap; //not used
+	SmiDenseRowMap dRowMap; //Map of <int,double*>, stores row entries in dense format
 
-	SmiCoreData *core_;
-	bool isCoreNode_;
+	SmiCoreData *core_; //Link to core data
+	bool isCoreNode_; //Is this node a core node? If so, it should, at least in my opinion, not turn up in the Tree
 	SmiCoreCombineRule *combineRule_;
 
-	int numarrays_;
-	int nels_;
-	int nrow_;
-	int ncol_;
-	int rowbeg_;
-	int colbeg_;
-	int nstrt_;
-	bool has_matrix_;
-	int mat_strt_;
+	int numarrays_; //= number of arrays used = 5 (clo,cup,rlo,rup,obj)
+	int nels_; //number of elements in the matrix and the other arrays
+	int nrow_; //number of rows (of corresponding stage in core model)
+	int ncol_; //number of columns (of corresponding stage in core model)
+	int rowbeg_; //index, where rows of corresponding stage begins in the core model
+	int colbeg_; //index, where columns begin wrt to the columns of the corresponding stage in the core model
+	int nstrt_; //number of strt indices = numarray + nrow+1 (see assignMemory())
+	bool has_matrix_; //If this node has a matrix entry
+	int mat_strt_; //start arrays for corresponding entries
 	int clo_strt_;
 	int cup_strt_;
 	int obj_strt_;
 	int rlo_strt_;
 	int rup_strt_;
-	double * dels_;
-	int    * inds_;
-	int    * strt_;
+	double * dels_; //concrete elements
+	int    * inds_; //indices for the elements
+	int    * strt_; //start array, where new row begins
 
-	int ptr_count;
+	int ptr_count; //Propably for memory management?!
 };
 
 
 class SmiCoreData
 {
 public:
-	inline int getNumCols(){ return ncol_;}
-	inline int getNumRows(){ return nrow_;}
-	inline int getNumStages(){ return nstag_;}
-	inline int getNumCols(SmiStageIndex t){ return nColInStage_[t];}
-	inline int getNumRows(SmiStageIndex t){ return nRowInStage_[t];}
-	inline int getColStart(SmiStageIndex t){ return stageColPtr_[t];}
-	inline int getRowStart(SmiStageIndex t){ return stageRowPtr_[t];}
-	inline int getColStage(int i){ return colStage_[i];}
-	inline int getRowStage(int i){ return rowStage_[i];}
-	inline int getRowInternalIndex(int i){ return rowEx2In_[i];}
+	inline int getNumCols(){ return ncol_;} //Gesamtzahl Variablen für das CoreModell
+	inline int getNumRows(){ return nrow_;} //Gesamtzahl Restriktionen für das CoreModell
+	inline int getNumElements(){ return nz_;} // Gesamtzahl Elemente für das CoreModell
+	inline int getNumStages(){ return nstag_;} //Anzahl an Stufen
+	inline int getNumCols(SmiStageIndex t){ return nColInStage_[t];} //Anzahl Variablen in Stufe t 
+	inline int getNumRows(SmiStageIndex t){ return nRowInStage_[t];} //Number of Restrictions in stage t
+	inline int getColStart(SmiStageIndex t){ return stageColPtr_[t];} //Index where Variables of stage t starts
+	inline int getRowStart(SmiStageIndex t){ return stageRowPtr_[t];} //Index where Rows of stage t starts
+	inline int getColStage(int i){ return colStage_[i];} //Stage to Variable i
+	inline int getRowStage(int i){ return rowStage_[i];} //Stage to Row i
+	//Christian: TODO: In my Opinion these methods do not belong here, as it takes care of converting indices from/to det. eq. to core model formulation
+	inline int getRowInternalIndex(int i){ return rowEx2In_[i];} //Get Internal Index (in case of det. eq.) from external index (core model)
 	inline int getColInternalIndex(int i){ return colEx2In_[i];}
-	inline int getRowExternalIndex(int i){ return rowIn2Ex_[i];}
+	inline int getRowExternalIndex(int i){ return rowIn2Ex_[i];} //Get external index (core model) from internal index (det. eq. model)
 	inline int getColExternalIndex(int i){ return colIn2Ex_[i];}
 	/*
 	inline CoinPackedVector * getMatrixRow(SmiStageIndex t, int i){ return nodes_[t]->getRow(i);}
@@ -205,6 +219,12 @@ public:
 	inline const double * getDenseColUpper(SmiStageIndex t){return cdcup_[t];}
 	inline const double * getDenseObjCoefficients(SmiStageIndex t){return cdobj_[t];}
 
+    inline vector<int> getIntCols(int stage) { return intColsStagewise[stage]; };
+	inline int* getIntegerIndices() { return integerIndices_; } //indices of integer variables
+	inline int getIntegerLength() { return integerLength_; }
+    inline int* getBinaryIndices() { return binaryIndices_; } //indices of binary variables
+    inline int getBinaryLength() { return binaryLength_; }
+
 	void copyRowLower(double * drlo,SmiStageIndex t );
 	void copyRowUpper(double * drup,SmiStageIndex t);
 	void copyColLower(double * dclo,SmiStageIndex t);
@@ -212,40 +232,47 @@ public:
 	void copyObjective(double * dobj,SmiStageIndex t);
 
 	inline SmiNodeData * getNode(SmiStageIndex t){return nodes_[t];}
-	SmiCoreData(OsiSolverInterface *osi, int nstag, int *cstag, int *rstag);
-	SmiCoreData(CoinMpsIO *cMps, int nstag, int *cstag, int *rstag);
+    SmiCoreData(CoinMpsIO *cMps, int nstag, int *cstag, int *rstag,int *integerIndices = 0, int integerLength = 0, int *binaryIndices = 0, int binaryLength = 0);
+    SmiCoreData(OsiSolverInterface *osi, int nstag, int *cstag, int *rstag,int *integerIndices = 0, int integerLength = 0, int *binaryIndices = 0, int binaryLength = 0);
+	
 	~SmiCoreData();
 
 private:
-	void gutsOfConstructor(int nrow,int ncol,int nstag,
-							   int *cstag,int *rstag,
-							   CoinPackedMatrix *matrix,
-							   CoinPackedVector *dclo,
-							   CoinPackedVector *dcup,
-							   CoinPackedVector *dobj,
-							   CoinPackedVector *drlo,
-							   CoinPackedVector *drup);
+
+	//Christian: Creates SmiCoreData for whole tree from deterministic core model and information about stages. Splits
+	// rows and columns into nstag stages, given by cstag and rstag. Creates a core node for every stage.
+    void gutsOfConstructor(int nrow,int ncol,int nstag, int *cstag,int *rstag, CoinPackedMatrix *matrix, CoinPackedVector *dclo, CoinPackedVector *dcup, CoinPackedVector *dobj, CoinPackedVector *drlo, CoinPackedVector *drup, int* integerIndices = 0,int integerLength = 0,int* binaryIndices = 0,int binaryLength = 0);
+
+    OsiSolverInterface* generateCoreProblem(OsiSolverInterface* osi);
+
+
 private:
 	int nrow_;
 	int ncol_;
-	SmiStageIndex nstag_;
-	int *nColInStage_;
-	int *nRowInStage_;
-	int *stageColPtr_;
-	int *stageRowPtr_;
-	int *colStage_;
-	int *rowStage_;
-	int *colEx2In_;
-	int *rowEx2In_;
-	int *colIn2Ex_;
-	int *rowIn2Ex_;
+    int nz_; // We can count the total number of elements, but I do not if we need this at one point
+	SmiStageIndex nstag_; //Total number of stages in the problem, apart from the first stage. A two-stage problem has nstag_ = 1 and so on. If the problem is deterministic, nstag_ = 0.
+	int *nColInStage_; //Number of Columns in Stage
+	int *nRowInStage_; //Number of Rows in Stage
+	int *stageColPtr_; //Start Index of Columns in Stage, with respect to ncol_
+	int *stageRowPtr_; //Start Index of Rows in Stage, with respect to nrow_
+	int *colStage_; //To which stage belongs the column?
+	int *rowStage_; //To which stage belongs the row?
+	int *colEx2In_; //Not clear yet
+	int *rowEx2In_; //Not clear yet
+	int *colIn2Ex_; // Not clear yet
+	int *rowIn2Ex_; // Not clear yet
+    int *integerIndices_; //indices of integer variables
+    int integerLength_; //number of integer variables
+    int *binaryIndices_; //indices of binary variables
+    int binaryLength_; //number of binary variables
 	double **cdrlo_;
 	double **cdrup_;
 	double **cdobj_;
 	double **cdclo_;
 	double **cdcup_;
-	vector<SmiNodeData*> nodes_;
-	vector<double *> pDenseRow_;
+	vector<SmiNodeData*> nodes_; //Nodes, that contain stage dependent constraints (with Bounds,Ranges,Objective,Matrix), so called CoreNodes 
+	vector<double *> pDenseRow_; //dense probability vector
+	vector< vector<int> > intColsStagewise; // For each stage separately, it contains the position of every integer column
 };
 
 #endif //#define SmiScnData_HPP

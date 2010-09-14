@@ -7,70 +7,107 @@
 
 using namespace std;
 
-SmiCoreData::SmiCoreData(OsiSolverInterface *osi,int nstag,int *cstag,int *rstag)
-{
-	int nrow = osi->getNumRows();
-	int ncol = osi->getNumCols();
-	CoinPackedVector *drlo = new CoinPackedVector(nrow,osi->getRowLower());
-	CoinPackedVector *drup = new CoinPackedVector(nrow,osi->getRowUpper());
-	CoinPackedVector *dclo = new CoinPackedVector(ncol,osi->getColLower());
-	CoinPackedVector *dcup = new CoinPackedVector(ncol,osi->getColUpper());
-	CoinPackedVector *dobj = new CoinPackedVector(ncol,osi->getObjCoefficients());
+int nrow_;
+int ncol_;
+int nz_; // We can count the total number of elements, but I do not if we need this at one point
+SmiStageIndex nstag_; //Total number of stages in the problem, apart from the first stage. A two-stage problem has nstag_ = 1 and so on. If the problem is deterministic, nstag_ = 0.
+int *nColInStage_; //Number of Columns in Stage
+int *nRowInStage_; //Number of Rows in Stage
+int *stageColPtr_; //Start Index of Columns in Stage, with respect to ncol_
+int *stageRowPtr_; //Start Index of Rows in Stage, with respect to nrow_
+int *colStage_; //To which stage belongs the column?
+int *rowStage_; //To which stage belongs the row?
+int *colEx2In_; //Not clear yet
+int *rowEx2In_; //Not clear yet
+int *colIn2Ex_; // Not clear yet
+int *rowIn2Ex_; // Not clear yet
+int *integerIndices_; //indices of integer variables
+int integerLength_; //number of integer variables
+int *binaryIndices_; //indices of binary variables
+int binaryLength_; //number of binary variables
+double **cdrlo_;
+double **cdrup_;
+double **cdobj_;
+double **cdclo_;
+double **cdcup_;
+vector<SmiNodeData*> nodes_; //Nodes, that contain stage dependent constraints (with Bounds,Ranges,Objective,Matrix), so called CoreNodes 
+vector<double *> pDenseRow_; //dense probability vector
+vector< vector<int> > intColsStagewise; // For each stage separately, it contains the position of every integer column
 
-	CoinPackedMatrix *matrix = new CoinPackedMatrix(*osi->getMatrixByRow());
-	matrix->eliminateDuplicates(0.0);
+SmiCoreData::SmiCoreData(OsiSolverInterface *osi,int nstag,int *cstag,int *rstag, int* integerIndices,int integerLength, int* binaryIndices, int binaryLength):
+nrow_(0),ncol_(0),nz_(0),nstag_(nstag),nColInStage_(NULL),nRowInStage_(NULL),stageColPtr_(NULL),colStage_(NULL),rowStage_(NULL),colEx2In_(NULL),rowEx2In_(NULL),
+colIn2Ex_(NULL),rowIn2Ex_(NULL),integerIndices_(NULL),integerLength_(0),binaryIndices_(NULL),binaryLength_(0),
+cdrlo_(NULL),cdrup_(NULL),cdobj_(NULL),cdclo_(NULL),cdcup_(NULL),nodes_(),pDenseRow_(),intColsStagewise(nstag,std::vector<int>())
+{	//Copies all values already stored in the Solver..
+    int nrow = osi->getNumRows();
+    int ncol = osi->getNumCols();
+    CoinPackedVector *drlo = new CoinPackedVector(nrow,osi->getRowLower());
+    CoinPackedVector *drup = new CoinPackedVector(nrow,osi->getRowUpper());
+    CoinPackedVector *dclo = new CoinPackedVector(ncol,osi->getColLower());
+    CoinPackedVector *dcup = new CoinPackedVector(ncol,osi->getColUpper());
+    CoinPackedVector *dobj = new CoinPackedVector(ncol,osi->getObjCoefficients());
 
-	gutsOfConstructor(nrow,ncol,nstag,cstag,rstag,matrix,dclo,dcup,dobj,drlo,drup);
+    CoinPackedMatrix *matrix = new CoinPackedMatrix(*osi->getMatrixByRow());
+    matrix->eliminateDuplicates(0.0);
 
-		delete matrix;
-		delete drlo;
-		delete drup;
-		delete dclo;
-		delete dcup;
-		delete dobj;
+    gutsOfConstructor(nrow,ncol,nstag,cstag,rstag,matrix,dclo,dcup,dobj,drlo,drup,integerIndices,integerLength,binaryIndices,binaryLength);
 
-
-
+    delete matrix;
+    delete drlo;
+    delete drup;
+    delete dclo;
+    delete dcup;
+    delete dobj;
 }
 
-SmiCoreData::SmiCoreData(CoinMpsIO *osi,int nstag,int *cstag,int *rstag)
+SmiCoreData::SmiCoreData(CoinMpsIO *osi,int nstag,int *cstag,int *rstag,int* integerIndices,int integerLength, int* binaryIndices, int binaryLength):
+nrow_(0),ncol_(0),nz_(0),nstag_(nstag),nColInStage_(NULL),nRowInStage_(NULL),stageColPtr_(NULL),colStage_(NULL),rowStage_(NULL),colEx2In_(NULL),rowEx2In_(NULL),
+colIn2Ex_(NULL),rowIn2Ex_(NULL),integerIndices_(NULL),integerLength_(0),binaryIndices_(NULL),binaryLength_(0),
+cdrlo_(NULL),cdrup_(NULL),cdobj_(NULL),cdclo_(NULL),cdcup_(NULL),nodes_(),pDenseRow_(),intColsStagewise(nstag,std::vector<int>())
 {
-	int nrow = osi->getNumRows();
-	int ncol = osi->getNumCols();
-	CoinPackedVector *drlo = new CoinPackedVector(nrow,osi->getRowLower());
-	CoinPackedVector *drup = new CoinPackedVector(nrow,osi->getRowUpper());
-	CoinPackedVector *dclo = new CoinPackedVector(ncol,osi->getColLower());
-	CoinPackedVector *dcup = new CoinPackedVector(ncol,osi->getColUpper());
-	CoinPackedVector *dobj = new CoinPackedVector(ncol,osi->getObjCoefficients());
+    int nrow = osi->getNumRows();
+    int ncol = osi->getNumCols();
+    CoinPackedVector *drlo = new CoinPackedVector(nrow,osi->getRowLower());
+    CoinPackedVector *drup = new CoinPackedVector(nrow,osi->getRowUpper());
+    CoinPackedVector *dclo = new CoinPackedVector(ncol,osi->getColLower());
+    CoinPackedVector *dcup = new CoinPackedVector(ncol,osi->getColUpper());
+    CoinPackedVector *dobj = new CoinPackedVector(ncol,osi->getObjCoefficients());
 
-	CoinPackedMatrix *matrix = new CoinPackedMatrix(*osi->getMatrixByRow());
-	matrix->eliminateDuplicates(0.0);
+    CoinPackedMatrix *matrix = new CoinPackedMatrix(*osi->getMatrixByRow());
+    matrix->eliminateDuplicates(0.0);
+    
+    gutsOfConstructor(nrow,ncol,nstag,cstag,rstag,matrix,dclo,dcup,dobj,drlo,drup,integerIndices,integerLength,binaryIndices,binaryLength);
 
-	gutsOfConstructor(nrow,ncol,nstag,cstag,rstag,matrix,dclo,dcup,dobj,drlo,drup);
-
-		delete matrix;
-		delete drlo;
-		delete drup;
-		delete dclo;
-		delete dcup;
-		delete dobj;
-
-
-
+    delete matrix;
+    delete drlo;
+    delete drup;
+    delete dclo;
+    delete dcup;
+    delete dobj;
 }
-void
-SmiCoreData::gutsOfConstructor(int nrow,int ncol,int nstag,
-							   int *cstag,int *rstag,
-							   CoinPackedMatrix *matrix,
-							   CoinPackedVector *dclo,
-							   CoinPackedVector *dcup,
-							   CoinPackedVector *dobj,
-							   CoinPackedVector *drlo,
-							   CoinPackedVector *drup)
+
+OsiSolverInterface* SmiCoreData::generateCoreProblem(OsiSolverInterface* osi){
+    osi->reset();
+    //Set Matrix
+
+    //Set column, row, objective function
+
+    return osi;
+}
+
+void SmiCoreData::gutsOfConstructor( int nrow,int ncol,int nstag, int *cstag,int *rstag, CoinPackedMatrix *matrix, CoinPackedVector *dclo, CoinPackedVector *dcup, CoinPackedVector *dobj, CoinPackedVector *drlo, CoinPackedVector *drup, int* integerIndices /*= 0*/,int integerLength /*= 0*/,int* binaryIndices /*= 0*/,int binaryLength /*= 0*/ )
 {
 	int i;
 	nrow_ = nrow;
 	ncol_ = ncol;
+    integerIndices_ = new int[integerLength];
+    integerLength_ = integerLength;
+    memcpy(integerIndices_,integerIndices,sizeof(int)*integerLength);
+    binaryIndices_ = new int[binaryLength];
+    binaryLength_ = binaryLength;
+    memcpy(binaryIndices_,binaryIndices,sizeof(int)*binaryLength);
+
+
 
 	// store number stages
 	nstag_ = nstag;
@@ -113,10 +150,11 @@ SmiCoreData::gutsOfConstructor(int nrow,int ncol,int nstag,
 	// place index into next open position in its stage
 	for (i=0;i<nrow_;i++)
 	{
-		rowEx2In_[i] = stageRowPtr_[rowStage_[i]];
+		rowEx2In_[i] = stageRowPtr_[rowStage_[i]]; //The result of RowEx2In for Row i is the stageRowPointer for the given stage (but because this pointer is increased, nothing happens..)
 		rowIn2Ex_[rowEx2In_[i]] = i;
 		stageRowPtr_[rowStage_[i]]++;
 	}
+	cout << endl;
 
 	// reset stage pointers
 	stageRowPtr_[0] = 0;
@@ -144,40 +182,50 @@ SmiCoreData::gutsOfConstructor(int nrow,int ncol,int nstag,
 		stageColPtr_[colStage_[i]]++;
 	}
 
+    //for (i=0;i<ncol_;i++){
+	//	printf("colEx2In = %d, colIn2Ex = %d for index %d\n",colEx2In_[i],colIn2Ex_[i],i);
+	//}
+
 	// reset stage pointers
 	stageColPtr_[0] = 0;
 	for (i=0;i<nstag_;i++)
 		stageColPtr_[i+1] = stageColPtr_[i] + nColInStage_[i];
 
+    // store list with values of integer columns for cur stage only
+    int * nColInPrevStages = new int[nstag_];
+    nColInPrevStages[0] = 0;
+    for (i=1; i<nstag_; i++) {
+        nColInPrevStages[i] = nColInPrevStages[i-1] + nColInStage_[i-1];
+    }    
+    for (i=0; i<integerLength_; i++) {
+        int indice = integerIndices[i];
+        int stage = colStage_[indice];
+        intColsStagewise[stage].push_back(indice - nColInPrevStages[stage]);
+    }
+    delete nColInPrevStages;
 
-	// make nodes
 
+	// reserve place for nodes holding stage dependent fixed information
 	this->nodes_.reserve(nstag_);
 
-		// TODO: specialize this interface for core nodes
-
-
+	// TODO: specialize this interface for core nodes
 	cdclo_ = new double*[nstag_];
 	cdcup_ = new double*[nstag_];
 	cdobj_ = new double*[nstag_];
 	cdrlo_ = new double*[nstag_];
 	cdrup_ = new double*[nstag_];
-
+	//Christian: Create core nodes for every stage
 	for (i=0;i<nstag_;i++)
 	{
-
 		SmiNodeData *node = new SmiNodeData(i,this,
 			matrix,dclo,dcup,dobj,drlo,drup);
-
 		node->setCoreNode();
-
 		nodes_.push_back(node);
-
 		int nrow=this->getNumRows(i);
 		int ncol=this->getNumCols(i);
 		int irow=this->getRowStart(i);
 		int icol=this->getColStart(i);
-
+		//Christian: TODO Why is irow added to these vectors? And Why are these vectors created, if no one uses the getMethods?
 		CoinPackedVector cpv_rlo(node->getRowLowerLength(),node->getRowLowerIndices(),node->getRowLowerElements());
 		cdrlo_[i]=cpv_rlo.denseVector(nrow+irow)+irow;
 
@@ -194,6 +242,7 @@ SmiCoreData::gutsOfConstructor(int nrow,int ncol,int nstag,
 		cdobj_[i]=cpv_obj.denseVector(ncol+icol)+icol;
 
 		// sort indices in each row
+		//Christian: TODO Why do we have to sort indices?
 		for (int ii=irow; ii<irow+nrow; ++ii)
 		{
 			if (node->getRowLength(ii)>0)
@@ -268,6 +317,7 @@ SmiCoreData::~SmiCoreData()
 	delete [] cdclo_;
 	delete [] cdcup_;
 	delete [] cdobj_;
+    delete [] integerIndices_;
 	for (unsigned int i=1; i<nodes_.size(); ++i)
 	  delete nodes_[i];
 
@@ -280,7 +330,10 @@ SmiNodeData::setCoreNode()
 }
 
 // constructor from LP data
+// copies present values in given data structures for an SmiNodeData
 // TODO: allow for special node data like integer variables not in core, etc
+//Christian: Stores information corresponding to given stage for ranges, objective and bounds, but not for the matrix. This needs to be done in a better way, eventually.
+//Excess memory is released at the end of the method.
 SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 				 const CoinPackedMatrix * const matrix,
 				 CoinPackedVector *dclo,
@@ -327,6 +380,9 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 	offset_dst      = 0;
 
 	// Matrix
+	//Christian: Copy Matrix Elements. 
+	//What is done here? CoinPackedMatrix needs to have the same size as the core Matrix, but only the current stage constraints are read in
+	//TODO: Change this behaviour, so that only a small matrix is given to this method?!?!
 	this->mat_strt_ = i_start;
 	if (matrix && matrix->getNumElements() > 0)
 	{
@@ -349,7 +405,8 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 		const int    *matrix_len = localMatrix->getVectorLengths();
 		const int    *matrix_str = localMatrix->getVectorStarts();
 
-		// check all rows in stage
+
+		// check all rows in the stage of this node
 		for (int i=0; i<this->nrow_; ++i)
 		{
 			// "External" index of a matrix row that belongs to the stage
@@ -368,9 +425,10 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 				//update offset
 				offset_dst += len;
 			}
-			//store row start
+			//store row start for next row
 			i_start++;
 			this->strt_[i_start] = offset_dst;
+		
 
 		}
 		//convert indices to "Internal"

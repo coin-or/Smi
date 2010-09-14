@@ -90,7 +90,8 @@ public:
 	void setScenario(int s) {
 		scen_ = s;
 	}
-
+	
+	// Returns new child node with cd, linked in the tree
 	SmiTreeNode<T> * addChild(T cd, int scenario) {
 		SmiTreeNode<T> *c = new SmiTreeNode(cd);
 
@@ -146,10 +147,9 @@ public:
 
 	/// Destructor
 
-	~SmiTreeNode() {
+	~SmiTreeNode<T>() {
 		delete sibling_;
 		delete child_;
-		//	   delete ptr_ ;
 	}
 
 	//@}
@@ -295,13 +295,16 @@ public:
 		assert (scenario < (int) leaf_.size());
 		SmiTreeNode<T> * n = leaf_[scenario];
 
-		//		if ( n->getDataPtr()==scen_data[n->depth()] ) return scen_data;
-
-		int ns = n->depth() + 1 - scen_data.size();
-		for (int j = 0; j < ns; j++)
-			scen_data.push_back(n->getDataPtr());
-
+		//if ( n->getDataPtr()==scen_data[n->depth()] ) return scen_data;
+		//Christian: Why is this necessary? Reason: Number of Stages places should be readily available in the vector, if this is not already the case, do it..
+		//int ns = n->depth() + 1 - scen_data.size();
+		//for (int j = 0; j < ns; j++)
+		//	scen_data.push_back(n->getDataPtr());
+	
+		//Christian: TODO: Why not change this so, that it looks better? i.e. i-- and i= n->depth(); and i >= 0?
+		//Christian: TODO: Think about changing container from vector to deque or list.. 
 		int i = n->depth() + 1;
+		scen_data.resize(i,n->getDataPtr()); //Maybe a call to capacity should do it too.. ?! TODO
 		while (i > 0) {
 			scen_data[--i] = n->getDataPtr();
 			n = n->getParent();
@@ -329,22 +332,7 @@ public:
 			parent = find(brscenario, stage);
 
 		parent = addNodesToTree(parent, scenario, pathdata, start);
-#if 0
-		for (unsigned int i=start; i<pathdata.size(); ++i)
-		{
-			if (parent)
-			{
-				parent = parent->addChild(pathdata[i],scenario);
-			}
-			else
-			{
-				parent = root_ = new SmiTreeNode<T>(pathdata[0]);
-				root_->setScenario(scenario);
-			}
-			// add data to full node_data array
-			node_data.push_back(pathdata[i]);
-		}
-#endif
+
 		if (pathdata.size()) {
 			leaf_.push_back(parent);
 		}
@@ -378,29 +366,14 @@ public:
 			i = parent->depth() + 1;
 
 		parent = addNodesToTree(parent, scenario, pathdata, i);
-#if 0
-		for (; i<pathdata.size(); ++i)
-		{
-			if (parent)
-			{
-				parent = parent->addChild(pathdata[i],scenario);
-
-			}
-			else
-			{
-				parent = root_ = new SmiTreeNode<T>(pathdata[0]);
-				root_->setScenario(scenario);
-			}
-			// add data to full node_data array
-			node_data.push_back(pathdata[i]);
-		}
-#endif
+ 
 		if (pathdata.size()) {
 			leaf_.push_back(parent);
 		}
 		return leaf_.size() - 1;
 
 	}
+
 	SmiTreeNode<T> * addNodesToTree(SmiTreeNode<T> *parent, int scenario,
 			vector<T> &pathdata, int start) {
 

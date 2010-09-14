@@ -59,6 +59,7 @@ class SmiCoreCombineReplace : public SmiCoreCombineRule
 public:
 	static SmiCoreCombineReplace * Instance();
 	static void ClearInstance();
+	//Replace values in d1 with values from cpv2, where o1 is the offset to apply to d1
 	virtual void Process(double *d1, int o1, const CoinPackedVector &cpv2, char *type=0);
 	virtual void Process(double *d1, int o1, const int len, const int* inds, const double *dels, char *type=0);
 	virtual CoinPackedVector * Process(CoinPackedVector *cpv1, CoinPackedVector *cpv2, char *type=0);

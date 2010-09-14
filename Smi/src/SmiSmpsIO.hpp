@@ -83,22 +83,38 @@ public:
         inline SmiCoreCombineRule *getCoreCombineRule() { return combineRule_;}
 	inline int getNumStages(){ return nstag_;}
 	inline int *getColumnStages(){ return cstag_;}
-	inline int *getRowStages(){ return rstag_;}	
+	inline int *getRowStages(){ return rstag_;}
+	
+	void writeSmps(const char* filename);
 public:
-	SmiSmpsIO():CoinMpsIO(),nstag_(0),cstag_(NULL),rstag_(NULL),iftime(false),combineRuleSet(false){}
+	SmiSmpsIO():CoinMpsIO(),nstag_(0),cstag_(NULL),rstag_(NULL),iftime(false),ifstoch(false),smpsCardReader_(NULL),combineRule_(NULL),combineRuleSet(false),core(NULL),tree(NULL),periodMap_(),scenarioMap_() {}
+    SmiSmpsIO(SmiCoreData * core, SmiScenarioTree<SmiScnNode *> * smiTree):CoinMpsIO(),nstag_(0),cstag_(NULL),rstag_(NULL),iftime(false),ifstoch(false),smpsCardReader_(NULL),combineRule_(NULL),combineRuleSet(false),core(core),tree(smiTree),periodMap_(),scenarioMap_() {}
         ~SmiSmpsIO(){delete [] cstag_;delete[] rstag_;delete smpsCardReader_;}
 private:
+    void writeCoreFile(const char* filename);
+    void writeTimeFile(const char* filename);
+    void writeStochFile(const char* filename);
+
+    void writeScenarioToStochFile(std::stringstream& stream, SmiTreeNode<SmiScnNode *> * node, int scenario);
+    
+    std::string getModProblemName(); // get the (probably modified) problem name
+
 	int nstag_;
 	int *cstag_;
 	int *rstag_;
-	typedef std::map<string,int> StringIntMap;
-	StringIntMap periodMap_;
-	StringIntMap scenarioMap_;
+
 	bool iftime,ifstoch;
 	SmiSmpsCardReader *smpsCardReader_;
 	SmiCoreCombineRule *combineRule_;
 	bool combineRuleSet;
 	
+	SmiCoreData * core;
+	SmiScenarioTree<SmiScnNode *> * tree;
+
+    typedef std::map<string,int> StringIntMap;
+    StringIntMap periodMap_;
+    StringIntMap scenarioMap_;
+
 };
 
 
