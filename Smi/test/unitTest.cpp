@@ -4,7 +4,7 @@
 
 #include <string>
 
-#define SMI_TEST_DATA_DIR  "./SmiTestData"
+#define SMI_TEST_DATA_DIR  "SmiTestData"
 
 #include "SmiScnModel.hpp"
 #include "OsiClpSolverInterface.hpp"
@@ -1113,6 +1113,7 @@ void SmiScnModelScenarioUnitTest()
 	Then get the parent.  Repeat until parent is NULL.
 	(Only the root node has a NULL parent.)
 	*/
+    double probSum = 0;
 
 	for(is=0; is<ns; ++is)
 	{
@@ -1123,7 +1124,7 @@ void SmiScnModelScenarioUnitTest()
 		SmiScnNode *node = smiModel->getLeafNode(is);
 
 		// leaf node probability is the scenario probability
-		double scenprob = node->getModelProb();
+		double scenprob = node->getProb();
 
 		while (node != NULL)
 		{
@@ -1138,9 +1139,10 @@ void SmiScnModelScenarioUnitTest()
 			node = node->getParent();
 		}
 		objSum += scenSum*scenprob;
+        probSum += scenprob;
 	}
 
-
+    myAssert(__FILE__,__LINE__,fabs(probSum-1) < 0.01);
 	myAssert(__FILE__,__LINE__,fabs(smiOsi->getObjValue()-objSum) <	0.01);
 	free (incr);
 	free (indx);
@@ -1974,7 +1976,7 @@ void ModelBug()
 	myAssert(__FILE__,__LINE__,osiStoch->getObjValue()== 0.5);
 
 	delete smiModel;
-	delete osiCore;
+	//delete osiCore;
 
 	delete rlo0;
 	delete rlo1;
@@ -1986,11 +1988,12 @@ void SmpsBug()
 	SmiScnModel smi;
 
 	std::string dataDir=SMI_TEST_DATA_DIR;
+	dataDir += "/bug";
 
 	// read SMPS model from files
 	// <name>.core, <name>.time, and <name>.stoch
 	// the argument myCombineRule overrides the combine rule specified in the Stoch file
-	myAssert(__FILE__,__LINE__,-1!=smi.readSmps((dataDir+"/bug").c_str()));
+	myAssert(__FILE__,__LINE__,-1!=smi.readSmps(dataDir.c_str()));
 
 	// generate OSI solver object
 	// 	here we use OsiClp
@@ -2007,6 +2010,8 @@ void SmpsBug()
 	// solve
 	osiStoch->initialSolve();
 
+    smi.writeSmps("bug_smps");
+
 	// print results
 	printf("Solved stochastic program Bug\n");
 	printf("Number of rows: %d\n",osiStoch->getNumRows());
@@ -2022,34 +2027,31 @@ void SmpsBug()
 int main()
 {
 
-#if 1
-	testingMessage( "Testing SmiTreeNode \n");
+	//testingMessage( "Testing SmiTreeNode \n");
 	SmiTreeNodeUnitTest();
 
-	testingMessage( "Testing SmiScenarioTree\n" );
+	//testingMessage( "Testing SmiScenarioTree\n" );
 	SmiScenarioTreeUnitTest();
 
-	testingMessage( "Testing SmiScnSmpsIO Replace\n" );
+	//testingMessage( "Testing SmiScnSmpsIO Replace\n" );
 	SmiScnSmpsIOUnitTestReplace();
 
-	testingMessage( "Testing SmiScnSmpsIO Add\n" );
+	//testingMessage( "Testing SmiScnSmpsIO Add\n" );
 	SmiScnSmpsIOUnitTestAdd();
 
-	testingMessage( "Testing base data structures for SmiScnModel\n");
+	//testingMessage( "Testing base data structures for SmiScnModel\n");
     SmiScnModelScenarioUnitTest();
 
-	testingMessage( "Testing SmiScnModel Discrete Distribution\n" );
+	//testingMessage( "Testing SmiScnModel Discrete Distribution\n" );
 	SmiScnModelDiscreteUnitTest();
 
-	testingMessage("Model generation for simple model Bug");
+	//testingMessage("Model generation for simple model Bug");
 	ModelBug();
 
 	testingMessage("Read SMPS version of simple model Bug");
 	SmpsBug();
 
-#endif
-
-	testingMessage("Unit test for decomposition.");
+	//testingMessage("Unit test for decomposition.");
 	DecompUnitTest();
 
 	SmiCoreCombineReplace::ClearInstance();

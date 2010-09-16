@@ -303,6 +303,13 @@ double SmiScnModel::solveEV(OsiSolverInterface *osiSolver, double objSense = 1)
     osiStoch_->setObjSense(objSense);
     osiStoch_->initialSolve(); //Solve this problem. We need objSense..
 
+    //Delete new-ed objects
+    delete matrix_;
+    delete [] this->dels_;
+    delete [] this->indx_;
+    delete [] this->rstrt_;
+    matrix_ = 0; dels_ = 0; indx_ = 0; rstrt_ = 0;
+
     //Print out Matrix.. if in Debug Mode
     //TODO: Define proper Debug Mode..
     //TODO: Printout obj-functions
@@ -323,13 +330,12 @@ double SmiScnModel::solveEV(OsiSolverInterface *osiSolver, double objSense = 1)
         printf("\n%g <= %d <= %g",osiStoch_->getColLower()[mi],mi,osiStoch_->getColUpper()[mi]);
     }
 #endif
-
     return this->osiStoch_->getObjValue();
 }
 
 double SmiScnModel::solveEEV(OsiSolverInterface *osiSolver, double objSense = 1)
 {
-    solveEV(osiSolver, objSense);
+    solveEV(osiSolver, objSense); //We create a new osiSolver object in here (osiStoch_)
 
     // save the column solution for stage-1-columns
     int numStage1Cols = core_->getColStart(1);
@@ -358,13 +364,12 @@ double SmiScnModel::solveEEV(OsiSolverInterface *osiSolver, double objSense = 1)
     for (int i = 0; i < this->core_->getNumStages(); i++)
         tempNels += this->maxNelsPerScenInStage[i];
 
-    // loop over all scenarios and solve each of it individually
+    // loop over all scenarios and solve each of it individually TODO: This can get easily parallelized.
     for( int i = 0; i < this->smiTree_.getNumScenarios(); i++) {
         // We have an empty model (zero cols,rows,els)
         ncol_=0;
         nrow_=0;
         nels_=0;
-        //TODO: Create a new SolverObject by using the type of osiStoch. Need to load osiCoreData in the newly created osiStoch..
         osiStoch_->reset();
         // initialize row-ordered matrix arrays
         this->dels_ = new double[tempNels+1]; //TODO: Remove the +1 as it should work without it.. something is wrong there during addition of the elements..
@@ -405,6 +410,13 @@ double SmiScnModel::solveEEV(OsiSolverInterface *osiSolver, double objSense = 1)
         // sum up the solution values (multiplied with probabilities)
         eev += osiStoch_->getObjValue() * nodes[nodes.size()-1]->getProb();
 
+        //Delete new-ed objects
+        delete matrix_;
+        delete [] this->dels_;
+        delete [] this->indx_;
+        delete [] this->rstrt_;
+        matrix_ = 0; dels_ = 0; indx_ = 0; rstrt_ = 0;
+
         //Print out Matrix.. if in Debug Mode
         //TODO: Define proper Debug Mode..
         //TODO: Printout obj-functions
@@ -431,13 +443,14 @@ double SmiScnModel::solveEEV(OsiSolverInterface *osiSolver, double objSense = 1)
 #pragma endregion EEVP;
 
     delete [] colSolution;
-
+    delete osiStoch_;
+    osiStoch_ = NULL;
     return eev;
 }
 
 std::vector< std::pair<double,double> > SmiScnModel::solveWS(OsiSolverInterface *osiSolver, double objSense = 1) 
 {
-    this->setOsiSolverHandle(osiSolver);
+    this->setOsiSolverHandle(osiSolver); // We copy the existing solverHandle, so we have to delete it at the end?
 
     //Clean up previous stuff.
     delete[] dclo_;
@@ -499,6 +512,13 @@ std::vector< std::pair<double,double> > SmiScnModel::solveWS(OsiSolverInterface 
         osiStoch_->initialSolve(); //Solve this problem. We need objSense..
         solutionValues.push_back(make_pair<double,double>(osiStoch_->getObjValue(),nodes.back()->getProb()));
 
+        //Delete new-ed objects
+        delete matrix_;
+        delete [] this->dels_;
+        delete [] this->indx_;
+        delete [] this->rstrt_;
+        matrix_ = 0; dels_ = 0; indx_ = 0; rstrt_ = 0;
+
         //Print out Matrix.. if in Debug Mode
         //TODO: Define proper Debug Mode..
         //TODO: Printout obj-functions
@@ -521,6 +541,8 @@ std::vector< std::pair<double,double> > SmiScnModel::solveWS(OsiSolverInterface 
         printf("\n");
 #endif
     }
+    delete osiStoch_;
+    osiStoch_ = NULL;
     return solutionValues;
 }
 
