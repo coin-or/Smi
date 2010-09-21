@@ -944,7 +944,7 @@ void SmiSmpsIO::writeTimeFile(const char* filename) {
         line << std::setw(25) << std::left << this->rowName(core->getRowStart(stg));
         stg == 0 ? line << "ROOT\n" : line << "STAGE_" << stg << "\n";
     }
-    line << "ENDDATA\n";
+    line << "ENDATA\n";
     output->puts(line.str());        
     delete output;
 }
@@ -967,7 +967,7 @@ void SmiSmpsIO::writeStochFile(const char* filename) {
         writeScenarioToStochFile(line, tree->getLeaf(scen), scen);
     }
     
-    line << "ENDDATA\n";
+    line << "ENDATA\n";
     output->puts(line.str());        
     delete output;
 }
