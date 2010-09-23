@@ -7,6 +7,7 @@
 
 using namespace std;
 
+
 int nrow_;
 int ncol_;
 int nz_; // We can count the total number of elements, but I do not if we need this at one point
@@ -318,8 +319,9 @@ SmiCoreData::~SmiCoreData()
 	delete [] cdcup_;
 	delete [] cdobj_;
     delete [] integerIndices_;
-	for (unsigned int i=1; i<nodes_.size(); ++i)
-	  delete nodes_[i];
+    for (int ijk=0; ijk<nodes_.size(); ijk++){
+	  delete nodes_[ijk];
+    }
 
 }
 
@@ -545,9 +547,12 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 	this->strt_[i_start] = offset_dst;
 
 	// return excess memory to the heap
-	this->dels_=(double *)realloc(this->dels_,offset_dst*sizeof(double));
-	this->inds_=(int *)realloc(this->inds_,offset_dst*sizeof(int));
-
+    void *temp_ptr = realloc(this->dels_,offset_dst*sizeof(double));
+    if (temp_ptr) 
+        this->dels_ = (double*)temp_ptr;
+    temp_ptr = realloc(this->inds_,offset_dst*sizeof(int));
+    if (temp_ptr)
+        this->inds_ = (int*)temp_ptr;
 }
 
 int SmiNodeData::combineWithDenseCoreRow(double *dr,const int nels,const int *inds, const double *dels, double *dest_dels,int *dest_indx)
@@ -609,13 +614,7 @@ void SmiNodeData::copyObjective(double * d){
 
 SmiNodeData::~SmiNodeData()
 {
-	if (--ptr_count)
-		return;
-
 	SmiRowMap::iterator iRowMap;
-
-//	for (iRowMap=rowMap.begin(); iRowMap!=rowMap.end(); ++iRowMap)
-//	  iRowMap->second;
 
 	SmiDenseRowMap::iterator idRowMap;
 	for (idRowMap=dRowMap.begin(); idRowMap!=dRowMap.end(); ++idRowMap)

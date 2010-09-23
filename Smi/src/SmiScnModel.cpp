@@ -236,7 +236,9 @@ SmiScenarioIndex SmiScnModel::generateScenario(SmiCoreData *core,
     return scen;
 
 }
-double SmiScnModel::getWSValue(OsiSolverInterface *osiSolver, double objSense = 1){
+
+// Main public interfaces for getting WS, EV, and EEV values (no coefficients whatsoever).
+double SmiScnModel::getWSValue(OsiSolverInterface *osiSolver, double objSense ){
     //Test if wsValues is empty, if this is the case, run solveWS
     std::vector< std::pair<double,double> > tempVector = solveWS(osiSolver, objSense);
     assert( tempVector.size() == smiTree_.getNumScenarios()); 
@@ -247,9 +249,22 @@ double SmiScnModel::getWSValue(OsiSolverInterface *osiSolver, double objSense = 
     return result;
 }
 
-double SmiScnModel::solveEV(OsiSolverInterface *osiSolver, double objSense = 1)
+double SmiScnModel::getEVValue(OsiSolverInterface *osiSolver, double objSense ){
+    //Test if wsValues is empty, if this is the case, run solveWS
+    std::pair<double, double*> results(solveEV(osiSolver,objSense));
+    delete[] results.second;
+    return results.first;
+}
+
+double SmiScnModel::getEEVValue(OsiSolverInterface* osiSolver, double objSense){
+    return solveEEV(osiSolver,objSense);
+}
+
+std::pair<double,double*> SmiScnModel::solveEV(OsiSolverInterface *osiSolver, double objSense )
 {
-    this->setOsiSolverHandle(osiSolver);
+    // We create a new osiSolver Handle at this point. 
+    OsiSolverInterface* tempPtr = osiStoch_;
+    osiStoch_ = osiSolver->clone(false);
 
     //Clean up previous stuff.
     delete[] dclo_;
@@ -274,8 +289,6 @@ double SmiScnModel::solveEV(OsiSolverInterface *osiSolver, double objSense = 1)
     ncol_=0;
     nrow_=0;
     nels_=0;
-    //TODO: Create a new SolverObject by using the type of osiStoch. Need to load osiCoreData in the newly created osiStoch..
-    osiStoch_->reset();
     // initialize row-ordered matrix arrays
     this->dels_ = new double[tempNels]; //TODO: Remove the +1 as it should work without it.. something is wrong there during addition of the elements..
     this->indx_ = new int[tempNels];
@@ -330,17 +343,26 @@ double SmiScnModel::solveEV(OsiSolverInterface *osiSolver, double objSense = 1)
         printf("\n%g <= %d <= %g",osiStoch_->getColLower()[mi],mi,osiStoch_->getColUpper()[mi]);
     }
 #endif
-    return this->osiStoch_->getObjValue();
+    
+    double * colSolution = new double[core_->getColStart(1)];
+    memcpy(colSolution, osiStoch_->getColSolution(), (core_->getColStart(1) * sizeof(double)) );
+    int objValue = osiStoch_->getObjValue();
+    delete osiStoch_;
+    osiStoch_ = tempPtr;
+    return make_pair(objValue,colSolution );
 }
 
-double SmiScnModel::solveEEV(OsiSolverInterface *osiSolver, double objSense = 1)
+double SmiScnModel::solveEEV(OsiSolverInterface *osiSolver, double objSense)
 {
-    solveEV(osiSolver, objSense); //We create a new osiSolver object in here (osiStoch_)
+    OsiSolverInterface* tempPtr = osiStoch_;
+    osiStoch_ = osiSolver->clone(false);
+    std::pair<double, double* > evResult(solveEV(osiSolver, objSense)); //We create a new osiSolver object in here (osiStoch_)
+    
 
     // save the column solution for stage-1-columns
     int numStage1Cols = core_->getColStart(1);
-    double * colSolution = new double[numStage1Cols];
-    memcpy(colSolution, osiStoch_->getColSolution(), (numStage1Cols * sizeof(double)));
+    double * colSolution = evResult.second;
+
 
 #pragma region EEVP
     double eev = 0; // the value of the EEVP
@@ -444,13 +466,14 @@ double SmiScnModel::solveEEV(OsiSolverInterface *osiSolver, double objSense = 1)
 
     delete [] colSolution;
     delete osiStoch_;
-    osiStoch_ = NULL;
+    osiStoch_ = tempPtr;
     return eev;
 }
 
-std::vector< std::pair<double,double> > SmiScnModel::solveWS(OsiSolverInterface *osiSolver, double objSense = 1) 
+std::vector< std::pair<double,double> > SmiScnModel::solveWS(OsiSolverInterface *osiSolver, double objSense) 
 {
-    this->setOsiSolverHandle(osiSolver); // We copy the existing solverHandle, so we have to delete it at the end?
+    OsiSolverInterface* tempPtr = osiStoch_;
+    osiStoch_ = osiSolver->clone(false); // We copy the existing solverHandle, so we have to delete it at the end?
 
     //Clean up previous stuff.
     delete[] dclo_;
@@ -542,7 +565,7 @@ std::vector< std::pair<double,double> > SmiScnModel::solveWS(OsiSolverInterface 
 #endif
     }
     delete osiStoch_;
-    osiStoch_ = NULL;
+    osiStoch_ = tempPtr;
     return solutionValues;
 }
 

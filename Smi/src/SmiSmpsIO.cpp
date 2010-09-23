@@ -169,6 +169,8 @@ SmiSmpsIO::readTimeFile(SmiScnModel *smi, const char *c, const char *ext)
 
 
 	SmiCoreData *smiCoreData = new SmiCoreData(this,nstag_+1,cstag_,rstag_,intInd,intLen,binInd,binLen);
+    delete[] intInd;
+    delete[] binInd;
 	return smiCoreData;
 
 }
