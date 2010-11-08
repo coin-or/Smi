@@ -757,23 +757,25 @@ SmiSmpsCardReader::nextSmpsField (  )
 			  if (!(next = strtok(NULL,blanks)))
 			  {
 				  smiSmpsType_ = SMI_UNKNOWN_MPS_TYPE;
-				  break;
+				  //break;
 			  }
 			  // find the section, if there is one
 			  // next card should be DISCRETE
 			  if (!(next = strtok(NULL,blanks)))
 			  {
 				  smiSmpsType_ = SMI_UNKNOWN_MPS_TYPE;
-				  break;
+				  //break;
 			  }
 			  // find the section, if there is one
-			  
-			  for ( i = SMI_SMPS_COMBINE_ADD; i < SMI_SMPS_COMBINE_UNKNOWN; i++ ) {
-				  if ( !strncmp ( next, smpsType[i], strlen ( section[i] ) ) ) {
-					  break;
-				  }
+			  if (next == NULL) {
+			    i = SMI_SMPS_COMBINE_REPLACE; 
+			  } else {
+			      for ( i = SMI_SMPS_COMBINE_ADD; i < SMI_SMPS_COMBINE_UNKNOWN; i++ ) {
+				      if ( !strncmp ( next, smpsType[i], strlen ( section[i] ) ) ) {
+					      break;
+				      }
+			      }
 			  }
-			  
 		   }
 			  // set combine rule if it is not already set.
 		   if (!combineRuleSet)
@@ -840,7 +842,7 @@ std::string SmiSmpsIO::getModProblemName() {
     return name;
 }
 
-void SmiSmpsIO::writeCoreFile(const char* filename) {
+void SmiSmpsIO::writeCoreFile(const char* filename, const char* extension, const bool strictFormat) {
     // count nels
     int nels = 0;
     for (int t = 0; t < core->getNumStages(); t++) {
@@ -898,14 +900,43 @@ void SmiSmpsIO::writeCoreFile(const char* filename) {
         ncol += core->getNumCols(stg);
 	    nrow += core->getNumRows(stg);
     }
+    // 
+    if (solverInf_ != this->infinity_){
+    // We have to transform the values from solverInfinity to infinity
+        for (int i = 0; i < core->getNumCols(); i++){
+            if (clo[i] == -solverInf_)
+                clo[i] = -infinity_;
+            if (clo[i] == solverInf_)
+                clo[i] = infinity_;
+            if (cup[i] == -solverInf_)
+                cup[i] = -infinity_;
+            if (cup[i] == solverInf_)
+                cup[i] = infinity_;
+            if (obj[i] == -solverInf_)
+                obj[i] = -infinity_;
+            if (obj[i] == solverInf_)
+                obj[i] = infinity_;
+        }
+        for (int i = 0; i < core->getNumRows(); i++){
+            if (rlo[i] == -solverInf_)
+                rlo[i] = -infinity_;
+            if (rlo[i] == solverInf_)
+                rlo[i] = infinity_;
+            if (rup[i] == -solverInf_)
+                rup[i] = -infinity_;
+            if (rup[i] == solverInf_)
+                rup[i] = infinity_;
+        }
+        // We assume that there are no infinity values in the coefficient matrix..
+    }
     
     CoinPackedMatrix matrix(false, ncol, nrow, nels, dels, indx, rstrt, NULL);
     
     delete [] dels;
     delete [] indx;
     delete [] rstrt;
-    
-    this->setMpsData(matrix, this->infinity_, clo, cup, obj, NULL, rlo, rup, NULL, NULL);
+       
+    this->setMpsData(matrix, this->infinity_, clo, cup, obj, NULL, rlo, rup, this->core->getColumnNames(strictFormat), NULL);
 
     delete [] clo;
     delete [] cup;
@@ -924,13 +955,17 @@ void SmiSmpsIO::writeCoreFile(const char* filename) {
     delete [] integrality;
     
     std::string fnWithExt = filename;
-    fnWithExt += ".core";
-    this->writeMps(fnWithExt.c_str());
+    fnWithExt.append(".").append(extension);
+    
+    if (strictFormat)
+        this->writeMps(fnWithExt.c_str());
+    else
+        this->writeMps(fnWithExt.c_str(), 0, 1);
 }
 
-void SmiSmpsIO::writeTimeFile(const char* filename) {
+void SmiSmpsIO::writeTimeFile(const char* filename, const char* extension, const bool strictFormat) {
     std::string fnWithExt = filename;
-    fnWithExt.append(".time");
+    fnWithExt.append(".").append(extension);
     CoinFileOutput* output = CoinFileOutput::create(fnWithExt, CoinFileOutput::COMPRESS_NONE);
 
     std::stringstream line;
@@ -941,8 +976,10 @@ void SmiSmpsIO::writeTimeFile(const char* filename) {
         line << "    ";
         if (core->getColStart(stg) == core->getNumCols())
             line << std::setw(10) << std::left << "RHS"; // if this stage has no columns, it may have some RHS values
-        else
+        else if (strictFormat)
             line << std::setw(10) << std::left << this->columnName(core->getColStart(stg));
+        else
+            line << this->columnName(core->getColStart(stg)) << " ";
         line << std::setw(25) << std::left << this->rowName(core->getRowStart(stg));
         line << "STAGE_" << stg << "\n";
     }
@@ -951,22 +988,31 @@ void SmiSmpsIO::writeTimeFile(const char* filename) {
     delete output;
 }
 
-void SmiSmpsIO::writeStochFile(const char* filename) {
+void SmiSmpsIO::writeStochFile(const char* filename, const char* extension, const bool strictFormat) {
     std::string fnWithExt = filename;
-    fnWithExt.append(".stoch");
+    fnWithExt.append(".").append(extension);
     CoinFileOutput* output = CoinFileOutput::create(fnWithExt, CoinFileOutput::COMPRESS_NONE);
     
-    std::stringstream line;
+    std::ostringstream line;
     line.fill(' ');
+
+    if (strictFormat) {
+        line << setprecision(11);
+    }
+    else {
+        line << setprecision(20);
+    }
+    
     line << "STOCH         " << this->getModProblemName() << "\n";
-    line << "SCENARIOS     DISCRETE                 ";
-    if (tree->getLeaf(0)->getDataPtr()->getNode()->getCoreCombineRule() == SmiCoreCombineReplace::Instance())
-        line << "REPLACE\n";
-    else
-        line << "ADD\n";
+    line << "SCENARIOS     DISCRETE\n";
+    //line << "SCENARIOS     DISCRETE                 ";
+    //if (tree->getLeaf(0)->getDataPtr()->getNode()->getCoreCombineRule() == SmiCoreCombineReplace::Instance())
+    //    line << "REPLACE\n";
+    //else
+    //    line << "ADD\n";
         
     for (int scen = 0; scen < tree->getNumScenarios(); scen++) {
-        writeScenarioToStochFile(line, tree->getLeaf(scen), scen);
+        writeScenarioToStochFile(line, tree->getLeaf(scen), scen, strictFormat);
     }
     
     line << "ENDATA\n";
@@ -974,20 +1020,33 @@ void SmiSmpsIO::writeStochFile(const char* filename) {
     delete output;
 }
 
-void SmiSmpsIO::writeScenarioToStochFile(std::stringstream& stream, SmiTreeNode<SmiScnNode *> * node, int scenario) {
+void SmiSmpsIO::writeScenarioToStochFile(std::ostringstream& stream, SmiTreeNode<SmiScnNode *> * node, int scenario, bool strictFormat) {
     // first, go up the tree - if possible and the parent node is still within the same scenario and not the root node
     // if thats not the case, we reached the first node for that scenario
     if (node->hasParent() && node->getParent()->scenario() == scenario && node->getParent() != tree->getRoot()) {
-        writeScenarioToStochFile(stream, node->getParent(), scenario);
+        // go up the tree
+        writeScenarioToStochFile(stream, node->getParent(), scenario, strictFormat);
     } else {
+        // write scenario card
         stream << " SC Scen_" << std::setw(5) << std::left << node->scenario();
+
         if (node->getParent() != tree->getRoot()) {
-            stream << "Scen_" << std::setw(10) << std::left << node->getParent()->scenario();
+            // branches from parent scenario
+            stream << "Scen_" << std::setw(5) << std::left << node->getParent()->scenario();
         } else {
-            stream << std::setw(15) << std::left << "ROOT";
+            // branches from root, i.e. Scen_0.
+            if (scenario == 0) // First Scenario (Scen_0) branches from ROOT, other scenarios branches from Scen_0
+                stream << std::setw(10) << std::left << "'ROOT'";
+            else
+                stream << std::setw(10) << std::left << "Scen_0";
         }
-        stream << std::setw(10) << tree->getLeaf(scenario)->getDataPtr()->getProb();
-        stream << "STAGE_" << node->getDataPtr()->getStage() << "\n";
+
+        if (strictFormat)
+            stream << std::setw(15) << std::left << tree->getLeaf(scenario)->getDataPtr()->getProb(); // write the probabilty
+        else
+            stream << tree->getLeaf(scenario)->getDataPtr()->getProb() << " "; // write the probabilty
+
+        stream << "STAGE_" << node->getDataPtr()->getStage() << "\n"; // write the stage number
     }
     
     // now we can print the stochastic data
@@ -997,44 +1056,112 @@ void SmiSmpsIO::writeScenarioToStochFile(std::stringstream& stream, SmiTreeNode<
         for (int i = data->getCore()->getRowStart(data->getStage()); i < data->getCore()->getRowStart(data->getStage()+1); i++) {
             for (int j = 0; j < data->getRowLength(i); j++) {
                 stream << "    " << std::setw(10) << std::left << this->columnName(data->getRowIndices(i)[j]);
-                stream << std::setw(15) << std::left << this->rowName(i);
+                stream << std::setw(10) << std::left << this->rowName(i);
                 stream << data->getRowElements(i)[j] << "\n";
             }
         }
     }
-    if (data->getColLowerLength() > 0) {
-        // write column lower elements
-    }
-    if (data->getColUpperLength() > 0) {
-        // write column upper elements
-    }
 
     // write row lower elements
     for (int i = 0; i < data->getRowLowerLength(); i++) {
-        stream << "    RHS       " << std::setw(15) << std::left << this->rowName(data->getRowLowerIndices()[i]) << data->getRowLowerElements()[i] << "\n";
+        stream << "    RHS       " << std::setw(10) << std::left << this->rowName(data->getRowLowerIndices()[i]) << data->getRowLowerElements()[i] << "\n";
     }
 
     // write row upper elements
     for (int i = 0; i < data->getRowUpperLength(); i++) {
         if (this->getRowSense()[data->getRowUpperIndices()[i]] != 'E')
-            stream << "    RHS       " << std::setw(15) << std::left << this->rowName(data->getRowUpperIndices()[i]) << data->getRowUpperElements()[i] << "\n";
+            stream << "    RHS       " << std::setw(10) << std::left << this->rowName(data->getRowUpperIndices()[i]) << data->getRowUpperElements()[i] << "\n";
     }
 
     // write objective elements
     for (int i = 0; i < data->getObjectiveLength(); i++) {
         stream << "    " << std::setw(10) << std::left << this->columnName(data->getObjectiveIndices()[i]) << "OBJROW         " << data->getObjectiveElements()[i] << "\n";
     }
+
+    // write column bounds    
+    if (data->getColLowerLength() > 0 || data->getColUpperLength() > 0) {
+        int icl = 0, icu = 0;
+        while (icl < data->getColLowerLength() || icu < data->getColUpperLength()) {
+            
+            if (icl < data->getColLowerLength() &&  icu < data->getColUpperLength() && data->getColLowerIndices()[icl] == data->getColUpperIndices()[icu]) {
+                // lower and upper bound given for current column
+                if (data->getColLowerElements()[icl] == data->getColUpperElements()[icu]) {
+                    // variable is fixed
+                    stream << " FX BOUND     " << std::setw(10) << std::left << this->columnName(data->getColLowerIndices()[icl]) << data->getColLowerElements()[icl];
+                } 
+                else if (data->getColLowerElements()[icl] == 0.0 && data->getColUpperElements()[icu] == 1.0) {
+                    // variable is binary
+                    stream << " BV BOUND     " << std::setw(10) << std::left << this->columnName(data->getColLowerIndices()[icl]);
+                }
+                else if (data->getColLowerElements()[icl] == -this->solverInf_ && data->getColUpperElements()[icu] == this->solverInf_) {
+                    // variable is free
+                    stream << " FR BOUND     " << std::setw(10) << std::left << this->columnName(data->getColLowerIndices()[icl]);
+                }
+                icl++; icu++;
+                continue;
+            }
+            
+            if (icu >= data->getColUpperLength() || data->getColLowerIndices()[icl] < data->getColUpperIndices()[icu]) {
+                // write column lower bound
+                if (this->isInteger(icl)) {
+                    // column lower bound for integer variable
+                    stream << " LI BOUND     " << std::setw(10) << std::left << this->columnName(data->getColLowerIndices()[icl]) << data->getColLowerElements()[icl];
+                }
+                else {
+                    if (data->getColLowerElements()[icl] == -this->solverInf_) {
+                        // lower bound is -infinity
+                        stream << " MI BOUND     " << std::setw(10) << std::left << this->columnName(data->getColLowerIndices()[icl]);
+                    }
+                    else {
+                        // normal column lower bound
+                        stream << " LO BOUND     " << std::setw(10) << std::left << this->columnName(data->getColLowerIndices()[icl]) << data->getColLowerElements()[icl];
+                    }
+                }
+                icl++;
+            }
+            else {
+                // write column upper bound
+                if (this->isInteger(icu)) {
+                    // column upper bound for integer variable
+                    stream << " UI BOUND     " << std::setw(10) << std::left << this->columnName(data->getColUpperIndices()[icu]) << data->getColUpperElements()[icu];
+                }
+                else {
+                    if (data->getColUpperElements()[icu] == this->solverInf_) {
+                        // upper bound is infinity
+                        stream << " PL BOUND     " << std::setw(10) << std::left << this->columnName(data->getColUpperIndices()[icu]);
+                    }
+                    else {
+                        // normal column upper bound
+                        stream << " UP BOUND     " << std::setw(10) << std::left << this->columnName(data->getColUpperIndices()[icu]) << data->getColUpperElements()[icu];
+                    }
+                }
+                icu++;
+            }
+        }
+    }
+
 }
 
-void SmiSmpsIO::writeSmps(const char* filename) {
-    //write core file
-    this->writeCoreFile(filename);
-    
-    // write time file
-    this->writeTimeFile(filename);
-    
-    // write stoch file
-    this->writeStochFile(filename);
+void SmiSmpsIO::writeSmps(const char* filename, bool winFileExtensions, bool strictFormat) {
+    if (winFileExtensions) {
+        //write core file
+        this->writeCoreFile(filename, "cor", strictFormat);
+        
+        // write time file
+        this->writeTimeFile(filename, "tim", strictFormat);
+        
+        // write stoch file
+        this->writeStochFile(filename, "sto", strictFormat);
+    } else {
+        //write core file
+        this->writeCoreFile(filename, "core", strictFormat);
+        
+        // write time file
+        this->writeTimeFile(filename, "time", strictFormat);
+        
+        // write stoch file
+        this->writeStochFile(filename, "stoch", strictFormat);
+    }
     
     this->freeAll();
 }

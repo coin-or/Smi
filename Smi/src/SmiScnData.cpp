@@ -38,7 +38,7 @@ vector< vector<int> > intColsStagewise; // For each stage separately, it contain
 SmiCoreData::SmiCoreData(OsiSolverInterface *osi,int nstag,int *cstag,int *rstag, int* integerIndices,int integerLength, int* binaryIndices, int binaryLength):
 nrow_(0),ncol_(0),nz_(0),nstag_(nstag),nColInStage_(NULL),nRowInStage_(NULL),stageColPtr_(NULL),colStage_(NULL),rowStage_(NULL),colEx2In_(NULL),rowEx2In_(NULL),
 colIn2Ex_(NULL),rowIn2Ex_(NULL),integerIndices_(NULL),integerLength_(0),binaryIndices_(NULL),binaryLength_(0),
-cdrlo_(NULL),cdrup_(NULL),cdobj_(NULL),cdclo_(NULL),cdcup_(NULL),nodes_(),pDenseRow_(),intColsStagewise(nstag,std::vector<int>())
+cdrlo_(NULL),cdrup_(NULL),cdobj_(NULL),cdclo_(NULL),cdcup_(NULL),nodes_(),pDenseRow_(),intColsStagewise(nstag,std::vector<int>()),colNamesFree(NULL),colNamesStrict(NULL)
 {	//Copies all values already stored in the Solver..
     int nrow = osi->getNumRows();
     int ncol = osi->getNumCols();
@@ -52,6 +52,7 @@ cdrlo_(NULL),cdrup_(NULL),cdobj_(NULL),cdclo_(NULL),cdcup_(NULL),nodes_(),pDense
     matrix->eliminateDuplicates(0.0);
 
     gutsOfConstructor(nrow,ncol,nstag,cstag,rstag,matrix,dclo,dcup,dobj,drlo,drup,integerIndices,integerLength,binaryIndices,binaryLength);
+    infinity_ = osi->getInfinity();
 
     delete matrix;
     delete drlo;
@@ -64,7 +65,7 @@ cdrlo_(NULL),cdrup_(NULL),cdobj_(NULL),cdclo_(NULL),cdcup_(NULL),nodes_(),pDense
 SmiCoreData::SmiCoreData(CoinMpsIO *osi,int nstag,int *cstag,int *rstag,int* integerIndices,int integerLength, int* binaryIndices, int binaryLength):
 nrow_(0),ncol_(0),nz_(0),nstag_(nstag),nColInStage_(NULL),nRowInStage_(NULL),stageColPtr_(NULL),colStage_(NULL),rowStage_(NULL),colEx2In_(NULL),rowEx2In_(NULL),
 colIn2Ex_(NULL),rowIn2Ex_(NULL),integerIndices_(NULL),integerLength_(0),binaryIndices_(NULL),binaryLength_(0),
-cdrlo_(NULL),cdrup_(NULL),cdobj_(NULL),cdclo_(NULL),cdcup_(NULL),nodes_(),pDenseRow_(),intColsStagewise(nstag,std::vector<int>())
+cdrlo_(NULL),cdrup_(NULL),cdobj_(NULL),cdclo_(NULL),cdcup_(NULL),nodes_(),pDenseRow_(),intColsStagewise(nstag,std::vector<int>()),colNamesFree(NULL),colNamesStrict(NULL)
 {
     int nrow = osi->getNumRows();
     int ncol = osi->getNumCols();
@@ -78,6 +79,7 @@ cdrlo_(NULL),cdrup_(NULL),cdobj_(NULL),cdclo_(NULL),cdcup_(NULL),nodes_(),pDense
     matrix->eliminateDuplicates(0.0);
     
     gutsOfConstructor(nrow,ncol,nstag,cstag,rstag,matrix,dclo,dcup,dobj,drlo,drup,integerIndices,integerLength,binaryIndices,binaryLength);
+    infinity_ = osi->getInfinity();
 
     delete matrix;
     delete drlo;
@@ -323,6 +325,14 @@ SmiCoreData::~SmiCoreData()
 	  delete nodes_[ijk];
     }
 
+    if (colNamesStrict != NULL && colNamesFree != NULL) {
+        for (int i = 0; i < this->getNumCols(); i++) {
+            delete [] colNamesStrict[i];
+            delete [] colNamesFree[i];
+        }
+        delete [] colNamesStrict;
+        delete [] colNamesFree;
+    }
 }
 
 void

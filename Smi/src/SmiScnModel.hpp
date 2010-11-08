@@ -70,9 +70,22 @@ public:
 
     */
     int readSmps(const char *name,
-        SmiCoreCombineRule *r=NULL );
+        SmiCoreCombineRule *r=NULL);
 
-    void writeSmps(const char *name);
+    /**@name Writes SMPS files.
+    
+    This method generates three files {name}.[core, time, stoch] or {name}.[cor, tim, sto] (see second parameter).
+    
+    @param name The name for the model and the written files
+    
+    @param winFileExtensions optional; false by default, so extensions will be [core, time, stoch]. With this parameter set to true, it will be [cor, tim, sto].
+    
+    @param strictFormat optional, true by default. Set to false if SMPS files should be written in free format.
+    
+    @return -1 in case of no existing SMI model, otherwise 0
+    
+    */
+    int writeSmps(const char *name, bool winFileExtensions = false, bool strictFormat = true);
 
     SmiCoreData * getCore() {return core_;}
 

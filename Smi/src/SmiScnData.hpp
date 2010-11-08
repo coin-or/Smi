@@ -224,6 +224,7 @@ public:
 	inline int getIntegerLength() { return integerLength_; }
     inline int* getBinaryIndices() { return binaryIndices_; } //indices of binary variables
     inline int getBinaryLength() { return binaryLength_; }
+    inline double getInfinity() { return infinity_; }
 
 	void copyRowLower(double * drlo,SmiStageIndex t );
 	void copyRowUpper(double * drup,SmiStageIndex t);
@@ -232,6 +233,10 @@ public:
 	void copyObjective(double * dobj,SmiStageIndex t);
 
 	inline SmiNodeData * getNode(SmiStageIndex t){return nodes_[t];}
+
+	inline void setColumnNames(char** namesStrict, char** namesFree) { this->colNamesStrict = namesStrict; this->colNamesFree = namesFree; }
+	inline char** getColumnNames(bool strictFormat = true) { if (strictFormat) return this->colNamesStrict; else return this->colNamesFree; }
+
     SmiCoreData(CoinMpsIO *cMps, int nstag, int *cstag, int *rstag,int *integerIndices = 0, int integerLength = 0, int *binaryIndices = 0, int binaryLength = 0);
     SmiCoreData(OsiSolverInterface *osi, int nstag, int *cstag, int *rstag,int *integerIndices = 0, int integerLength = 0, int *binaryIndices = 0, int binaryLength = 0);
 	
@@ -265,6 +270,7 @@ private:
     int integerLength_; //number of integer variables
     int *binaryIndices_; //indices of binary variables
     int binaryLength_; //number of binary variables
+    double infinity_; //Infinity of solver
 	double **cdrlo_;
 	double **cdrup_;
 	double **cdobj_;
@@ -273,6 +279,8 @@ private:
 	vector<SmiNodeData*> nodes_; //Nodes, that contain stage dependent constraints (with Bounds,Ranges,Objective,Matrix), so called CoreNodes 
 	vector<double *> pDenseRow_; //dense probability vector
 	vector< vector<int> > intColsStagewise; // For each stage separately, it contains the position of every integer column
+	char **colNamesStrict;
+	char **colNamesFree;
 };
 
 #endif //#define SmiScnData_HPP

@@ -174,10 +174,6 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath="..\..\..\src\OsiStochasticSolverInterface.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\SmiCoreCombineRule.cpp"
 				>
 			</File>
@@ -187,10 +183,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\SmiMessage.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\SmiModel.cpp"
 				>
 			</File>
 			<File
@@ -259,10 +251,6 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
-				RelativePath="..\..\..\src\OsiStochasticSolverInterface.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\SmiCoreCombineRule.hpp"
 				>
 			</File>
@@ -276,10 +264,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\SmiMessage.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\SmiModel.hpp"
 				>
 			</File>
 			<File
