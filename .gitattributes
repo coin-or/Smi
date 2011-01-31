@@ -16,6 +16,8 @@ Smi/MSVisualStudio/v8/Smi.suo -text
 Smi/MSVisualStudio/v8/libSmi/smiLib.vcproj -text
 Smi/MSVisualStudio/v8/unitTestSmi/smiUnitTest.vcproj -text
 Smi/MSVisualStudio/v9/Smi.sln -text
+Smi/MSVisualStudio/v9/exampleFlopcpp_Invest/exampleFlopcpp_Invest.vcproj -text
+Smi/MSVisualStudio/v9/exampleFlopcpp_Transp/exampleFlopcpp_Transp.vcproj -text
 Smi/MSVisualStudio/v9/exampleSmi/exampleSmi.vcproj -text
 Smi/MSVisualStudio/v9/libSmi/smiLib.vcproj -text
 Smi/MSVisualStudio/v9/unitTestSmi/app0110.cor -text
@@ -37,7 +39,16 @@ Smi/configure.ac -text
 Smi/examples/Makefile.in -text
 Smi/examples/investment.cpp -text
 Smi/examples/stoch.cpp -text
+Smi/flopcpp_examples/Makefile.in -text
+Smi/flopcpp_examples/corenode_base.cpp -text
+Smi/flopcpp_examples/corenode_base.hpp -text
+Smi/flopcpp_examples/ex_invest.cpp -text
+Smi/flopcpp_examples/ex_transp.cpp -text
+Smi/flopcpp_examples/flop-smi_methods.cpp -text
+Smi/flopcpp_examples/flop-smi_methods.hpp -text
 Smi/flopcpp_examples/investment/investment.cpp -text
+Smi/flopcpp_examples/scen-tree_struct.cpp -text
+Smi/flopcpp_examples/scen-tree_struct.hpp -text
 Smi/inc/config_smi.h.in -text
 Smi/src/.cproject -text
 Smi/src/.project -text
