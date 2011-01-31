@@ -16,7 +16,6 @@ Smi/MSVisualStudio/v8/Smi.suo -text
 Smi/MSVisualStudio/v8/libSmi/smiLib.vcproj -text
 Smi/MSVisualStudio/v8/unitTestSmi/smiUnitTest.vcproj -text
 Smi/MSVisualStudio/v9/Smi.sln -text
-Smi/MSVisualStudio/v9/exampleFlopCpp/exampleFlopCpp.vcproj -text
 Smi/MSVisualStudio/v9/exampleSmi/exampleSmi.vcproj -text
 Smi/MSVisualStudio/v9/libSmi/smiLib.vcproj -text
 Smi/MSVisualStudio/v9/unitTestSmi/app0110.cor -text
