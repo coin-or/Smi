@@ -12,6 +12,7 @@
 */
 
 #include <cstdlib>
+#include <cmath>
 #include "scen-tree_struct.hpp"
 
 using namespace std;
@@ -36,13 +37,11 @@ int BinTreeStruct::set_scen_nodes(int const sc)
 }
 
 
-long int lround(double A){return floor(A+0.5);}
-
 BinTreeStruct::BinTreeStruct(int const T)
-: ScenTreeStruct(lround(pow(2.0, T-1)), T),
+: ScenTreeStruct((int) floor(pow(2.0, T-1) + 0.5), T),
   nextScen(0), scenProb(1.0 / nmbScens)
 {
-	int firstLeaf = lround(pow(2.0, T-1)) - 1;
+	int firstLeaf = (int) floor(pow(2.0, T-1) + 0.5) - 1;
 	assert ((int) leaves.size() == nmbScens && "done in the parent class");
 	for (int s = 0; s < nmbScens; s++) {
 		leaves[s] = firstLeaf + s;

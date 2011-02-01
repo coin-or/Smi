@@ -17,7 +17,6 @@
 #include <iostream>
 #include <vector>
 #include <cassert>
-#include <cmath>
 
 namespace FlopSmiEx {
 using std::vector;
