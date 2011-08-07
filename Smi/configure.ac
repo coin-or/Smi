@@ -60,12 +60,6 @@ AC_COIN_CHECK_PACKAGE(Osi, [osi], [Smi])
 AC_COIN_CHECK_PACKAGE(Clp, [osi-clp])
 AC_COIN_CHECK_PACKAGE(DataStochastic, [coindatastochastic])
 
-#############################################################################
-#                             Other dependencies                            #
-#############################################################################
-
-AC_COIN_CHECK_GNU_READLINE
-
 ##############################################################################
 #                   VPATH links for example input files                      #
 ##############################################################################
