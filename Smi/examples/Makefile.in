@@ -37,68 +37,64 @@ VPATH = @srcdir@
 #  COIN package.                                                         #
 ##########################################################################
 
+COIN_HAS_PKGCONFIG = @COIN_HAS_PKGCONFIG_TRUE@TRUE
+COIN_CXX_IS_CL = @COIN_CXX_IS_CL_TRUE@TRUE
+COIN_HAS_DATASTOCHASTIC = @COIN_HAS_DATASTOCHASTIC_TRUE@TRUE
+
 # C++ Compiler command
 CXX = @CXX@
 
 # C++ Compiler options
 CXXFLAGS = @CXXFLAGS@
 
+# Stochastic data directory
+ifeq ($(COIN_HAS_DATASTOCHASTIC), TRUE)
+  ifeq ($(COIN_HAS_PKGCONFIG), TRUE)
+    CXXFLAGS += -DDATASTOCHASTICDIR=\"`PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --variable=datadir coindatastochastic`\"
+  else
+    CXXFLAGS += -DDATASTOCHASTICDIR=\"@DATASTOCHASTIC_DATA_INSTALLED@\"
+  endif
+endif
+
 # additional C++ Compiler options for linking
 CXXLINKFLAGS = @RPATH_FLAGS@
 
-###########################################################################
+# Include directories (we use the CYGPATH_W variables to allow compilation with Windows compilers)
+ifeq ($(COIN_HAS_PKGCONFIG), TRUE)
+  INCL = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --cflags smi osi-clp`
+else
+  INCL = @SMI_CFLAGS_INSTALLED@ @CLP_CFLAGS_INSTALLED@
+endif
+INCL += $(ADDINCFLAGS)
+
+# Linker flags
+ifeq ($(COIN_HAS_PKGCONFIG), TRUE)
+  LIBS = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs smi osi-clp`
+else
+  ifeq ($(COIN_CXX_IS_CL), TRUE)
+    LIBS = -link -libpath:`$(CYGPATH_W) @abs_lib_dir@` libSmi.lib @SMI_LIBS_INSTALLED@ @CLP_LIBS_INSTALLED@
+  else
+    LIBS = -L@abs_lib_dir@ -lSmi @SMI_LIBS_INSTALLED@ @CLP_LIBS_INSTALLED@
+  endif
+endif
+
 # The following is necessary under cygwin, if native compilers are used
-###########################################################################
-
 CYGPATH_W = @CYGPATH_W@
-
-###########################################################################
-# directories for finding COIN packages
-###########################################################################
-
-COININCDIR = @abs_include_dir@/coin
-
-COINLIBDIR = @abs_lib_dir@
-
-###########################################################################
-# define SMI libs
-###########################################################################
-
-COIN_HAS_PKGCONFIG = @COIN_HAS_PKGCONFIG_TRUE@TRUE
-
-ifeq ($(COIN_HAS_PKGCONFIG),TRUE)
-LIBS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs smi`
-else
-LIBS += -L@abs_lib_dir@ -lSmi @SMI_LIBS_INSTALLED@
-endif
-
-###########################################################################
-# define CFLAGS
-###########################################################################
-
-CFLAGS += -I`$(CYGPATH_W) $(COININCDIR)`
-
-ifeq ($(COIN_HAS_PKGCONFIG),TRUE)
-CFLAGS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --cflags smi`
-else
-CFLAGS += @SMI_CFLAGS_INSTALLED@
-endif
 
 all: $(EXE)
 
-.SUFFIXES: .cpp .c .o .obj
+.SUFFIXES: .cpp .o .obj
 
 $(EXE): $(OBJS)
 	bla=;\
 	for file in $(OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; done; \
-	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(ADDLIBS) $(LIBS)
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(LIBS) $(ADDLIBS)
 
 clean:
 	rm -rf $(EXE) $(OBJS)
 
 .cpp.o:
-	$(CXX) $(CXXFLAGS) $(CFLAGS) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
-
+	$(CXX) $(CXXFLAGS) $(INCL) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
 
 .cpp.obj:
-	$(CXX) $(CXXFLAGS) $(CFLAGS) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`
+	$(CXX) $(CXXFLAGS) $(INCL) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`

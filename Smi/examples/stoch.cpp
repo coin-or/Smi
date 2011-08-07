@@ -1,18 +1,13 @@
 // Copyright (C) 2003, International Business Machines
 // Corporation and others.  All Rights Reserved.
 
-#if defined(_MSC_VER)
-// Turn off compiler warning about long names
-#  pragma warning(disable:4786)
-#endif
-
 #include <string>
 using namespace std;
 
 #include <cassert>
 #include <iostream>
 
-
+#include "CoinPragma.hpp"
 #include "SmiScnModel.hpp"
 #include "SmiScnData.hpp"
 #include "OsiClpSolverInterface.hpp"
@@ -29,7 +24,7 @@ int main()
 {
 
 	testingMessage( "Model generation using SMPS files for Cambridge-Watson problems.\n" );
-	SmpsIO("../../Data/Stochastic/wat_10_C_32");
+	SmpsIO(DATASTOCHASTICDIR"/wat_10_C_32");
 
 	testingMessage( "Model generation using scenario tree construction methods.\n");
 	ModelScenario("Dantzig-Ferguson Aircraft Allocation using Scenarios");

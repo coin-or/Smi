@@ -58,6 +58,7 @@ AC_COIN_INIT_AUTO_TOOLS
 
 AC_COIN_CHECK_PACKAGE(Osi, [osi], [Smi])
 AC_COIN_CHECK_PACKAGE(Clp, [osi-clp])
+AC_COIN_CHECK_PACKAGE(DataStochastic, [coindatastochastic])
 
 #############################################################################
 #                             Other dependencies                            #
