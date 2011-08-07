@@ -35,8 +35,11 @@ Smi/MSVisualStudio/v9/unitTestSmi/smiUnitTest.vcproj -text
 Smi/Makefile.am -text
 Smi/Makefile.in -text
 Smi/README -text
+Smi/config.guess -text
+Smi/config.sub -text
 Smi/configure -text
 Smi/configure.ac -text
+Smi/depcomp -text
 Smi/examples/Makefile.in -text
 Smi/examples/investment.cpp -text
 Smi/examples/stoch.cpp -text
@@ -50,6 +53,9 @@ Smi/flopcpp_examples/flop-smi_methods.hpp -text
 Smi/flopcpp_examples/investment/investment.cpp -text
 Smi/flopcpp_examples/scen-tree_struct.cpp -text
 Smi/flopcpp_examples/scen-tree_struct.hpp -text
+Smi/install-sh -text
+Smi/ltmain.sh -text
+Smi/missing -text
 Smi/smi-uninstalled.pc.in -text
 Smi/smi.pc.in -text
 Smi/src/.cproject -text
