@@ -12,7 +12,7 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT([Smi],[trunk],[coin-smi@list.coin-or.org])
+AC_INIT([Smi],[trunk],[smi@list.coin-or.org])
 
 AC_COPYRIGHT([
 Copyright 2006 International Business Machines and others.
@@ -56,11 +56,8 @@ AC_COIN_INIT_AUTO_TOOLS
 #                              COIN components                              #
 #############################################################################
 
-AC_COIN_CHECK_PACKAGE(CoinUtils, [coinutils], [Smi])
-AC_COIN_CHECK_PACKAGE(Clp, [osi-clp], [Smi])
-AC_COIN_CHECK_PACKAGE(Cgl, [cgl], [Smi])
-AC_COIN_CHECK_PACKAGE(Cbc, [osi-cbc], [Smi])
-AC_COIN_CHECK_PACKAGE(FlopCpp, [flopcpp], [Smi])
+AC_COIN_CHECK_PACKAGE(Osi, [osi], [Smi])
+AC_COIN_CHECK_PACKAGE(Clp, [osi-clp])
 
 #############################################################################
 #                             Other dependencies                            #
@@ -95,10 +92,13 @@ AC_CONFIG_FILES([Makefile
                  examples/Makefile
                  src/Makefile
                  test/Makefile
-		 smi.pc
-		 smi-uninstalled.pc])
+                 smi.pc
+                 smi-uninstalled.pc])
 
 # Here put the location and name of the configuration header file
+# Smi does not make use of the config header files, so the first is
+# just a dummy file. The second is for a user who wants to get the
+# Smi version number.
 AC_CONFIG_HEADER([src/config.h src/config_smi.h])
 
 # Finally, we let configure write all the output...

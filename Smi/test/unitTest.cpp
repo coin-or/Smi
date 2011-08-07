@@ -11,11 +11,6 @@
 
 //####################################################################
 
-#ifdef NDEBUG
-#undef NDEBUG
-#endif
-
-
 
 // Display message on stdout and stderr
 void testingMessage( const char * const msg )
@@ -558,8 +553,8 @@ SmiTreeNodeUnitTest()
 	myAssert(__FILE__,__LINE__, !n4->hasSibling());
 
 	vector<SmiTreeNode<int *> *> *vec1 = n1->getChildren();
-	assert ((*vec1)[0] == n2 );
-	assert ((*vec1)[1] == n3 );
+	myAssert(__FILE__,__LINE__, (*vec1)[0] == n2 );
+	myAssert(__FILE__,__LINE__, (*vec1)[1] == n3 );
 	delete vec1;
 
 	delete i1;
@@ -1413,7 +1408,7 @@ void SmiScnModelDiscreteUnitTest()
 			SmiDiscreteRV *smiRV = smiDD->getDiscreteRV(jj);
 
 			indx[jj] = 0;
-			nsamp[jj] = smiRV->getNumEvents();
+			nsamp[jj] = static_cast<int>(smiRV->getNumEvents());
 			ns *= nsamp[jj];
 			dp *= smiRV->getEventProb(indx[jj]);
 
@@ -1574,7 +1569,7 @@ void SmiScnModelDiscreteUnitTest()
 
 			for (int jjj=0;jjj<smiDD->getNumRV();++jjj)
 			{
-				int nEvents = smiDD->getDiscreteRV(jjj)->getNumEvents();
+				int nEvents = static_cast<int>(smiDD->getDiscreteRV(jjj)->getNumEvents());
 				int iStage = smiDD->getDiscreteRV(jjj)->getStage();
 
 				label[iStage] *= nEvents;

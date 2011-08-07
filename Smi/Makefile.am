@@ -29,9 +29,9 @@ endif
 # Here we need include all files that are not mentioned in other Makefiles
 
 EXTRA_DIST = \
-	examples/Makefile.in \
-	examples/README \
-	examples/stoch.cpp \
+        examples/Makefile.in \
+        examples/README \
+        examples/stoch.cpp \
         test/SmiTestData/app0110.stoch \
         test/SmiTestData/app0110.cor \
         test/SmiTestData/app0110.time \
@@ -75,7 +75,7 @@ if COIN_HAS_PKGCONFIG
 	$(PKG_CONFIG) --libs smi > $(addlibsdir)/smi_addlibs.txt
 else
 if COIN_CXX_IS_CL
-	echo "/libpath:`$(CYGPATH_W) @abs_lib_dir@` libSmi.lib @SMI_LIBS_INSTALLED@" > $(addlibsdir)/smi_addlibs_cpp.txt
+	echo "-libpath:`$(CYGPATH_W) @abs_lib_dir@` libSmi.lib @SMI_LIBS_INSTALLED@" > $(addlibsdir)/smi_addlibs_cpp.txt
 else
 	echo -L@abs_lib_dir@ -lSmi @SMI_LIBS_INSTALLED@ > $(addlibsdir)/smi_addlibs.txt
 endif
@@ -91,4 +91,4 @@ uninstall-hook:
 # Files that are generated and should be cleaned with make distclean
 DISTCLEANFILES = 
 
-include ../BuildTools/Makemain.inc
+include BuildTools/Makemain.inc

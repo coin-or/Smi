@@ -40,16 +40,15 @@ libSmi_la_LDFLAGS = $(LT_LDFLAGS)
 # being compiled.
 AM_CPPFLAGS = $(SMI_CFLAGS)
 
-# This line is necessary to allow VPATH compilation with MS compilers
-# on Cygwin
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` 
+# This line is necessary to allow VPATH compilation
+DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)`
 
 ########################################################################
 #                Headers that need to be installed                     #
 ########################################################################
 
 # Here list all the header files that are required by a user of the library,
-# and that therefore should be installed in 'install/coin'
+# and that therefore should be installed in 'include/coin'
 includecoindir = $(includedir)/coin
 includecoin_HEADERS = \
 	SmiCoreCombineRule.hpp \
@@ -59,3 +58,10 @@ includecoin_HEADERS = \
 	SmiScnData.hpp \
 	SmiMessage.hpp \
 	SmiScnModel.hpp
+
+install-exec-local:
+	$(install_sh_DATA) config_smi.h $(DESTDIR)$(includecoindir)/SmiConfig.h
+
+uninstall-local:
+	rm -f $(DESTDIR)$(includecoindir)/SmiConfig.h
+	

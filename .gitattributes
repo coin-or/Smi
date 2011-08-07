@@ -56,11 +56,11 @@ Smi/src/.cproject -text
 Smi/src/.project -text
 Smi/src/Makefile.am -text
 Smi/src/Makefile.in -text
+Smi/src/SmiConfig.h -text
 Smi/src/SmiDiscreteDistribution.cpp -text
 Smi/src/SmiMessage.cpp -text
 Smi/src/SmiMessage.hpp -text
 Smi/src/config.h.in -text
-Smi/src/config_default.h -text
 Smi/src/config_smi.h.in -text
 Smi/src/config_smi_default.h -text
 Smi/test/.cproject -text

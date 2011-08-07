@@ -12,26 +12,29 @@ AUTOMAKE_OPTIONS = foreign
 #                         unitTest for Coin                            #
 ########################################################################
 
+if COIN_HAS_CLP
+
 noinst_PROGRAMS = unitTest
 
 unitTest_SOURCES = unitTest.cpp
 
 # List libraries of COIN projects
-unitTest_LDADD = ../src/libSmi.la $(SMI_LIBS)
-unitTest_DEPENDENCIES = ../src/libSmi.la $(SMI_DEPENDENCIES)
+unitTest_LDADD = ../src/libSmi.la $(SMI_LIBS) $(CLP_LIBS)
+unitTest_DEPENDENCIES = ../src/libSmi.la $(SMI_DEPENDENCIES) $(CLP_DEPENDENCIES)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Cygwin
-AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../src` $(SMI_CFLAGS)
-
-# This line is necessary to allow VPATH compilation with MS compilers
-# on Cygwin
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` 
+AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../src` $(SMI_CFLAGS) $(CLP_CFLAGS)
 
 test: unitTest$(EXEEXT)
 	./unitTest$(EXEEXT)
 
 .PHONY: test
+
+endif
+
+# This line is necessary to allow VPATH compilation
+DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` 
 
 ########################################################################
 #                          Cleaning stuff                              #

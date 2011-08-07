@@ -346,7 +346,7 @@ std::pair<double,double*> SmiScnModel::solveEV(OsiSolverInterface *osiSolver, do
     
     double * colSolution = new double[core_->getColStart(1)];
     memcpy(colSolution, osiStoch_->getColSolution(), (core_->getColStart(1) * sizeof(double)) );
-    int objValue = osiStoch_->getObjValue();
+    double objValue = osiStoch_->getObjValue();
     delete osiStoch_;
     osiStoch_ = tempPtr;
     return make_pair(objValue,colSolution );
@@ -885,7 +885,7 @@ SmiScnModel::addNode(SmiScnNode *tnode,bool notDetEq /* = false */)
     node->copyRowUpper(drup_+nrow_);
 
     // multiply obj coeffs by node probability and normalize
-    double prob = !notDetEq ? tnode->getProb()/this->totalProb_ : 1; //Christian: TODO: totalProb_ = Summer aller absoluten W'keiten (am Ende müsste die bei 1 sein..?!)
+    double prob = !notDetEq ? tnode->getProb()/this->totalProb_ : 1; //Christian: TODO: totalProb_ = Summer aller absoluten W'keiten (am Ende muesste die bei 1 sein..?!)
     tnode->setModelProb(prob);
 
     for(int j=ncol_; j<ncol_+core->getNumCols(stg); ++j)
@@ -1334,7 +1334,7 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
         SmiDiscreteRV *smiRV = smiDD->getDiscreteRV(jj);
 
         indx[jj] = 0;
-        nsamp[jj] = smiRV->getNumEvents();
+        nsamp[jj] = static_cast<int>(smiRV->getNumEvents());
 
         assert( COIN_INT_MAX / ns > nsamp[jj] );
         ns *= nsamp[jj];
@@ -1443,7 +1443,7 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
         {
             SmiDiscreteRV *s = smiDD->getDiscreteRV(jjj);
 
-            label[s->getStage()] *= s->getNumEvents();
+            label[s->getStage()] *= static_cast<int>(s->getNumEvents());
             label[s->getStage()] += indx[jjj];
         }
 
@@ -1556,7 +1556,7 @@ SmiScnModel::addNodeToSubmodel(SmiScnNode * smiScnNode)
 
     // fill in vector up to root
     int t=stg;
-    while (s = s->getParent() )
+    while ((s = s->getParent()) != NULL )
     {
         vecNode[--t] = s;
         label[t]   = s->getScenarioIndex();

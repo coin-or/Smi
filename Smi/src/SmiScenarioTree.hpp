@@ -327,7 +327,7 @@ public:
 	int addPathtoLeaf(int brscenario, int stage, vector<T> &pathdata,
 			unsigned int start = 0) {
 		SmiTreeNode<T> *parent = NULL;
-		int scenario = leaf_.size();
+		int scenario = static_cast<int>(leaf_.size());
 		if (scenario)
 			parent = find(brscenario, stage);
 
@@ -336,7 +336,7 @@ public:
 		if (pathdata.size()) {
 			leaf_.push_back(parent);
 		}
-		return leaf_.size() - 1;
+		return static_cast<int>(leaf_.size()) - 1;
 
 	}
 
@@ -357,7 +357,7 @@ public:
 	 */
 	int addPathtoLeaf(vector<int> &labels, vector<T> &pathdata) {
 		SmiTreeNode<T> *parent = NULL;
-		int scenario = leaf_.size();
+		int scenario = static_cast<int>(leaf_.size());
 		if (scenario)
 			parent = find(labels);
 
@@ -370,7 +370,7 @@ public:
 		if (pathdata.size()) {
 			leaf_.push_back(parent);
 		}
-		return leaf_.size() - 1;
+		return static_cast<int>(leaf_.size()) - 1;
 
 	}
 

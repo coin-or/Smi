@@ -11,9 +11,6 @@
 #include <iomanip>
 #include <sstream>
 
-// In CoinUtilsConfig.h the COIN_HAS_ZLIB macro is set (or not)
-#include "CoinUtilsConfig.h"
-
 #include "CoinMpsIO.hpp"
 #include "CoinMessage.hpp"
 #include "CoinError.hpp"
@@ -207,10 +204,9 @@ SmiSmpsIO::readStochFile(SmiScnModel *smi,SmiCoreData *core, const char *c, cons
 			<<1
 			<<fileName_
 			<<CoinMessageEol;
-#ifdef COIN_USE_ZLIB
-		if (!smpsCardReader_->filePointer()) 
-			handler_->message(COIN_MPS_BADFILE2,messages_)<<CoinMessageEol;
-		
+#if 0 //FIXME: SmiSmpsCardReader has no member filePointer(), also none in CoinMpsCardReader
+    if (CoinFileInput::haveGzipSupport() && !smpsCardReader_->filePointer())
+		  handler_->message(COIN_MPS_BADFILE2,messages_)<<CoinMessageEol;
 #endif
 		return -2;
 	} else if ( smpsCardReader_->whichSection (  ) != COIN_EOF_SECTION ) {
