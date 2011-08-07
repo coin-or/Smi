@@ -1,0 +1,16 @@
+#ifndef __CONFIG_SMI_H__
+#define __CONFIG_SMI_H__
+
+/* Version number of project */
+#undef SMI_VERSION
+
+/* Major Version number of project */
+#undef SMI_VERSION_MAJOR
+
+/* Minor Version number of project */
+#undef SMI_VERSION_MINOR
+
+/* Release Version number of project */
+#undef SMI_VERSION_RELEASE
+
+#endif

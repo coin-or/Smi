@@ -11,6 +11,7 @@
 
 #include "CoinMpsIO.hpp"
 #include "CoinFileIO.hpp"
+#include "CoinFinite.hpp"
 #include "SmiScnModel.hpp"
 #include "SmiScnData.hpp"
 #include "SmiScenarioTree.hpp"

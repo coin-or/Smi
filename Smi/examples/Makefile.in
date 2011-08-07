@@ -46,24 +46,43 @@ CXXFLAGS = @CXXFLAGS@
 # additional C++ Compiler options for linking
 CXXLINKFLAGS = @RPATH_FLAGS@
 
-# Directory with COIN header files
+###########################################################################
+# The following is necessary under cygwin, if native compilers are used
+###########################################################################
+
+CYGPATH_W = @CYGPATH_W@
+
+###########################################################################
+# directories for finding COIN packages
+###########################################################################
+
 COININCDIR = @abs_include_dir@/coin
 
-# Directory with COIN libraries
 COINLIBDIR = @abs_lib_dir@
 
-# Libraries necessary to link with Smi
-LIBS = -L$(COINLIBDIR) -lSmi -lFlopCpp -lOsiClp -lOsi -lClp -lCoinUtils \
-	`cat @OSIDOCDIR@/osi_addlibs.txt` \
-	`cat @CLPDOCDIR@/clp_addlibs.txt` \
-	`cat @COINUTILSDOCDIR@/coinutils_addlibs.txt`
+###########################################################################
+# define SMI libs
+###########################################################################
 
-# Necessary Include dirs (we use the CYGPATH_W variables to allow
-# compilation with Windows compilers)
-INCL =  -I`$(CYGPATH_W) $(COININCDIR)` $(ADDINCFLAGS)
+COIN_HAS_PKGCONFIG = @COIN_HAS_PKGCONFIG_TRUE@TRUE
 
-# The following is necessary under cygwin, if native compilers are used
-CYGPATH_W = @CYGPATH_W@
+ifeq ($(COIN_HAS_PKGCONFIG),TRUE)
+LIBS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs smi`
+else
+LIBS += -L@abs_lib_dir@ -lSmi @SMI_LIBS_INSTALLED@
+endif
+
+###########################################################################
+# define CFLAGS
+###########################################################################
+
+CFLAGS += -I`$(CYGPATH_W) $(COININCDIR)`
+
+ifeq ($(COIN_HAS_PKGCONFIG),TRUE)
+CFLAGS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --cflags smi`
+else
+CFLAGS += @SMI_CFLAGS_INSTALLED@
+endif
 
 all: $(EXE)
 
@@ -78,8 +97,8 @@ clean:
 	rm -rf $(EXE) $(OBJS)
 
 .cpp.o:
-	$(CXX) $(CXXFLAGS) $(INCL) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
+	$(CXX) $(CXXFLAGS) $(CFLAGS) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
 
 
 .cpp.obj:
-	$(CXX) $(CXXFLAGS) $(INCL) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`
+	$(CXX) $(CXXFLAGS) $(CFLAGS) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`

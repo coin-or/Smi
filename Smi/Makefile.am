@@ -57,17 +57,38 @@ clean-local:
 distclean-local:
 	if test -r test/Makefile; then cd test; $(MAKE) distclean; fi
 
-install-exec-local: install-doc
+.PHONY: test unitTest 
 
-uninstall-local: uninstall-doc
+########################################################################
+#                  Installation of the addlibs file                    #
+########################################################################
 
-.PHONY: test unitTest clean-test distclean-test
+pkgconfiglibdir = $(libdir)/pkgconfig
+pkgconfiglib_DATA = smi.pc
+
+addlibsdir = $(DESTDIR)$(datadir)/coin/doc/Smi
+
+install-data-hook:
+	@$(mkdir_p) "$(addlibsdir)"
+if COIN_HAS_PKGCONFIG
+	PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ \
+	$(PKG_CONFIG) --libs smi > $(addlibsdir)/smi_addlibs.txt
+else
+if COIN_CXX_IS_CL
+	echo "/libpath:`$(CYGPATH_W) @abs_lib_dir@` libSmi.lib @SMI_LIBS_INSTALLED@" > $(addlibsdir)/smi_addlibs_cpp.txt
+else
+	echo -L@abs_lib_dir@ -lSmi @SMI_LIBS_INSTALLED@ > $(addlibsdir)/smi_addlibs.txt
+endif
+endif
+
+uninstall-hook:
+	rm -f $(addlibsdir)/smi_addlibs.txt
 
 ########################################################################
 #                         Maintainer Stuff                             #
 ########################################################################
 
 # Files that are generated and should be cleaned with make distclean
-DISTCLEANFILES =
+DISTCLEANFILES = 
 
 include ../BuildTools/Makemain.inc

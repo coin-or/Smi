@@ -1,0 +1,11 @@
+prefix=@prefix@
+libdir=@ABSBUILDDIR@/src
+includedir=@abs_source_dir@/src
+
+Name: SMI
+Description: Stochastic Modeling Interface
+URL: https://projects.coin-or.org/Smi
+Version: @PACKAGE_VERSION@
+Libs: ${libdir}/libSmi.la @SMI_PCLIBS@
+Cflags: -I${includedir} 
+Requires: @SMI_PCREQUIRES@

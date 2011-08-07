@@ -14,34 +14,19 @@ AUTOMAKE_OPTIONS = foreign
 
 noinst_PROGRAMS = unitTest
 
-unitTest_SOURCES = \
-	unitTest.cpp
+unitTest_SOURCES = unitTest.cpp
 
 # List libraries of COIN projects
-unitTest_LDADD = \
-	$(SMIOBJDIR)/src/libSmi.la \
-	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
-	$(OSIOBJDIR)/src/libOsi.la \
-	$(CLPOBJDIR)/src/libClp.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la
-
-# List additional libraries
-LIBS += $(ADDLIBS) `cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt`
+unitTest_LDADD = ../src/libSmi.la $(SMI_LIBS)
+unitTest_DEPENDENCIES = ../src/libSmi.la $(SMI_DEPENDENCIES)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Cygwin
-AM_CPPFLAGS = \
-        -I`$(CYGPATH_W) $(SMISRCDIR)/src` \
-        -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
-        -I`$(CYGPATH_W) $(OSISRCDIR)/src` \
-        -I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
-        -I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
-        -I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
-        -I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc`
+AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../src` $(SMI_CFLAGS)
 
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
+DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` 
 
 test: unitTest$(EXEEXT)
 	./unitTest$(EXEEXT)

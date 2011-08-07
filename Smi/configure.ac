@@ -12,7 +12,7 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT([Smi],[0.91.0],[coin-smi@list.coin-or.org])
+AC_INIT([Smi],[trunk],[coin-smi@list.coin-or.org])
 
 AC_COPYRIGHT([
 Copyright 2006 International Business Machines and others.
@@ -41,7 +41,7 @@ AC_CANONICAL_BUILD
 # the source root directory contains definition of where to find those
 # externals.  The following macro ensures that those externals are
 # retrieved by svn if they are not there yet.
-AC_COIN_PROJECTDIR_INIT
+AC_COIN_PROJECTDIR_INIT(Smi)
 
 # Check if user wants to produce debugging code
 AC_COIN_DEBUG_COMPILE(Smi)
@@ -56,13 +56,11 @@ AC_COIN_INIT_AUTO_TOOLS
 #                              COIN components                              #
 #############################################################################
 
-AC_COIN_HAS_PROJECT(Smi)
-AC_COIN_HAS_PROJECT(CoinUtils)
-AC_COIN_HAS_PROJECT(Clp)
-AC_COIN_HAS_PROJECT(Cgl)
-AC_COIN_HAS_PROJECT(Cbc)
-AC_COIN_HAS_PROJECT(Osi)
-AC_COIN_HAS_PROJECT(FlopCpp)
+AC_COIN_CHECK_PACKAGE(CoinUtils, [coinutils], [Smi])
+AC_COIN_CHECK_PACKAGE(Clp, [osi-clp], [Smi])
+AC_COIN_CHECK_PACKAGE(Cgl, [cgl], [Smi])
+AC_COIN_CHECK_PACKAGE(Cbc, [osi-cbc], [Smi])
+AC_COIN_CHECK_PACKAGE(FlopCpp, [flopcpp], [Smi])
 
 #############################################################################
 #                             Other dependencies                            #
@@ -96,10 +94,12 @@ AC_COIN_VPATH_LINK(test/SmiTestData/app0110R.time)
 AC_CONFIG_FILES([Makefile
                  examples/Makefile
                  src/Makefile
-                 test/Makefile])
+                 test/Makefile
+		 smi.pc
+		 smi-uninstalled.pc])
 
 # Here put the location and name of the configuration header file
-AC_CONFIG_HEADER([inc/config_smi.h])
+AC_CONFIG_HEADER([src/config.h src/config_smi.h])
 
 # Finally, we let configure write all the output...
 AC_COIN_FINALIZE

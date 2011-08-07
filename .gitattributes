@@ -1,4 +1,5 @@
 * text=auto !eol
+/Dependencies -text
 /INSTALL -text svneol=unset#application/octet-stream
 /LICENSE -text
 /Makefile.am -text
@@ -49,7 +50,8 @@ Smi/flopcpp_examples/flop-smi_methods.hpp -text
 Smi/flopcpp_examples/investment/investment.cpp -text
 Smi/flopcpp_examples/scen-tree_struct.cpp -text
 Smi/flopcpp_examples/scen-tree_struct.hpp -text
-Smi/inc/config_smi.h.in -text
+Smi/smi-uninstalled.pc.in -text
+Smi/smi.pc.in -text
 Smi/src/.cproject -text
 Smi/src/.project -text
 Smi/src/Makefile.am -text
@@ -57,6 +59,10 @@ Smi/src/Makefile.in -text
 Smi/src/SmiDiscreteDistribution.cpp -text
 Smi/src/SmiMessage.cpp -text
 Smi/src/SmiMessage.hpp -text
+Smi/src/config.h.in -text
+Smi/src/config_default.h -text
+Smi/src/config_smi.h.in -text
+Smi/src/config_smi_default.h -text
 Smi/test/.cproject -text
 Smi/test/.project -text
 Smi/test/Makefile.am -text

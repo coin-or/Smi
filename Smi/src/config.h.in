@@ -1,28 +1,22 @@
-/* inc/config_smi.h.in.  Generated from configure.ac by autoheader.  */
+/* src/config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Define to 1 if the Cbc package is used */
+/* Define to 1 if the Cbc package is available */
 #undef COIN_HAS_CBC
 
-/* Define to 1 if the Cgl package is used */
+/* Define to 1 if the Cgl package is available */
 #undef COIN_HAS_CGL
 
-/* Define to 1 if the Clp package is used */
+/* Define to 1 if the Clp package is available */
 #undef COIN_HAS_CLP
 
-/* Define to 1 if the CoinUtils package is used */
+/* Define to 1 if the CoinUtils package is available */
 #undef COIN_HAS_COINUTILS
 
-/* Define to 1 if the FlopCpp package is used */
+/* Define to 1 if the FlopCpp package is available */
 #undef COIN_HAS_FLOPCPP
-
-/* Define to 1 if the Osi package is used */
-#undef COIN_HAS_OSI
 
 /* Define to 1 if readline is available */
 #undef COIN_HAS_READLINE
-
-/* Define to 1 if the Smi package is used */
-#undef COIN_HAS_SMI
 
 /* Define to the debug sanity check level (0 is no test) */
 #undef COIN_SMI_CHECKLEVEL
@@ -80,6 +74,21 @@
 
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
+
+/* SVN revision number of project */
+#undef SMI_SVN_REV
+
+/* Version number of project */
+#undef SMI_VERSION
+
+/* Major Version number of project */
+#undef SMI_VERSION_MAJOR
+
+/* Minor Version number of project */
+#undef SMI_VERSION_MINOR
+
+/* Release Version number of project */
+#undef SMI_VERSION_RELEASE
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
