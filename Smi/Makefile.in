@@ -61,8 +61,9 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(srcdir)/BuildTools/Makemain.inc $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/smi-uninstalled.pc.in \
 	$(srcdir)/smi.pc.in $(top_srcdir)/configure \
-	$(top_srcdir)/examples/Makefile.in AUTHORS config.guess \
-	config.sub depcomp install-sh ltmain.sh missing
+	$(top_srcdir)/examples/Makefile.in \
+	$(top_srcdir)/flopcpp_examples/Makefile.in AUTHORS \
+	config.guess config.sub depcomp install-sh ltmain.sh missing
 @HAVE_EXTERNALS_TRUE@am__append_2 = Dependencies
 @HAVE_EXTERNALS_TRUE@am__append_3 = .Dependencies-stamp
 subdir = .
@@ -76,7 +77,8 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/src/config.h \
 	$(top_builddir)/src/config_smi.h
-CONFIG_CLEAN_FILES = examples/Makefile smi.pc smi-uninstalled.pc
+CONFIG_CLEAN_FILES = examples/Makefile flopcpp_examples/Makefile \
+	smi.pc smi-uninstalled.pc
 SOURCES =
 DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
@@ -143,6 +145,8 @@ COIN_HAS_CLP_FALSE = @COIN_HAS_CLP_FALSE@
 COIN_HAS_CLP_TRUE = @COIN_HAS_CLP_TRUE@
 COIN_HAS_DATASTOCHASTIC_FALSE = @COIN_HAS_DATASTOCHASTIC_FALSE@
 COIN_HAS_DATASTOCHASTIC_TRUE = @COIN_HAS_DATASTOCHASTIC_TRUE@
+COIN_HAS_FLOPCPP_FALSE = @COIN_HAS_FLOPCPP_FALSE@
+COIN_HAS_FLOPCPP_TRUE = @COIN_HAS_FLOPCPP_TRUE@
 COIN_HAS_OSI_FALSE = @COIN_HAS_OSI_FALSE@
 COIN_HAS_OSI_TRUE = @COIN_HAS_OSI_TRUE@
 COIN_HAS_PKGCONFIG_FALSE = @COIN_HAS_PKGCONFIG_FALSE@
@@ -176,6 +180,13 @@ EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 F77 = @F77@
 FFLAGS = @FFLAGS@
+FLOPCPP_CFLAGS = @FLOPCPP_CFLAGS@
+FLOPCPP_CFLAGS_INSTALLED = @FLOPCPP_CFLAGS_INSTALLED@
+FLOPCPP_DATA = @FLOPCPP_DATA@
+FLOPCPP_DATA_INSTALLED = @FLOPCPP_DATA_INSTALLED@
+FLOPCPP_DEPENDENCIES = @FLOPCPP_DEPENDENCIES@
+FLOPCPP_LIBS = @FLOPCPP_LIBS@
+FLOPCPP_LIBS_INSTALLED = @FLOPCPP_LIBS_INSTALLED@
 HAVE_EXTERNALS_FALSE = @HAVE_EXTERNALS_FALSE@
 HAVE_EXTERNALS_TRUE = @HAVE_EXTERNALS_TRUE@
 INSTALL_DATA = @INSTALL_DATA@
@@ -357,6 +368,8 @@ $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 examples/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
+flopcpp_examples/Makefile: $(top_builddir)/config.status $(top_srcdir)/flopcpp_examples/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 smi.pc: $(top_builddir)/config.status $(srcdir)/smi.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 smi-uninstalled.pc: $(top_builddir)/config.status $(srcdir)/smi-uninstalled.pc.in
@@ -524,7 +537,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/BuildTools $(distdir)/examples $(distdir)/test/SmiTestData
+	$(mkdir_p) $(distdir)/. $(distdir)/BuildTools $(distdir)/examples $(distdir)/flopcpp_examples $(distdir)/test/SmiTestData
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

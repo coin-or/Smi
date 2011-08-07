@@ -50,7 +50,7 @@ public:
 	int get_nmb_stages() const { return nmbStages; }
 
 	/// Get the number of scenarios = the number of leaves
-	int get_nmb_scens() const { return leaves.size(); }
+	int get_nmb_scens() const { return static_cast<int>(leaves.size()); }
 
 	/// Get probability of a given scenarios
 	virtual double get_scen_prob(int const sc) const = 0;

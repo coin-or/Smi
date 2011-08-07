@@ -21,7 +21,7 @@ SmiCoreData * FlopSmiEx::create_smi_core (vector<CoreNodeBase *> & coreNodes,
                                           string problemName)
 {
 	int i, j, t;
-	int nStages = coreNodes.size();
+	int nStages = static_cast<int>(coreNodes.size());
 
 	MP_model & coreModel = MP_model::getDefaultModel();
 	coreModel.setSolver(new OSI_SOLVER_INTERFACE);

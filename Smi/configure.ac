@@ -17,7 +17,7 @@ AC_INIT([Smi],[trunk],[smi@list.coin-or.org])
 AC_COPYRIGHT([
 Copyright 2006 International Business Machines and others.
 All Rights Reserved.
-This file is part of the open source package Coin which is distributed
+This file is part of the open source package Smi which is distributed
 under the Common Public License.])
 
 # List one file in the package so that the configure script can test
@@ -57,8 +57,12 @@ AC_COIN_INIT_AUTO_TOOLS
 #############################################################################
 
 AC_COIN_CHECK_PACKAGE(Osi, [osi], [Smi])
+if test $coin_has_osi != yes ; then
+  AC_MSG_ERROR([Required package Osi not found.])
+fi
 AC_COIN_CHECK_PACKAGE(Clp, [osi-clp])
 AC_COIN_CHECK_PACKAGE(DataStochastic, [coindatastochastic])
+AC_COIN_CHECK_PACKAGE(FlopCpp, [flopcpp])
 
 ##############################################################################
 #                   VPATH links for example input files                      #
@@ -87,6 +91,7 @@ AC_CONFIG_FILES([Makefile
                  examples/Makefile
                  src/Makefile
                  test/Makefile
+                 flopcpp_examples/Makefile
                  smi.pc
                  smi-uninstalled.pc])
 

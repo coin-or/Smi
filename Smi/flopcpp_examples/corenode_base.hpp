@@ -115,7 +115,7 @@ protected:
 		SP_variable(MP_set const &s1 = MP_set::getEmpty(),
 		            MP_set const &s2 = MP_set::getEmpty())
 		: MP_variable(s1, s2), p2node(CoreNodeBase::p2activeNode),
-			varIndx(p2node->all_variables.size())
+			varIndx(static_cast<int>(p2node->all_variables.size()))
 		{
 			#ifndef NDEBUG
 			cout << "Stage " << p2node->stage << ": adding SP_variable with "
@@ -173,7 +173,7 @@ protected:
 	public:
 		SP_constraint (MP_set const &s1 = MP_set::getEmpty())
 		: MP_constraint(s1), p2node(CoreNodeBase::p2activeNode),
-		  constrIndx(p2node->all_constraints.size())
+		  constrIndx(static_cast<int>(p2node->all_constraints.size()))
 		{
 			#ifndef NDEBUG
 			cout << "Stage " << p2node->stage << ": adding SP_constr.  with "

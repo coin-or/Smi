@@ -29,9 +29,13 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../src` $(SMI_CFLAGS) $(CLP_CFLAGS)
 test: unitTest$(EXEEXT)
 	./unitTest$(EXEEXT)
 
-.PHONY: test
-
+else
+test:
+	echo "Clp required to run unittest."
+	
 endif
+
+.PHONY: test
 
 # This line is necessary to allow VPATH compilation
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` 

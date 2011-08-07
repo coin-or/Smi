@@ -11,7 +11,7 @@
 #
 # Copyright 2006 International Business Machines and others.
 # All Rights Reserved.
-# This file is part of the open source package Coin which is distributed
+# This file is part of the open source package Smi which is distributed
 # under the Common Public License.
 ## --------------------- ##
 ## M4sh Initialization.  ##
@@ -472,7 +472,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os ALWAYS_FALSE_TRUE ALWAYS_FALSE_FALSE have_svnversion SMI_SVN_REV CDEFS ADD_CFLAGS DBG_CFLAGS OPT_CFLAGS sol_cc_compiler CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT COIN_CC_IS_CL_TRUE COIN_CC_IS_CL_FALSE MPICC CXXDEFS ADD_CXXFLAGS DBG_CXXFLAGS OPT_CXXFLAGS CXX CXXFLAGS ac_ct_CXX COIN_CXX_IS_CL_TRUE COIN_CXX_IS_CL_FALSE MPICXX EGREP LN_S INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT LIBTOOLM4 have_autoconf have_automake have_svn BUILDTOOLSDIR AUX_DIR abs_source_dir abs_lib_dir abs_include_dir abs_bin_dir HAVE_EXTERNALS_TRUE HAVE_EXTERNALS_FALSE host host_cpu host_vendor host_os ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL ac_c_preproc_warn_flag ac_cxx_preproc_warn_flag RPATH_FLAGS LT_LDFLAGS PKG_CONFIG ac_pt_PKG_CONFIG COIN_HAS_PKGCONFIG_TRUE COIN_HAS_PKGCONFIG_FALSE COIN_PKG_CONFIG_PATH COIN_PKG_CONFIG_PATH_UNINSTALLED OSI_LIBS OSI_CFLAGS OSI_DATA OSI_DEPENDENCIES OSI_LIBS_INSTALLED OSI_CFLAGS_INSTALLED OSI_DATA_INSTALLED SMI_CFLAGS SMI_LIBS SMI_PCLIBS SMI_PCREQUIRES SMI_DEPENDENCIES SMI_CFLAGS_INSTALLED SMI_LIBS_INSTALLED COIN_HAS_OSI_TRUE COIN_HAS_OSI_FALSE CLP_LIBS CLP_CFLAGS CLP_DATA CLP_DEPENDENCIES CLP_LIBS_INSTALLED CLP_CFLAGS_INSTALLED CLP_DATA_INSTALLED COIN_HAS_CLP_TRUE COIN_HAS_CLP_FALSE DATASTOCHASTIC_LIBS DATASTOCHASTIC_CFLAGS DATASTOCHASTIC_DATA DATASTOCHASTIC_DEPENDENCIES DATASTOCHASTIC_LIBS_INSTALLED DATASTOCHASTIC_CFLAGS_INSTALLED DATASTOCHASTIC_DATA_INSTALLED COIN_HAS_DATASTOCHASTIC_TRUE COIN_HAS_DATASTOCHASTIC_FALSE LIBEXT VPATH_DISTCLEANFILES ABSBUILDDIR LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os ALWAYS_FALSE_TRUE ALWAYS_FALSE_FALSE have_svnversion SMI_SVN_REV CDEFS ADD_CFLAGS DBG_CFLAGS OPT_CFLAGS sol_cc_compiler CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT COIN_CC_IS_CL_TRUE COIN_CC_IS_CL_FALSE MPICC CXXDEFS ADD_CXXFLAGS DBG_CXXFLAGS OPT_CXXFLAGS CXX CXXFLAGS ac_ct_CXX COIN_CXX_IS_CL_TRUE COIN_CXX_IS_CL_FALSE MPICXX EGREP LN_S INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT LIBTOOLM4 have_autoconf have_automake have_svn BUILDTOOLSDIR AUX_DIR abs_source_dir abs_lib_dir abs_include_dir abs_bin_dir HAVE_EXTERNALS_TRUE HAVE_EXTERNALS_FALSE host host_cpu host_vendor host_os ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL ac_c_preproc_warn_flag ac_cxx_preproc_warn_flag RPATH_FLAGS LT_LDFLAGS PKG_CONFIG ac_pt_PKG_CONFIG COIN_HAS_PKGCONFIG_TRUE COIN_HAS_PKGCONFIG_FALSE COIN_PKG_CONFIG_PATH COIN_PKG_CONFIG_PATH_UNINSTALLED OSI_LIBS OSI_CFLAGS OSI_DATA OSI_DEPENDENCIES OSI_LIBS_INSTALLED OSI_CFLAGS_INSTALLED OSI_DATA_INSTALLED SMI_CFLAGS SMI_LIBS SMI_PCLIBS SMI_PCREQUIRES SMI_DEPENDENCIES SMI_CFLAGS_INSTALLED SMI_LIBS_INSTALLED COIN_HAS_OSI_TRUE COIN_HAS_OSI_FALSE CLP_LIBS CLP_CFLAGS CLP_DATA CLP_DEPENDENCIES CLP_LIBS_INSTALLED CLP_CFLAGS_INSTALLED CLP_DATA_INSTALLED COIN_HAS_CLP_TRUE COIN_HAS_CLP_FALSE DATASTOCHASTIC_LIBS DATASTOCHASTIC_CFLAGS DATASTOCHASTIC_DATA DATASTOCHASTIC_DEPENDENCIES DATASTOCHASTIC_LIBS_INSTALLED DATASTOCHASTIC_CFLAGS_INSTALLED DATASTOCHASTIC_DATA_INSTALLED COIN_HAS_DATASTOCHASTIC_TRUE COIN_HAS_DATASTOCHASTIC_FALSE FLOPCPP_LIBS FLOPCPP_CFLAGS FLOPCPP_DATA FLOPCPP_DEPENDENCIES FLOPCPP_LIBS_INSTALLED FLOPCPP_CFLAGS_INSTALLED FLOPCPP_DATA_INSTALLED COIN_HAS_FLOPCPP_TRUE COIN_HAS_FLOPCPP_FALSE LIBEXT VPATH_DISTCLEANFILES ABSBUILDDIR LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1129,6 +1129,9 @@ Optional Packages:
   --with-datastochastic-datadir
                           directory with data files for using package
                           DataStochastic
+  --with-flopcpp-lib linker flags for using package FlopCpp
+  --with-flopcpp-incdir directory with header files for using package FlopCpp
+  --with-flopcpp-datadir directory with data files for using package FlopCpp
 
 Some influential environment variables:
   CDEFS       Additional -D flags to be used when compiling C code.
@@ -1267,7 +1270,7 @@ gives unlimited permission to copy, distribute and modify it.
 
 Copyright 2006 International Business Machines and others.
 All Rights Reserved.
-This file is part of the open source package Coin which is distributed
+This file is part of the open source package Smi which is distributed
 under the Common Public License.
 _ACEOF
   exit 0
@@ -5936,7 +5939,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 5939 "configure"' > conftest.$ac_ext
+  echo '#line 5942 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7070,7 +7073,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:7073:" \
+echo "$as_me:7076:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -8137,11 +8140,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8140: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8143: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8144: \$? = $ac_status" >&5
+   echo "$as_me:8147: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8405,11 +8408,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8408: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8411: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8412: \$? = $ac_status" >&5
+   echo "$as_me:8415: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8509,11 +8512,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8512: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8515: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:8516: \$? = $ac_status" >&5
+   echo "$as_me:8519: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -10854,7 +10857,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10857 "configure"
+#line 10860 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10954,7 +10957,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10957 "configure"
+#line 10960 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13298,11 +13301,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13301: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13304: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13305: \$? = $ac_status" >&5
+   echo "$as_me:13308: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -13402,11 +13405,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13405: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13408: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13409: \$? = $ac_status" >&5
+   echo "$as_me:13412: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14972,11 +14975,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14975: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14978: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14979: \$? = $ac_status" >&5
+   echo "$as_me:14982: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -15076,11 +15079,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15079: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15082: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:15083: \$? = $ac_status" >&5
+   echo "$as_me:15086: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -17283,11 +17286,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17286: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17289: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17290: \$? = $ac_status" >&5
+   echo "$as_me:17293: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17551,11 +17554,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17554: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17557: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17558: \$? = $ac_status" >&5
+   echo "$as_me:17561: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17655,11 +17658,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17658: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17661: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:17662: \$? = $ac_status" >&5
+   echo "$as_me:17665: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -21272,6 +21275,11 @@ fi
 
 
 
+if test $coin_has_osi != yes ; then
+  { { echo "$as_me:$LINENO: error: Required package Osi not found." >&5
+echo "$as_me: error: Required package Osi not found." >&2;}
+   { (exit 1); exit 1; }; }
+fi
 
 echo "$as_me:$LINENO: checking for COIN-OR package Clp" >&5
 echo $ECHO_N "checking for COIN-OR package Clp... $ECHO_C" >&6
@@ -22235,6 +22243,487 @@ fi
 
 
 
+echo "$as_me:$LINENO: checking for COIN-OR package FlopCpp" >&5
+echo $ECHO_N "checking for COIN-OR package FlopCpp... $ECHO_C" >&6
+
+coin_has_flopcpp=notGiven
+
+# check if user wants to skip package in any case
+if test x"$COIN_SKIP_PROJECTS" != x; then
+  for dir in $COIN_SKIP_PROJECTS; do
+    if test $dir = "FlopCpp"; then
+      coin_has_flopcpp=skipping
+    fi
+  done
+fi
+
+if test "$coin_has_flopcpp" != skipping; then
+
+# Check whether --with-m4_tolower(FlopCpp) or --without-m4_tolower(FlopCpp) was given.
+if test "${with_flopcpp+set}" = set; then
+  withval="$with_flopcpp"
+  if test "$withval" = no ; then
+       coin_has_flopcpp=skipping
+     fi
+
+fi;
+fi
+
+FLOPCPP_LIBS=
+FLOPCPP_CFLAGS=
+FLOPCPP_DATA=
+FLOPCPP_DEPENDENCIES=
+FLOPCPP_PCLIBS=
+FLOPCPP_PCREQUIRES=
+FLOPCPP_DATA=
+
+
+
+
+
+
+
+
+
+#check if user provided LIBS, CFLAGS, or DATA for package or disables use of package
+if test $coin_has_flopcpp != skipping; then
+
+# Check whether --with-m4_tolower(FlopCpp)-lib or --without-m4_tolower(FlopCpp)-lib was given.
+if test "${with_flopcpp_lib+set}" = set; then
+  withval="$with_flopcpp_lib"
+  if test "$withval" = no ; then
+       coin_has_flopcpp=skipping
+     else
+       coin_has_flopcpp=yes
+       FLOPCPP_LIBS="$withval"
+       FLOPCPP_PCLIBS="$withval"
+
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         FLOPCPP_LIBS_INSTALLED="$withval"
+
+       fi
+     fi
+
+fi;
+fi
+
+if test $coin_has_flopcpp != skipping; then
+
+# Check whether --with-m4_tolower(FlopCpp)-incdir or --without-m4_tolower(FlopCpp)-incdir was given.
+if test "${with_flopcpp_incdir+set}" = set; then
+  withval="$with_flopcpp_incdir"
+  if test "$withval" = no ; then
+       coin_has_flopcpp=skipping
+     else
+       coin_has_flopcpp=yes
+       FLOPCPP_CFLAGS="-I`${CYGPATH_W} $withval`"
+
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         FLOPCPP_CFLAGS_INSTALLED="$FLOPCPP_CFLAGS"
+
+       fi
+     fi
+
+fi;
+fi
+
+if test $coin_has_flopcpp != skipping; then
+
+# Check whether --with-m4_tolower(FlopCpp)-datadir or --without-m4_tolower(FlopCpp)-datadir was given.
+if test "${with_flopcpp_datadir+set}" = set; then
+  withval="$with_flopcpp_datadir"
+  if test "$withval" = no ; then
+       coin_has_flopcpp=skipping
+     else
+       coin_has_flopcpp=yes
+       FLOPCPP_DATA="$withval"
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         FLOPCPP_DATA_INSTALLED="$withval"
+       fi
+     fi
+
+fi;
+fi
+
+if test $coin_has_flopcpp = notGiven; then
+  if test -n "$PKG_CONFIG" ; then
+    # set search path for pkg-config
+    # need to export variable to be sure that the following pkg-config gets these values
+    coin_save_PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH:$COIN_PKG_CONFIG_PATH_UNINSTALLED"
+    export PKG_CONFIG_PATH
+
+    # let pkg-config do it's magic
+
+
+
+if test -n "$PKG_CONFIG" ; then
+  if $PKG_CONFIG --exists "flopcpp"; then
+    FLOPCPP_VERSIONS=`$PKG_CONFIG --modversion "flopcpp" 2>/dev/null | tr '\n' ' '`
+     cflags=`$PKG_CONFIG --cflags "flopcpp" 2>/dev/null`
+    # pkg-config cannot handle spaces, so CYGPATH_W cannot be put into .pc files
+	# thus, we modify the cflags extracted from pkg-config by putting CYGPATH_W behind -I's
+	# but only do this if is not trivial
+    if test "$CYGPATH_W" != "echo" ; then
+      # need to put into brackets since otherwise autoconf replaces the brackets in the sed command
+      cflags=`echo $cflags | sed -e 's/-I\([^ ]*\)/-I\`${CYGPATH_W} \1\`/g'`
+    fi
+    FLOPCPP_CFLAGS="$cflags"
+    FLOPCPP_LIBS=`$PKG_CONFIG --libs "flopcpp" 2>/dev/null`
+    FLOPCPP_DATA=`$PKG_CONFIG --variable=datadir "flopcpp" 2>/dev/null`
+     coin_has_flopcpp=yes
+        echo "$as_me:$LINENO: result: yes: $FLOPCPP_VERSIONS" >&5
+echo "${ECHO_T}yes: $FLOPCPP_VERSIONS" >&6
+
+        # adjust linker flags for (i)cl compiler
+        # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl)
+        if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
+        then
+          FLOPCPP_LIBS=`echo " $FLOPCPP_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
+        fi
+        FLOPCPP_PCREQUIRES="flopcpp"
+
+        # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in
+
+
+
+  else
+    FLOPCPP_PKG_ERRORS=`$PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "flopcpp"`
+      coin_has_flopcpp=notGiven
+        echo "$as_me:$LINENO: result: not given: $FLOPCPP_PKG_ERRORS" >&5
+echo "${ECHO_T}not given: $FLOPCPP_PKG_ERRORS" >&6
+
+  fi
+else
+  { { echo "$as_me:$LINENO: error: \"Cannot check for existance of module FlopCpp without pkg-config\"" >&5
+echo "$as_me: error: \"Cannot check for existance of module FlopCpp without pkg-config\"" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+
+
+
+    # reset PKG_CONFIG_PATH variable
+    PKG_CONFIG_PATH="$coin_save_PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+
+  else
+    echo "$as_me:$LINENO: result: skipped check via pkg-config, redirect to fallback" >&5
+echo "${ECHO_T}skipped check via pkg-config, redirect to fallback" >&6
+
+echo "$as_me:$LINENO: checking for COIN-OR package FlopCpp (fallback)" >&5
+echo $ECHO_N "checking for COIN-OR package FlopCpp (fallback)... $ECHO_C" >&6
+
+coin_has_flopcpp=notGiven
+FLOPCPP_LIBS=
+FLOPCPP_LIBS_INSTALLED=
+FLOPCPP_CFLAGS=
+FLOPCPP_CFLAGS_INSTALLED=
+FLOPCPP_DATA=
+FLOPCPP_DATA_INSTALLED=
+FLOPCPP_PCLIBS=
+FLOPCPP_PCREQUIRES=
+
+# initial list of dependencies is "flopcpp", but we need to filter out version number specifications (= x, <= x, >= x, != x)
+projtoprocess="flopcpp"
+
+# we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
+# further, we collect the list of corresponding .pc files, but do this in reverse order, because we need this order afterwards
+# the latter we also do with .pc files corresponding to the installed projects, which will be needed to setup Makefiles for examples
+# also, we setup the DATA variable
+allproj=""
+allpcfiles=""
+allpcifiles=""
+while test "x$projtoprocess" != x ; do
+
+  for proj in $projtoprocess ; do
+    # if $proj is available and configured, then a project-uninstalled.pc file should have been created, so search for it
+    pcfile=""
+    save_IFS="$IFS"
+    IFS=":"
+    for dir in $COIN_PKG_CONFIG_PATH_UNINSTALLED ; do
+      # the base directory configure should have setup coin_subdirs.txt in a way that it does not contain projects that should be skipped, so we do not need to test this here again
+      if test -r "$dir/${proj}-uninstalled.pc" ; then
+        pcfile="$dir/$proj-uninstalled.pc"
+        if test -r "$dir/${proj}.pc" ; then
+          pcifile="$dir/${proj}.pc"
+        else
+          { echo "$as_me:$LINENO: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This may break Makefile's of examples." >&5
+echo "$as_me: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This may break Makefile's of examples." >&2;}
+          pcifile=
+        fi
+        break
+      fi
+    done
+    IFS="$save_IFS"
+
+    if test "x$pcfile" != x ; then
+      # read dependencies from $pcfile and filter it
+      projrequires=`sed -n -e 's/Requires://gp' "$pcfile" | sed -e 's/<\{0,1\}>\{0,1\}=[ 	]\{0,\}[^ 	]\{1,\}//g'`
+
+      # add projrequires to the front of the list of projects that have to be processed next
+      # at the same time, remove $proj from this list
+      projtoprocess=`echo $projtoprocess | sed -e "s/$proj/$projrequires/"`
+
+      # read DATA from $pcfile, if _DATA is still empty
+      if test "x$FLOPCPP_DATA" = x ; then
+        projdatadir=
+        pcfilemod=`sed -e '/[a-zA-Z]:/d' -e 's/datadir=\(.*\)/echo projdatadir=\\\\"\1\\\\"/g' $pcfile`
+        eval `sh -c "$pcfilemod"`
+        FLOPCPP_DATA="$projdatadir"
+      fi
+
+      allproj="$allproj $proj"
+      allpcfiles="$pcfile:$allpcfiles"
+
+    else
+      echo "$as_me:$LINENO: result: no, dependency $proj not available" >&5
+echo "${ECHO_T}no, dependency $proj not available" >&6
+      allproj=fail
+      break 2
+    fi
+
+    if test "x$pcifile" != x ; then
+      allpcifiles="$pcifile:$allpcifiles"
+
+      # read DATA_INSTALLED from $pcifile, if _DATA_INSTALLED is still empty
+      if test "x$FLOPCPP_DATA_INSTALLED" = x ; then
+        projdatadir=
+        pcifilemod=`sed -e '/[a-zA-Z]:/d' -e 's/datadir=\(.*\)/echo projdatadir=\\\\"\1\\\\"/g' $pcifile`
+        eval `sh -c "$pcifilemod"`
+        if test "${CYGPATH_W}" != "echo"; then
+          projdatadir="\`\$(CYGPATH_W) ${projdatadir} | sed -e 's/\\\\\\\\/\\\\\\\\\\\\\\\\/g'\`"
+        fi
+        FLOPCPP_DATA_INSTALLED="$projdatadir"
+      fi
+
+    fi
+
+    break
+  done
+
+  # remove spaces on begin of $projtoprocess
+  projtoprocess=`echo $projtoprocess | sed -e 's/^ *//'`
+
+done
+
+if test "$allproj" != fail ; then
+
+  # now go through the list of .pc files and assemble compiler and linker flags
+  # important is here to obey the reverse order that has been setup before,
+  # since then libraries that are required by several others should be after these other libraries
+  pcfilesprocessed=""
+
+  save_IFS="$IFS"
+  IFS=":"
+  for pcfile in $allpcfiles ; do
+
+    # if $pcfile has been processed already, skip this round
+    if test "x$pcfilesprocessed" != x ; then
+      for pcfiledone in $pcfilesprocessed ; do
+        if test "$pcfiledone" = "$pcfile" ; then
+          continue 2
+        fi
+      done
+    fi
+
+    # modify .pc file to a shell script that prints shell commands for setting the compiler and library flags:
+    #   replace "Libs:" by "echo projlibs="
+    #   replace "Cflags:" by "echo projcflags="
+    #   remove every line starting with <some word>:
+    pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
+
+    # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
+    projcflags=
+    projlibs=
+    IFS="$save_IFS"
+    eval `sh -c "$pcfilemod"`
+    IFS=":"
+
+    # add CYGPATH_W cludge into include flags and set CFLAGS variable
+    if test "${CYGPATH_W}" != "echo"; then
+      projcflags=`echo "$projcflags" | sed -e 's/-I\([^ ]*\)/-I\`${CYGPATH_W} \1\`/g'`
+    fi
+    FLOPCPP_CFLAGS="$projcflags $FLOPCPP_CFLAGS"
+
+    # set LIBS variable
+    FLOPCPP_LIBS="$projlibs $FLOPCPP_LIBS"
+
+    # remember that we have processed $pcfile
+    pcfilesprocessed="$pcfilesprocessed:$pcfile"
+
+  done
+  IFS="$save_IFS"
+
+
+  # now go through the list of .pc files for installed projects and assemble compiler and linker flags
+  # important is here again to obey the reverse order that has been setup before,
+  # since then libraries that are required by several others should be after these other libraries
+  pcfilesprocessed=""
+
+  save_IFS="$IFS"
+  IFS=":"
+  for pcfile in $allpcifiles ; do
+
+    # if $pcfile has been processed already, skip this round
+    if test "x$pcfilesprocessed" != x ; then
+      for pcfiledone in $pcfilesprocessed ; do
+        if test "$pcfiledone" = "$pcfile" ; then
+          continue 2
+        fi
+      done
+    fi
+
+    # modify .pc file to a shell script that prints shell commands for setting the compiler and library flags:
+    #   replace "Libs:" by "echo projlibs="
+    #   replace "Cflags:" by "echo projcflags="
+    #   remove every line starting with <some word>:
+    pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
+
+    # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
+    projcflags=
+    projlibs=
+    IFS="$save_IFS"
+    eval `sh -c "$pcfilemod"`
+    IFS=":"
+
+    # add CYGPATH_W cludge into include flags and set CFLAGS variable
+    if test "${CYGPATH_W}" != "echo"; then
+      projcflags=`echo "$projcflags" | sed -e 's/-I\([^ ]*\)/-I\`${CYGPATH_W} \1\`/g'`
+    fi
+    FLOPCPP_CFLAGS_INSTALLED="$projcflags $FLOPCPP_CFLAGS_INSTALLED"
+
+    # set LIBS variable
+    FLOPCPP_LIBS_INSTALLED="$projlibs $FLOPCPP_LIBS_INSTALLED"
+
+    # remember that we have processed $pcfile
+    pcfilesprocessed="$pcfilesprocessed:$pcfile"
+
+  done
+  IFS="$save_IFS"
+
+
+  # finish up
+  coin_has_flopcpp=yes
+  echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+
+cat >>confdefs.h <<\_ACEOF
+#define COIN_HAS_FLOPCPP 1
+_ACEOF
+
+
+  # adjust linker flags for (i)cl compiler
+  # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl),
+  # for the LIBS_INSTALLED, we replace everything of the form "/somepath/" by "`$(CYGPATH_W) /somepath/`",
+  #    everything of the form "-lname" by "libname.lib", and
+  #    everything of the form "-Lpath" by "-libpath:`$(CYGPATH_W) path`
+  if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
+  then
+    FLOPCPP_LIBS=`echo " $FLOPCPP_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
+    FLOPCPP_LIBS_INSTALLED=`echo " $FLOPCPP_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
+  fi
+
+  FLOPCPP_PCREQUIRES="flopcpp"
+
+
+fi
+
+
+
+if test $coin_has_flopcpp != notGiven &&
+                test $coin_has_flopcpp != skipping; then
+  COIN_HAS_FLOPCPP_TRUE=
+  COIN_HAS_FLOPCPP_FALSE='#'
+else
+  COIN_HAS_FLOPCPP_TRUE='#'
+  COIN_HAS_FLOPCPP_FALSE=
+fi
+
+
+
+  fi
+
+else
+  echo "$as_me:$LINENO: result: $coin_has_flopcpp" >&5
+echo "${ECHO_T}$coin_has_flopcpp" >&6
+fi
+
+if test $coin_has_flopcpp != skipping &&
+   test $coin_has_flopcpp != notGiven ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define COIN_HAS_FLOPCPP 1
+_ACEOF
+
+
+  # Check whether --enable-interpackage-dependencies or --disable-interpackage-dependencies was given.
+if test "${enable_interpackage_dependencies+set}" = set; then
+  enableval="$enable_interpackage_dependencies"
+
+else
+  enable_interpackage_dependencies=yes
+fi;
+
+  if test $enable_interpackage_dependencies = yes ; then
+     # construct dependencies variables from LIBS variables
+     # we add an extra space in LIBS so we can substitute out everything starting with " -"
+     # remove everything of the form -framework xxx as used on Mac and mklxxx as used on Windows
+     # then remove everything of the form -xxx
+     # also remove everything of the form `xxx`yyy (may have been added for cygwin/cl)
+     FLOPCPP_DEPENDENCIES=`echo " $FLOPCPP_LIBS" | sed -e 's/ mkl[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+
+  fi
+
+  if test 1 = 0 ; then  #change this test to enable a bit of debugging output
+    if test -n "$FLOPCPP_CFLAGS" ; then
+      { echo "$as_me:$LINENO: FlopCpp CFLAGS are $FLOPCPP_CFLAGS" >&5
+echo "$as_me: FlopCpp CFLAGS are $FLOPCPP_CFLAGS" >&6;}
+    fi
+    if test -n "$FLOPCPP_LIBS" ; then
+      { echo "$as_me:$LINENO: FlopCpp LIBS   are $FLOPCPP_LIBS" >&5
+echo "$as_me: FlopCpp LIBS   are $FLOPCPP_LIBS" >&6;}
+    fi
+    if test -n "$FLOPCPP_DEPENDENCIES" ; then
+      { echo "$as_me:$LINENO: FlopCpp DEPENDENCIES are $FLOPCPP_DEPENDENCIES" >&5
+echo "$as_me: FlopCpp DEPENDENCIES are $FLOPCPP_DEPENDENCIES" >&6;}
+    fi
+    if test -n "$FLOPCPP_DATA" ; then
+      { echo "$as_me:$LINENO: FlopCpp DATA   is  $FLOPCPP_DATA" >&5
+echo "$as_me: FlopCpp DATA   is  $FLOPCPP_DATA" >&6;}
+    fi
+    if test -n "$FLOPCPP_PCLIBS" ; then
+      { echo "$as_me:$LINENO: FlopCpp PCLIBS are $FLOPCPP_PCLIBS" >&5
+echo "$as_me: FlopCpp PCLIBS are $FLOPCPP_PCLIBS" >&6;}
+    fi
+    if test -n "$FLOPCPP_PCREQUIRES" ; then
+      { echo "$as_me:$LINENO: FlopCpp PCREQUIRES are $FLOPCPP_PCREQUIRES" >&5
+echo "$as_me: FlopCpp PCREQUIRES are $FLOPCPP_PCREQUIRES" >&6;}
+    fi
+
+  fi
+fi
+
+# Define the Makefile conditional
+
+
+if test $coin_has_flopcpp != notGiven &&
+                test $coin_has_flopcpp != skipping; then
+  COIN_HAS_FLOPCPP_TRUE=
+  COIN_HAS_FLOPCPP_FALSE='#'
+else
+  COIN_HAS_FLOPCPP_TRUE='#'
+  COIN_HAS_FLOPCPP_FALSE=
+fi
+
+
+
+
 ##############################################################################
 #                   VPATH links for example input files                      #
 ##############################################################################
@@ -22350,7 +22839,7 @@ fi
 
 # Here list all the files that configure should create (except for the
 # configuration header file)
-                                                            ac_config_files="$ac_config_files Makefile examples/Makefile src/Makefile test/Makefile smi.pc smi-uninstalled.pc"
+                                                                      ac_config_files="$ac_config_files Makefile examples/Makefile src/Makefile test/Makefile flopcpp_examples/Makefile smi.pc smi-uninstalled.pc"
 
 
 # Here put the location and name of the configuration header file
@@ -22616,6 +23105,20 @@ if test -z "${COIN_HAS_DATASTOCHASTIC_TRUE}" && test -z "${COIN_HAS_DATASTOCHAST
   { { echo "$as_me:$LINENO: error: conditional \"COIN_HAS_DATASTOCHASTIC\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"COIN_HAS_DATASTOCHASTIC\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${COIN_HAS_FLOPCPP_TRUE}" && test -z "${COIN_HAS_FLOPCPP_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"COIN_HAS_FLOPCPP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"COIN_HAS_FLOPCPP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${COIN_HAS_FLOPCPP_TRUE}" && test -z "${COIN_HAS_FLOPCPP_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"COIN_HAS_FLOPCPP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"COIN_HAS_FLOPCPP\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -23067,6 +23570,7 @@ do
   "examples/Makefile" ) CONFIG_FILES="$CONFIG_FILES examples/Makefile" ;;
   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
   "test/Makefile" ) CONFIG_FILES="$CONFIG_FILES test/Makefile" ;;
+  "flopcpp_examples/Makefile" ) CONFIG_FILES="$CONFIG_FILES flopcpp_examples/Makefile" ;;
   "smi.pc" ) CONFIG_FILES="$CONFIG_FILES smi.pc" ;;
   "smi-uninstalled.pc" ) CONFIG_FILES="$CONFIG_FILES smi-uninstalled.pc" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
@@ -23300,6 +23804,15 @@ s,@DATASTOCHASTIC_CFLAGS_INSTALLED@,$DATASTOCHASTIC_CFLAGS_INSTALLED,;t t
 s,@DATASTOCHASTIC_DATA_INSTALLED@,$DATASTOCHASTIC_DATA_INSTALLED,;t t
 s,@COIN_HAS_DATASTOCHASTIC_TRUE@,$COIN_HAS_DATASTOCHASTIC_TRUE,;t t
 s,@COIN_HAS_DATASTOCHASTIC_FALSE@,$COIN_HAS_DATASTOCHASTIC_FALSE,;t t
+s,@FLOPCPP_LIBS@,$FLOPCPP_LIBS,;t t
+s,@FLOPCPP_CFLAGS@,$FLOPCPP_CFLAGS,;t t
+s,@FLOPCPP_DATA@,$FLOPCPP_DATA,;t t
+s,@FLOPCPP_DEPENDENCIES@,$FLOPCPP_DEPENDENCIES,;t t
+s,@FLOPCPP_LIBS_INSTALLED@,$FLOPCPP_LIBS_INSTALLED,;t t
+s,@FLOPCPP_CFLAGS_INSTALLED@,$FLOPCPP_CFLAGS_INSTALLED,;t t
+s,@FLOPCPP_DATA_INSTALLED@,$FLOPCPP_DATA_INSTALLED,;t t
+s,@COIN_HAS_FLOPCPP_TRUE@,$COIN_HAS_FLOPCPP_TRUE,;t t
+s,@COIN_HAS_FLOPCPP_FALSE@,$COIN_HAS_FLOPCPP_FALSE,;t t
 s,@LIBEXT@,$LIBEXT,;t t
 s,@VPATH_DISTCLEANFILES@,$VPATH_DISTCLEANFILES,;t t
 s,@ABSBUILDDIR@,$ABSBUILDDIR,;t t
