@@ -4,13 +4,8 @@
 #ifndef SmiScnModel_HPP
 #define SmiScnModel_HPP
 
-#if defined(_MSC_VER)
-// Turn off compiler warning about long names
-#  pragma warning(disable:4786)
-#endif
-
-
 // Include files
+#include "CoinPragma.hpp"
 #include "SmiDiscreteDistribution.hpp"
 #include "SmiScenarioTree.hpp"
 #include "SmiScnData.hpp"
@@ -19,9 +14,7 @@
 #include "SmiMessage.hpp"
 
 // STL declarations
-#include <map>
 #include <vector>
-using namespace std;
 
 // forward declaration of SmiScnNode
 class SmiScnNode;
@@ -154,7 +147,7 @@ public:
         CoinPackedVector *dclo, CoinPackedVector *dcup,
         CoinPackedVector *dobj,
         CoinPackedVector *drlo, CoinPackedVector *drup,
-        vector<int>labels, double prob,
+        std::vector<int>labels, double prob,
         SmiCoreCombineRule *r = SmiCoreCombineReplace::Instance());
 
     /**@name loadOsiSolverData
@@ -193,7 +186,7 @@ public:
     int* getBinaryInd(){return core_->getBinaryIndices();}
     int getBinaryLen(){return core_->getBinaryLength();}
 
-    inline vector<int> getIntIndices() {
+    inline std::vector<int> getIntIndices() {
         return intIndices;
     }
     inline void addIntIndice(int indice) {
@@ -280,7 +273,7 @@ private:
     int* binaryInd;
     int binaryLen;
 
-    vector<int> intIndices;
+    std::vector<int> intIndices;
     int* maxNelsPerScenInStage;
 };
 

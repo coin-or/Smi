@@ -3,23 +3,18 @@
 #ifndef SmiScenarioTree_H
 #define SmiScenarioTree_H
 
-#if defined(_MSC_VER)
-// Turn off compiler warning about long names
-#  pragma warning(disable:4786)
-#endif
-
 /** Scenario Tree
 
  This class is used for storing and accessing scenario trees.
 
  */
-#include <list>
+
 #include <vector>
 #include <map>
 #include <iostream>
-#include <assert.h>
+#include <cassert>
 
-using namespace std;
+#include "CoinPragma.hpp"
 
 /** SmiTreeNode template class.
 
@@ -33,7 +28,7 @@ class SmiTreeNode {
 	//friend void SmiTreeNodeUnitTest();
 public:
 
-	typedef map<int, SmiTreeNode<T>*> child_label_map;
+	typedef std::map<int, SmiTreeNode<T>*> child_label_map;
 
 	bool hasParent() {
 		return (parent_ != NULL);
@@ -104,13 +99,13 @@ public:
 		return c;
 	}
 
-	vector<SmiTreeNode<T> *> *getChildren() {
+	std::vector<SmiTreeNode<T> *> *getChildren() {
 		SmiTreeNode<T> *pnode = this;
 		int i = this->numChildren();
 		if (i == 0) {
 			return NULL;
 		}
-		vector<SmiTreeNode<T> *> *vec = new vector<SmiTreeNode<T> *> (i);
+		std::vector<SmiTreeNode<T> *> *vec = new std::vector<SmiTreeNode<T> *> (i);
 		(*vec)[--i] = pnode = pnode->getChild();
 		while (i > 0)
 			(*vec)[--i] = pnode = pnode->getSibling();
@@ -208,27 +203,27 @@ public:
 
 
 	/** begin */
-	typename vector<T>::iterator treeBegin() {
+	typename std::vector<T>::iterator treeBegin() {
 		return node_data.begin();
 	}
 	/** end */
-	typename vector<T>::iterator treeEnd() {
+	typename std::vector<T>::iterator treeEnd() {
 		return node_data.end();
 	}
 	/** whole tree */
-	vector<T> &wholeTree() {
+	std::vector<T> &wholeTree() {
 		return node_data;
 	}
 
 	/** scenario iterators
 	 TODO: native code for these iterators that does not
 	 depend on copying. */
-	typename vector<T>::iterator scenBegin(int s) {
+	typename std::vector<T>::iterator scenBegin(int s) {
 		getScenario(s);
 		return scen_data.begin();
 	}
 
-	typename vector<T>::iterator scenEnd(int s) {
+	typename std::vector<T>::iterator scenEnd(int s) {
 		getScenario(s);
 		return scen_data.begin() + leaf_[s]->depth() + 1;
 	}
@@ -263,7 +258,7 @@ public:
 	}
 
 	/** Get node identified by longest match to array of labels */
-	SmiTreeNode<T> *find(vector<int> &label) {
+	SmiTreeNode<T> *find(std::vector<int> &label) {
 
 		assert(label.size()>0);
 		SmiTreeNode<T> *n = root_, *next;
@@ -291,7 +286,7 @@ public:
 	}
 
 	/** Get vector of node data for given scenario */
-	vector<T> &getScenario(int scenario) {
+	std::vector<T> &getScenario(int scenario) {
 		assert (scenario < (int) leaf_.size());
 		SmiTreeNode<T> * n = leaf_[scenario];
 
@@ -324,7 +319,7 @@ public:
 	 is assigned to SmiScenarioTree.
 	 SmiTreeNodeData elements must be created with "new" operator.
 	 */
-	int addPathtoLeaf(int brscenario, int stage, vector<T> &pathdata,
+	int addPathtoLeaf(int brscenario, int stage, std::vector<T> &pathdata,
 			unsigned int start = 0) {
 		SmiTreeNode<T> *parent = NULL;
 		int scenario = static_cast<int>(leaf_.size());
@@ -341,7 +336,7 @@ public:
 	}
 
 	/** Set child labels */
-	void setChildLabels(SmiTreeNode<T> *n, vector<int> labels) {
+	void setChildLabels(SmiTreeNode<T> *n, std::vector<int> labels) {
 		int t = n->depth();
 		while (n->hasChild()) {
 			n->setLastChildLabel(labels[++t]);
@@ -355,7 +350,7 @@ public:
 	 is assigned to SmiScenarioTree.
 	 SmiTreeNodeData elements must be created with "new" operator.
 	 */
-	int addPathtoLeaf(vector<int> &labels, vector<T> &pathdata) {
+	int addPathtoLeaf(std::vector<int> &labels, std::vector<T> &pathdata) {
 		SmiTreeNode<T> *parent = NULL;
 		int scenario = static_cast<int>(leaf_.size());
 		if (scenario)
@@ -375,7 +370,7 @@ public:
 	}
 
 	SmiTreeNode<T> * addNodesToTree(SmiTreeNode<T> *parent, int scenario,
-			vector<T> &pathdata, int start) {
+			std::vector<T> &pathdata, int start) {
 
 		for (unsigned int i = start; i < pathdata.size(); ++i) {
 			if (parent) {
@@ -406,9 +401,9 @@ public:
 	//@}
 
 private:
-	vector<T> node_data;
-	vector<T> scen_data;
-	vector<SmiTreeNode<T> *> leaf_;
+	std::vector<T> node_data;
+	std::vector<T> scen_data;
+	std::vector<SmiTreeNode<T> *> leaf_;
 	SmiTreeNode<T> *root_;
 };
 

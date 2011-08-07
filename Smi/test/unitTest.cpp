@@ -9,6 +9,8 @@
 #include "SmiScnModel.hpp"
 #include "OsiClpSolverInterface.hpp"
 
+using namespace std;
+
 //####################################################################
 
 

@@ -13,9 +13,6 @@
 
 #include "CoinPragma.hpp"
 #include "CoinPackedVector.hpp"
-#include <string>
-//#include <vector>
-using namespace std;
 
 /** This deals with combining Core and Stochastic data.
 

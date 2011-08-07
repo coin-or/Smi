@@ -3,11 +3,6 @@
 #ifndef SmiDiscreteRV_H
 #define SmiDiscreteRV_H
 
-#if defined(_MSC_VER)
-// Turn off compiler warning about long names
-#  pragma warning(disable:4786)
-#endif
-
 /** Smi Discrete Distribution
 
   This class is used for storing and accessing a discrete probability distribution.
@@ -17,11 +12,11 @@
 
 */
 
+#include "CoinPragma.hpp"
 #include "SmiScnData.hpp"
 #include "SmiLinearData.hpp"
 
 #include <vector>
-using namespace std;
 
 //forward declarations
 class SmiDiscreteRV;
@@ -64,7 +59,7 @@ public:
 private:
 	SmiDiscreteDistribution(){core_=NULL;}
 	SmiCoreData *core_;
-	vector<SmiDiscreteRV *> smiDiscrete_;
+	std::vector<SmiDiscreteRV *> smiDiscrete_;
 	SmiCoreCombineRule *combineRule_;
 
 
@@ -126,7 +121,7 @@ public:
 			delete events_[i];
 	}
 private:
-	vector<SmiDiscreteEvent *> events_;
+	std::vector<SmiDiscreteEvent *> events_;
 	SmiStageIndex  stg_;
 	double prob_;
 };

@@ -4,11 +4,7 @@
 #ifndef SmiScnData_HPP
 #define SmiScnData_HPP
 
-#if defined(_MSC_VER)
-// Turn off compiler warning about long names
-#  pragma warning(disable:4786)
-#endif
-
+#include "CoinPragma.hpp"
 #include "OsiSolverInterface.hpp"
 #include "CoinPackedVector.hpp"
 #include "CoinMpsIO.hpp"
@@ -17,8 +13,6 @@
 
 #include <map>
 #include <vector>
-
-using namespace std;
 
 
 typedef int SmiCoreIndex;
@@ -31,8 +25,8 @@ class SmiNodeData
 	//: public SmiLinearData
 {
 public:
-	typedef map<int,CoinPackedVector *> SmiRowMap;
-	typedef map<int,double *> SmiDenseRowMap;
+	typedef std::map<int,CoinPackedVector *> SmiRowMap;
+	typedef std::map<int,double *> SmiDenseRowMap;
 	void setCoreNode();
 	/*
 	CoinPackedVector * getRow(int i) {
@@ -195,9 +189,9 @@ private:
 class SmiCoreData
 {
 public:
-	inline int getNumCols(){ return ncol_;} //Gesamtzahl Variablen für das CoreModell
-	inline int getNumRows(){ return nrow_;} //Gesamtzahl Restriktionen für das CoreModell
-	inline int getNumElements(){ return nz_;} // Gesamtzahl Elemente für das CoreModell
+	inline int getNumCols(){ return ncol_;} //Gesamtzahl Variablen fï¿½r das CoreModell
+	inline int getNumRows(){ return nrow_;} //Gesamtzahl Restriktionen fï¿½r das CoreModell
+	inline int getNumElements(){ return nz_;} // Gesamtzahl Elemente fï¿½r das CoreModell
 	inline int getNumStages(){ return nstag_;} //Anzahl an Stufen
 	inline int getNumCols(SmiStageIndex t){ return nColInStage_[t];} //Anzahl Variablen in Stufe t 
 	inline int getNumRows(SmiStageIndex t){ return nRowInStage_[t];} //Number of Restrictions in stage t
@@ -219,7 +213,7 @@ public:
 	inline const double * getDenseColUpper(SmiStageIndex t){return cdcup_[t];}
 	inline const double * getDenseObjCoefficients(SmiStageIndex t){return cdobj_[t];}
 
-    inline vector<int> getIntCols(int stage) { return intColsStagewise[stage]; };
+    inline std::vector<int> getIntCols(int stage) { return intColsStagewise[stage]; };
 	inline int* getIntegerIndices() { return integerIndices_; } //indices of integer variables
 	inline int getIntegerLength() { return integerLength_; }
     inline int* getBinaryIndices() { return binaryIndices_; } //indices of binary variables
@@ -276,9 +270,9 @@ private:
 	double **cdobj_;
 	double **cdclo_;
 	double **cdcup_;
-	vector<SmiNodeData*> nodes_; //Nodes, that contain stage dependent constraints (with Bounds,Ranges,Objective,Matrix), so called CoreNodes 
-	vector<double *> pDenseRow_; //dense probability vector
-	vector< vector<int> > intColsStagewise; // For each stage separately, it contains the position of every integer column
+	std::vector<SmiNodeData*> nodes_; //Nodes, that contain stage dependent constraints (with Bounds,Ranges,Objective,Matrix), so called CoreNodes
+	std::vector<double *> pDenseRow_; //dense probability vector
+	std::vector< std::vector<int> > intColsStagewise; // For each stage separately, it contains the position of every integer column
 	char **colNamesStrict;
 	char **colNamesFree;
 };
