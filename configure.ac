@@ -12,7 +12,7 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT([Smi],[trunk],[coin-smi@lists.coin-or.org])
+AC_INIT([Smi],[trunk],[smi@lists.coin-or.org])
 
 AC_COPYRIGHT([
 Copyright 2006 International Business Machines and others.
@@ -44,13 +44,9 @@ AC_COIN_CREATE_LIBTOOL
 
 AC_COIN_MAIN_PACKAGEDIR(CoinUtils)
 AC_COIN_MAIN_PACKAGEDIR(Stochastic, Data)
-AC_COIN_MAIN_PACKAGEDIR(Sample,     Data)
 AC_COIN_MAIN_PACKAGEDIR(Osi)
 AC_COIN_MAIN_PACKAGEDIR(Clp)
-AC_COIN_MAIN_PACKAGEDIR(Cgl)
-AC_COIN_MAIN_PACKAGEDIR(Cbc)
 AC_COIN_MAIN_PACKAGEDIR(Smi)
-AC_COIN_MAIN_PACKAGEDIR(FlopCpp)
 
 ##############################################################################
 #                   Finishing up by writing all the output                   #
