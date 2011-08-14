@@ -1,5 +1,5 @@
 BuildTools      https://projects.coin-or.org/svn/BuildTools/stable/0.7
-Data/Stochastic https://projects.coin-or.org/svn/Data/Stochastic/trunk
+Data/Stochastic https://projects.coin-or.org/svn/Data/Stochastic/stable/1.1
 CoinUtils       https://projects.coin-or.org/svn/CoinUtils/stable/2.8/CoinUtils
 Osi             https://projects.coin-or.org/svn/Osi/stable/0.105/Osi
 Clp             https://projects.coin-or.org/svn/Clp/stable/1.14/Clp
