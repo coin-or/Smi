@@ -75,7 +75,7 @@ if COIN_HAS_PKGCONFIG
 	$(PKG_CONFIG) --libs smi > $(addlibsdir)/smi_addlibs.txt
 else
 if COIN_CXX_IS_CL
-	echo "-libpath:`$(CYGPATH_W) @abs_lib_dir@` libSmi.lib @SMI_LIBS_INSTALLED@" > $(addlibsdir)/smi_addlibs_cpp.txt
+	echo "-libpath:`$(CYGPATH_W) @abs_lib_dir@` libSmi.lib @SMI_LIBS_INSTALLED@" > $(addlibsdir)/smi_addlibs.txt
 else
 	echo -L@abs_lib_dir@ -lSmi @SMI_LIBS_INSTALLED@ > $(addlibsdir)/smi_addlibs.txt
 endif
