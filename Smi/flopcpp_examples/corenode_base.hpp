@@ -20,6 +20,7 @@
 #ifndef CORENODE_BASE_HPP
 #define CORENODE_BASE_HPP
 
+
 /** Note that the COIN-OR classes should be included as "coin/class-name",
     but some of the FlopC++ classes do not do that, so we have to call
     the class without the prefix and add the coin dir. to the search path. **/
@@ -27,8 +28,8 @@
 
 namespace FlopSmiEx {
 using namespace flopc;
-using std::cerr;
-using std::endl;
+using namespace std;
+
 
 
 /// Problem-independent base class for an LP/MIP model in one node of a tree.

@@ -13,6 +13,8 @@
 
 #include "flop-smi_methods.hpp"
 
+#include <vector>
+
 using namespace FlopSmiEx;
 using std::string;
 

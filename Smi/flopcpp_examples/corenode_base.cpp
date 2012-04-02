@@ -13,6 +13,8 @@
 
 #include "corenode_base.hpp"
 
+#include <vector>
+
 using namespace FlopSmiEx;
 
 // Initialize the static members - this has to be done outside the class

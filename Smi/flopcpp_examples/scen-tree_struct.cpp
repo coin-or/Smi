@@ -88,7 +88,7 @@ TwoStageTree::TwoStageTree(int const nScens)
 {
 	scenNodeNmb[0] = 0;
 	for (int s = 0; s < nmbScens; s++) {
-		leaves[s] = 1 + s; // root = 0, first leaf = 1
+		leaves[s] = (1 + s); // root = 0, first leaf = 1
 	}
 }
 
