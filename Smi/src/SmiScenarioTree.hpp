@@ -51,7 +51,7 @@ public:
 	}
 
 	void setLastChildLabel(int label) {
-		child_labels_.insert(make_pair(label, this->getChild()));
+		child_labels_.insert(std::make_pair(label, this->getChild()));
 	}
 
 	SmiTreeNode<T> *getChildByLabel(int n) {
