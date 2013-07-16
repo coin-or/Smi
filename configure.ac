@@ -12,7 +12,7 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT([Smi],[0.93],[smi@lists.coin-or.org])
+AC_INIT([Smi],[trunk],[smi@lists.coin-or.org])
 
 AC_COPYRIGHT([
 Copyright 2006 International Business Machines and others.
