@@ -4,7 +4,7 @@
 /***************************************************************************/
 
 /* Version number of project */
-#define SMI_VERSION "0.93"
+#define SMI_VERSION "0.93.2"
 
 /* Major Version number of project */
 #define SMI_VERSION_MAJOR 0
@@ -13,4 +13,4 @@
 #define SMI_VERSION_MINOR 93
 
 /* Release Version number of project */
-#define SMI_VERSION_RELEASE 9999
+#define SMI_VERSION_RELEASE 2
