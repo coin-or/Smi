@@ -9,6 +9,7 @@ Smi/AUTHORS -text
 Smi/LICENSE -text
 Smi/MSVisualStudio/v10/Smi.sln -text
 Smi/MSVisualStudio/v10/Smi.vcxproj -text
+Smi/MSVisualStudio/v10/ex_invest/ex_invest.vcxproj -text
 Smi/MSVisualStudio/v10/libSmi/libSmi.vcxproj -text
 Smi/MSVisualStudio/v9/Smi.sln -text
 Smi/MSVisualStudio/v9/exampleFlopcpp_Invest/exampleFlopcpp_Invest.vcproj -text
