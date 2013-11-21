@@ -11,18 +11,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{898829DC-4007-464B-A33B-090812D2BC57}</ProjectGuid>
+    <ProjectGuid>{19A57339-A3A9-4085-B974-6C00A5B524F8}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>libSmi</RootNamespace>
+    <RootNamespace>exampleFlopcpp_Invest</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
@@ -42,8 +42,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -51,11 +53,11 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\..\Smi\src;..\..\..\..\Clp\src;..\..\..\..\Osi\src\Osi;..\..\..\..\Osi\src\OsiClp;..\..\..\..\CoinUtils\src;..\..\..\..\BuildTools\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\..\..\FlopCpp\src;..\..\..\..\Smi\src;..\..\..\..\Clp\src\OsiClp;..\..\..\..\Clp\src;..\..\..\..\Osi\src\Osi;..\..\..\..\Osi\src\OsiClp;..\..\..\..\CoinUtils\src;..\..\..\..\BuildTools\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
@@ -67,37 +69,45 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\..\Smi\src;..\..\..\..\Clp\src;..\..\..\..\Osi\src;..\..\..\..\Osi\src\OsiClp;..\..\..\..\CoinUtils\src;..\..\..\..\BuildTools\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="ReadMe.txt" />
+    <ClCompile Include="..\..\..\flopcpp_examples\corenode_base.cpp" />
+    <ClCompile Include="..\..\..\flopcpp_examples\ex_invest.cpp" />
+    <ClCompile Include="..\..\..\flopcpp_examples\flop-smi_methods.cpp" />
+    <ClCompile Include="..\..\..\flopcpp_examples\scen-tree_struct.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\SmiConfig.h" />
-    <ClInclude Include="..\..\..\src\SmiCoreCombineRule.hpp" />
-    <ClInclude Include="..\..\..\src\SmiDiscreteDistribution.hpp" />
-    <ClInclude Include="..\..\..\src\SmiLinearData.hpp" />
-    <ClInclude Include="..\..\..\src\SmiMessage.hpp" />
-    <ClInclude Include="..\..\..\src\SmiScenarioTree.hpp" />
-    <ClInclude Include="..\..\..\src\SmiScnData.hpp" />
-    <ClInclude Include="..\..\..\src\SmiScnModel.hpp" />
-    <ClInclude Include="..\..\..\src\SmiSmpsIO.hpp" />
+    <ClInclude Include="..\..\..\flopcpp_examples\corenode_base.hpp" />
+    <ClInclude Include="..\..\..\flopcpp_examples\flop-smi_methods.hpp" />
+    <ClInclude Include="..\..\..\flopcpp_examples\scen-tree_struct.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\SmiCoreCombineRule.cpp" />
-    <ClCompile Include="..\..\..\src\SmiDiscreteDistribution.cpp" />
-    <ClCompile Include="..\..\..\src\SmiMessage.cpp" />
-    <ClCompile Include="..\..\..\src\SmiScnData.cpp" />
-    <ClCompile Include="..\..\..\src\SmiScnModel.cpp" />
-    <ClCompile Include="..\..\..\src\SmiSmpsIO.cpp" />
+    <ProjectReference Include="..\..\..\..\Clp\MSVisualStudio\v10\libClp\libClp.vcxproj">
+      <Project>{4f8f7d1c-3a9e-444d-8ee9-77f33fa05994}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Clp\MSVisualStudio\v10\libOsiClp\libOsiClp.vcxproj">
+      <Project>{02d45875-a8cf-41b9-990b-3699c0ecfe10}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\CoinUtils\MSVisualStudio\v10\libCoinUtils\libCoinUtils.vcxproj">
+      <Project>{c4867f15-438d-4ff8-8388-62fbaaa9786c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Osi\MSVisualStudio\v10\libOsi\libOsi.vcxproj">
+      <Project>{7d98e2cb-876e-4f75-9f71-77d3fe87e149}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\libflopc\libflopc.vcxproj">
+      <Project>{fc9b7250-a277-440d-9299-398c3fcb9ae2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\libSmi\libSmi.vcxproj">
+      <Project>{898829dc-4007-464b-a33b-090812d2bc57}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

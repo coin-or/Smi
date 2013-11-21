@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{898829DC-4007-464B-A33B-090812D2BC57}</ProjectGuid>
+    <ProjectGuid>{FC9B7250-A277-440D-9299-398C3FCB9AE2}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>libSmi</RootNamespace>
+    <RootNamespace>libflopc</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -41,10 +41,7 @@
     <Import Project="..\..\..\..\BuildTools\MSVisualStudio\v10\Release.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
-  </PropertyGroup>
+  <PropertyGroup />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>
@@ -52,7 +49,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\..\Smi\src;..\..\..\..\Clp\src;..\..\..\..\Osi\src\Osi;..\..\..\..\Osi\src\OsiClp;..\..\..\..\CoinUtils\src;..\..\..\..\BuildTools\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\FlopCpp\src;..\..\..\..\Smi\src;..\..\..\..\Clp\src\OsiClp;..\..\..\..\Clp\src;..\..\..\..\Osi\src\Osi;..\..\..\..\Osi\src\OsiClp;..\..\..\..\CoinUtils\src;..\..\..\..\BuildTools\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -68,7 +65,6 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\..\Smi\src;..\..\..\..\Clp\src;..\..\..\..\Osi\src;..\..\..\..\Osi\src\OsiClp;..\..\..\..\CoinUtils\src;..\..\..\..\BuildTools\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -81,23 +77,30 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\SmiConfig.h" />
-    <ClInclude Include="..\..\..\src\SmiCoreCombineRule.hpp" />
-    <ClInclude Include="..\..\..\src\SmiDiscreteDistribution.hpp" />
-    <ClInclude Include="..\..\..\src\SmiLinearData.hpp" />
-    <ClInclude Include="..\..\..\src\SmiMessage.hpp" />
-    <ClInclude Include="..\..\..\src\SmiScenarioTree.hpp" />
-    <ClInclude Include="..\..\..\src\SmiScnData.hpp" />
-    <ClInclude Include="..\..\..\src\SmiScnModel.hpp" />
-    <ClInclude Include="..\..\..\src\SmiSmpsIO.hpp" />
+    <ClInclude Include="..\..\..\..\FlopCpp\src\flopc.hpp" />
+    <ClInclude Include="..\..\..\..\FlopCpp\src\MP_boolean.hpp" />
+    <ClInclude Include="..\..\..\..\FlopCpp\src\MP_constant.hpp" />
+    <ClInclude Include="..\..\..\..\FlopCpp\src\MP_constraint.hpp" />
+    <ClInclude Include="..\..\..\..\FlopCpp\src\MP_data.hpp" />
+    <ClInclude Include="..\..\..\..\FlopCpp\src\MP_domain.hpp" />
+    <ClInclude Include="..\..\..\..\FlopCpp\src\MP_expression.hpp" />
+    <ClInclude Include="..\..\..\..\FlopCpp\src\MP_index.hpp" />
+    <ClInclude Include="..\..\..\..\FlopCpp\src\MP_model.hpp" />
+    <ClInclude Include="..\..\..\..\FlopCpp\src\MP_set.hpp" />
+    <ClInclude Include="..\..\..\..\FlopCpp\src\MP_utilities.hpp" />
+    <ClInclude Include="..\..\..\..\FlopCpp\src\MP_variable.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\SmiCoreCombineRule.cpp" />
-    <ClCompile Include="..\..\..\src\SmiDiscreteDistribution.cpp" />
-    <ClCompile Include="..\..\..\src\SmiMessage.cpp" />
-    <ClCompile Include="..\..\..\src\SmiScnData.cpp" />
-    <ClCompile Include="..\..\..\src\SmiScnModel.cpp" />
-    <ClCompile Include="..\..\..\src\SmiSmpsIO.cpp" />
+    <ClCompile Include="..\..\..\..\FlopCpp\src\MP_boolean.cpp" />
+    <ClCompile Include="..\..\..\..\FlopCpp\src\MP_constant.cpp" />
+    <ClCompile Include="..\..\..\..\FlopCpp\src\MP_constraint.cpp" />
+    <ClCompile Include="..\..\..\..\FlopCpp\src\MP_data.cpp" />
+    <ClCompile Include="..\..\..\..\FlopCpp\src\MP_domain.cpp" />
+    <ClCompile Include="..\..\..\..\FlopCpp\src\MP_expression.cpp" />
+    <ClCompile Include="..\..\..\..\FlopCpp\src\MP_index.cpp" />
+    <ClCompile Include="..\..\..\..\FlopCpp\src\MP_model.cpp" />
+    <ClCompile Include="..\..\..\..\FlopCpp\src\MP_set.cpp" />
+    <ClCompile Include="..\..\..\..\FlopCpp\src\MP_variable.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
