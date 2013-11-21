@@ -64,7 +64,9 @@ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includecoindir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libSmi_la_LIBADD =
+am__DEPENDENCIES_1 =
+@DEPENDENCY_LINKING_TRUE@libSmi_la_DEPENDENCIES =  \
+@DEPENDENCY_LINKING_TRUE@	$(am__DEPENDENCIES_1)
 am_libSmi_la_OBJECTS = SmiCoreCombineRule.lo \
 	SmiDiscreteDistribution.lo SmiScnData.lo SmiScnModel.lo \
 	SmiMessage.lo SmiSmpsIO.lo
@@ -156,6 +158,8 @@ DBG_CFLAGS = @DBG_CFLAGS@
 DBG_CXXFLAGS = @DBG_CXXFLAGS@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DEPENDENCY_LINKING_FALSE = @DEPENDENCY_LINKING_FALSE@
+DEPENDENCY_LINKING_TRUE = @DEPENDENCY_LINKING_TRUE@
 ECHO = @ECHO@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
@@ -301,6 +305,9 @@ libSmi_la_SOURCES = \
 	SmiMessage.cpp SmiMessage.hpp \
 	SmiSmpsIO.cpp SmiSmpsIO.hpp
 
+
+# List all additionally required libraries
+@DEPENDENCY_LINKING_TRUE@libSmi_la_LIBADD = $(SMI_LIBS)
 
 # This is for libtool (on Windows)
 libSmi_la_LDFLAGS = $(LT_LDFLAGS)
