@@ -20,13 +20,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unitTestSmi", "unitTestSmi\
 		{898829DC-4007-464B-A33B-090812D2BC57} = {898829DC-4007-464B-A33B-090812D2BC57}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "exampleSmi", "exampleSmi\exampleSmi.vcxproj", "{D743A328-4E0C-45CC-947F-F515AF0BD268}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "exampleFlopcpp_Trans", "exampleFlopcpp_Trans\exampleFlopcpp_Trans.vcxproj", "{CCBB30C3-F496-4BC8-BD89-290AF3547E1F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libflopc", "libflopc\libflopc.vcxproj", "{FC9B7250-A277-440D-9299-398C3FCB9AE2}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "exampleFlopcpp_Invest", "exampleFlopcpp_Invest\exampleFlopcpp_Invest.vcxproj", "{19A57339-A3A9-4085-B974-6C00A5B524F8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "exampleSmi", "exampleSmi\exampleSmi.vcxproj", "{93D4044B-DE9B-40F2-B83A-6E3F5A730702}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,10 +58,6 @@ Global
 		{4993262F-0157-4208-960E-6B66CE5976A3}.Debug|Win32.Build.0 = Debug|Win32
 		{4993262F-0157-4208-960E-6B66CE5976A3}.Release|Win32.ActiveCfg = Release|Win32
 		{4993262F-0157-4208-960E-6B66CE5976A3}.Release|Win32.Build.0 = Release|Win32
-		{D743A328-4E0C-45CC-947F-F515AF0BD268}.Debug|Win32.ActiveCfg = Debug|Win32
-		{D743A328-4E0C-45CC-947F-F515AF0BD268}.Debug|Win32.Build.0 = Debug|Win32
-		{D743A328-4E0C-45CC-947F-F515AF0BD268}.Release|Win32.ActiveCfg = Release|Win32
-		{D743A328-4E0C-45CC-947F-F515AF0BD268}.Release|Win32.Build.0 = Release|Win32
 		{CCBB30C3-F496-4BC8-BD89-290AF3547E1F}.Debug|Win32.ActiveCfg = Debug|Win32
 		{CCBB30C3-F496-4BC8-BD89-290AF3547E1F}.Debug|Win32.Build.0 = Debug|Win32
 		{CCBB30C3-F496-4BC8-BD89-290AF3547E1F}.Release|Win32.ActiveCfg = Release|Win32
@@ -74,6 +70,10 @@ Global
 		{19A57339-A3A9-4085-B974-6C00A5B524F8}.Debug|Win32.Build.0 = Debug|Win32
 		{19A57339-A3A9-4085-B974-6C00A5B524F8}.Release|Win32.ActiveCfg = Release|Win32
 		{19A57339-A3A9-4085-B974-6C00A5B524F8}.Release|Win32.Build.0 = Release|Win32
+		{93D4044B-DE9B-40F2-B83A-6E3F5A730702}.Debug|Win32.ActiveCfg = Debug|Win32
+		{93D4044B-DE9B-40F2-B83A-6E3F5A730702}.Debug|Win32.Build.0 = Debug|Win32
+		{93D4044B-DE9B-40F2-B83A-6E3F5A730702}.Release|Win32.ActiveCfg = Release|Win32
+		{93D4044B-DE9B-40F2-B83A-6E3F5A730702}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
