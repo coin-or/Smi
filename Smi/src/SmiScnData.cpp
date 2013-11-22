@@ -656,10 +656,20 @@ SmiNodeData::getDenseRow(int i) {
 void
 SmiNodeData::assignMemory()
 {
+	
 	this->nstrt_    = (this->nrow_+1) + this->numarrays_;
-
-	this->dels_     = (double *)calloc(this->nels_  ,sizeof(double));
-	this->inds_     = (int *)   calloc(this->nels_  ,sizeof(int)   );
+	
+	if (this->nels_ == 0)
+	{
+		this->dels_ = NULL;
+		this->inds_ = NULL;
+	}
+	else
+	{		
+		this->dels_     = (double *)calloc(this->nels_  ,sizeof(double));
+		this->inds_     = (int *)   calloc(this->nels_  ,sizeof(int)   );
+	}
+	
 	this->strt_     = (int *)   calloc(this->nstrt_ ,sizeof(int)   );
 }
 
