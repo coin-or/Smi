@@ -27,6 +27,11 @@ libSmi_la_SOURCES = \
 	SmiMessage.cpp SmiMessage.hpp \
 	SmiSmpsIO.cpp SmiSmpsIO.hpp
 
+# List all additionally required libraries
+if DEPENDENCY_LINKING
+libSmi_la_LIBADD = $(SMI_LIBS)
+endif
+
 # This is for libtool (on Windows)
 libSmi_la_LDFLAGS = $(LT_LDFLAGS)
 
