@@ -150,7 +150,60 @@ public:
         std::vector<int>labels, double prob,
         SmiCoreCombineRule *r = SmiCoreCombineReplace::Instance());
 
-    /**@name loadOsiSolverData
+	    /** generate scenario with ancestor/branch node identification
+
+    Core argument must be supplied.
+    Data values combine with corresponding core values,
+    if found, or creates them if not.
+
+    Scenario nodes need to have same dimensions as core nodes.
+
+    Data field arguments can be NULL, or empty.
+
+    branch, anc, arguments must be supplied.  These
+    identify the branching node according to the Stochastic MPS
+    standard.
+
+    prob is unconditional probability of scenario
+
+    */
+    SmiScenarioIndex generateScenario(
+        CoinPackedMatrix *matrix,
+        CoinPackedVector *dclo, CoinPackedVector *dcup,
+        CoinPackedVector *dobj,
+        CoinPackedVector *drlo, CoinPackedVector *drup,
+        SmiStageIndex branch, SmiScenarioIndex anc, double prob,
+        SmiCoreCombineRule *r = SmiCoreCombineReplace::Instance());
+
+    /** generate scenario with labels information
+
+    Core argument must be supplied.
+    Data values combine with corresponding core values,
+    if found, or creates them if not.
+
+    Scenario nodes need to have same dimensions as core nodes.
+
+    Data field arguments can be NULL, or empty.
+
+    Labels are passed as vector<int> array.
+    Adds new path using labels to find branching node.
+    The depth (root to leaf) of new path is labels.size().
+
+    */
+    SmiScenarioIndex generateScenario(
+        CoinPackedMatrix *matrix,
+        CoinPackedVector *dclo, CoinPackedVector *dcup,
+        CoinPackedVector *dobj,
+        CoinPackedVector *drlo, CoinPackedVector *drup,
+        std::vector<int>labels, double prob,
+        SmiCoreCombineRule *r = SmiCoreCombineReplace::Instance());
+
+	SmiScenarioIndex generateScenarioFromCore(SmiCoreData *core, double prob, 
+        SmiCoreCombineRule *r = SmiCoreCombineReplace::Instance());
+	SmiScenarioIndex generateScenarioFromCore(double prob,
+        SmiCoreCombineRule *r = SmiCoreCombineReplace::Instance());
+
+	/**@name loadOsiSolverData
 
     Loads deterministic equivalent model into internal osi data structures
     and return handle.
@@ -197,8 +250,16 @@ public:
     double getObjectiveValue(SmiScenarioIndex ns);
     double *getColSolution(SmiScenarioIndex ns, int *length);
     double *getRowSolution(SmiScenarioIndex ns, int *length);
+	double *getRowDuals(SmiScenarioIndex ns, int *length);
     double getColSolution(SmiScenarioIndex ns, int stage, int colIndex);
-    double getRowSolution(SmiScenarioIndex ns, int stage, int colIndex);
+    double getRowSolution(SmiScenarioIndex ns, int stage, int rowIndex);
+	double getRowDuals(SmiScenarioIndex ns, int stage, int rowIndex);
+
+	// base classes for getting values from solved SmiScnModel
+	double *getColValue(const double *d, SmiScenarioIndex ns, int*length);
+	double  getColValue(const double *d, SmiScenarioIndex ns, int stage, int rowIndex);
+	double *getRowValue(const double *d, SmiScenarioIndex ns, int*length, bool isDual);
+	double  getRowValue(const double *d, SmiScenarioIndex ns, int stage, int rowIndex, bool isDual);
 
     // OsiSolverInterface
     void setOsiSolverHandle(OsiSolverInterface &osi)

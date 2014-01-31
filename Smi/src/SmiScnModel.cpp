@@ -72,6 +72,16 @@ SmiScnModel::~SmiScnModel()
 // branch: Stage where the new scenario differs from previous scenario
 // anc: the ancestor of this scenario, this is the one it branches from
 // prob: unconditional probability of this scenario (leaf node probability)
+SmiScenarioIndex SmiScnModel::generateScenario(
+                              CoinPackedMatrix *matrix,
+                              CoinPackedVector *v_dclo, CoinPackedVector *v_dcup,
+                              CoinPackedVector *v_dobj,
+                              CoinPackedVector *v_drlo, CoinPackedVector *v_drup,
+                              SmiStageIndex branch, SmiScenarioIndex anc, double prob,
+                              SmiCoreCombineRule *r)
+{
+	return generateScenario(this->core_,matrix,v_dclo,v_dcup,v_dobj,v_drlo,v_drup,branch,anc,prob,r);
+}
 SmiScenarioIndex SmiScnModel::generateScenario(SmiCoreData *core,
                               CoinPackedMatrix *matrix,
                               CoinPackedVector *v_dclo, CoinPackedVector *v_dcup,
@@ -83,6 +93,12 @@ SmiScenarioIndex SmiScnModel::generateScenario(SmiCoreData *core,
 
     // this coding takes branch to be the node that the scenario branches *from*
     --branch;
+
+	// if core is null we use the SmiScnModel::core_
+	if (!core)
+		core = core_;
+
+	assert(core != 0);
 
     vector<SmiScnNode *> node_vec;
 
@@ -174,6 +190,17 @@ SmiScenarioIndex SmiScnModel::generateScenario(SmiCoreData *core,
     return scen;
 }
 
+SmiScenarioIndex SmiScnModel::generateScenario(
+                              CoinPackedMatrix *matrix,
+                              CoinPackedVector *v_dclo, CoinPackedVector *v_dcup,
+                              CoinPackedVector *v_dobj,
+                              CoinPackedVector *v_drlo, CoinPackedVector *v_drup,
+                              vector<int> labels, double prob,
+                              SmiCoreCombineRule *r)
+{
+	return generateScenario(this->core_,matrix,v_dclo,v_dcup,v_dobj,v_drlo,v_drup,labels,prob,r);
+}
+
 SmiScenarioIndex SmiScnModel::generateScenario(SmiCoreData *core,
                               CoinPackedMatrix *matrix,
                               CoinPackedVector *v_dclo, CoinPackedVector *v_dcup,
@@ -235,6 +262,17 @@ SmiScenarioIndex SmiScnModel::generateScenario(SmiCoreData *core,
 
     return scen;
 
+}
+SmiScenarioIndex SmiScnModel::generateScenarioFromCore(SmiCoreData *core, double prob,
+        SmiCoreCombineRule *r)
+{
+	return this->generateScenario(core,
+		NULL,NULL,NULL,NULL,NULL,NULL,1,0,prob,r);
+}
+SmiScenarioIndex SmiScnModel::generateScenarioFromCore(double prob,
+        SmiCoreCombineRule *r)
+{
+	return this->generateScenario(NULL,NULL,NULL,NULL,NULL,NULL,1,0,prob,r);
 }
 
 // Main public interfaces for getting WS, EV, and EEV values (no coefficients whatsoever).
@@ -1060,6 +1098,10 @@ SmiScnModel::getColSolution(int ns, int *length)
 {
     //CoinPackedVector *soln=new CoinPackedVector();
     const double * osiSoln = this->getOsiSolverInterface()->getColSolution();
+	return this->getColValue(osiSoln,ns,length);
+}
+double * SmiScnModel::getColValue(const double *osiSoln, int ns, int *length)
+{
     int numcols=0;
 
     assert( ns < this->getNumScenarios() );
@@ -1083,7 +1125,7 @@ SmiScnModel::getColSolution(int ns, int *length)
         // copy entries
         // getColStart returns the starting index of node in OSI model
         for(int j=node->getColStart(); j<node->getColStart()+node->getNumCols(); ++j){
-            // getCoreRowIndex returns the corresponding Core index
+            // getCoreColIndex returns the corresponding Core index
             // in the original (user's) ordering
             dsoln[node->getCoreColIndex(j)] = osiSoln[j];
         }
@@ -1099,6 +1141,10 @@ SmiScnModel::getColSolution(int ns, int stage, int colIndex)
 {
     //CoinPackedVector *soln=new CoinPackedVector();
     const double * osiSoln = this->getOsiSolverInterface()->getColSolution();
+	return this->getColValue(osiSoln,ns,stage,colIndex);
+}
+double SmiScnModel::getColValue(const double *osiSoln,int ns, int stage, int colIndex)
+{
 
     assert( ns < this->getNumScenarios() );
     assert( stage < this->core_->getNumStages() );
@@ -1118,8 +1164,17 @@ SmiScnModel::getColSolution(int ns, int stage, int colIndex)
 double *
 SmiScnModel::getRowSolution(int ns, int *length)
 {
-    //CoinPackedVector *soln=new CoinPackedVector();
+    bool isDual=false;
     const double * osiSoln = this->getOsiSolverInterface()->getRowActivity();
+	return getRowValue(osiSoln,ns,length, isDual);
+}
+double *SmiScnModel::getRowDuals(int ns, int *length){
+	bool isDual=true;
+	const double *osiDuals = this->getOsiSolverInterface()->getRowPrice();
+	return getRowValue(osiDuals,ns,length,isDual);
+}
+double *SmiScnModel::getRowValue(const double *osiSoln, int ns, int *length, bool isDual)
+{
     int numrows=0;
 
     assert( ns < this->getNumScenarios() );
@@ -1146,7 +1201,14 @@ SmiScnModel::getRowSolution(int ns, int *length)
         for(int j=node->getRowStart(); j<node->getRowStart()+node->getNumRows(); ++j){
             // getCoreRowIndex returns the corresponding Core index
             // in the original (user's) ordering
-            dsoln[node->getCoreRowIndex(j)] = osiSoln[j];
+			int jj= node->getCoreRowIndex(j);
+			// if the Duals are called for then need to extract the probability
+			// because the linear form for the duality principle incorporates probability explicitly
+            double dprob=node->getProb();
+			if (isDual && dprob)
+				dsoln[jj] = osiSoln[j]/dprob;
+			else
+				dsoln[jj] = osiSoln[j];
         }
         // get parent of node
         node = node->getParent();
@@ -1160,6 +1222,16 @@ SmiScnModel::getRowSolution(int ns, int stage, int rowIndex)
 {
     //CoinPackedVector *soln=new CoinPackedVector();
     const double * osiSoln = this->getOsiSolverInterface()->getRowActivity();
+	return this->getRowValue(osiSoln,ns,stage,rowIndex,false);
+}
+double SmiScnModel::getRowDuals(int ns, int stage, int rowIndex)
+{
+    //CoinPackedVector *soln=new CoinPackedVector();
+    const double * osiSoln = this->getOsiSolverInterface()->getRowPrice();
+	return this->getRowValue(osiSoln,ns,stage,rowIndex, true);
+}
+double SmiScnModel::getRowValue(const double *osiSoln, int ns, int stage, int rowIndex, bool isDual)
+{
     assert( ns < this->getNumScenarios() );
     assert( stage < this->core_->getNumStages() );
     // start with leaf node
@@ -1172,7 +1244,11 @@ SmiScnModel::getRowSolution(int ns, int stage, int rowIndex)
     }
 
     assert( rowIndex < core_->getRowStart(stage)+node->getNumRows() && rowIndex >= core_->getRowStart(stage));
-    return osiSoln[node->getRowStart()+rowIndex-core_->getRowStart(stage)];// Return element in matrix that is at nodeColStart + colIndex for stage. Where to get colIndex for stage?
+	double dvalue = osiSoln[node->getRowStart()+rowIndex-core_->getRowStart(stage)];
+	if (isDual && node->getProb())
+		dvalue /= node->getProb();
+
+    return dvalue;
 }
 
 
@@ -1360,7 +1436,7 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
         if (m.getNumElements()) assert(!m.isColOrdered());
 
         if (matrix.getNumElements()) //Christian: What is this about?! This can not work, as matrix is not yet initialized..
-        {
+        {                            //Alan: I don't know.  Hopefully matrix.getNumElements() returns zero.
             for (int i=0; i<m.getNumRows(); ++i)
             {
                 CoinPackedVector row=m.getVector(i);
