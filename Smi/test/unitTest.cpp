@@ -9,10 +9,210 @@
 #include "SmiScnModel.hpp"
 #include "OsiClpSolverInterface.hpp"
 
+#include "CoinMpsIO.hpp"
+#include "ClpInterior.hpp"
+#include "ClpSimplex.hpp"
+#include "ClpCholeskyBase.hpp"
+#include "ClpQuadraticObjective.hpp"
+
 using namespace std;
 
 //####################################################################
+void myAssert(const char * file, const int line, bool c );
+void	SmiTreeNodeUnitTest();
+void	SmiScenarioTreeUnitTest();
+void	SmiScnSmpsIOUnitTestReplace();
+void	SmiScnSmpsIOUnitTestAdd();
+void    SmiScnModelScenarioUnitTest();
+void	SmiScnModelDiscreteUnitTest();
+void	ModelBug();
+void	testingMessage(const char* const);
+void	SmpsBug();
+void	DecompUnitTest();
+void ModelBugQP();
 
+int main()
+{
+	try{
+	//testingMessage( "Testing SmiTreeNode \n");
+	SmiTreeNodeUnitTest();
+
+	//testingMessage( "Testing SmiScenarioTree\n" );
+	SmiScenarioTreeUnitTest();
+
+	//testingMessage( "Testing SmiScnSmpsIO Replace\n" );
+	SmiScnSmpsIOUnitTestReplace();
+
+	//testingMessage( "Testing SmiScnSmpsIO Add\n" );
+	SmiScnSmpsIOUnitTestAdd();
+
+	//testingMessage( "Testing base data structures for SmiScnModel\n");
+    SmiScnModelScenarioUnitTest();
+
+	//testingMessage( "Testing SmiScnModel Discrete Distribution\n" );
+	SmiScnModelDiscreteUnitTest();
+
+	//testingMessage("Model generation for simple model Bug");
+	ModelBug();
+
+	//testingMessage("Read SMPS version of simple model Bug");
+	SmpsBug();
+
+	//testingMessage("Unit test for decomposition.");
+	DecompUnitTest();
+
+	ModelBugQP();
+	}
+	catch(string c){
+		cout << c << "\n";
+		exit(1);
+	}
+
+	SmiCoreCombineReplace::ClearInstance();
+	SmiCoreCombineAdd::ClearInstance();
+
+    testingMessage( "*** Done! *** \n");
+
+
+	return 0;
+}
+
+void ModelBugQP()
+{
+
+	//just use this to get infinity and generate core model
+	OsiClpSolverInterface osi;
+	double INF=osi.getInfinity();
+
+	int nCoreRows=4;
+	double dCoreRup[] = { INF, INF, INF, INF };
+	
+	int nCoreCols=6;
+	double dCoreClo[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+	double dCoreCup[] = {INF, INF, INF, INF, INF, INF};
+	double dCoreObj[] = {1.0, 1.0, 1.0, 0.5, 0.5, 0.5};
+
+	//int nCoreElts=15;
+	int iCoreColStarts[] = {0,
+		3,
+		6,
+		9,
+		11,
+		13,
+		15};
+	int iCoreRowIndice[] = {3,1,0,
+		2,1,0,
+		3,2,0,
+		3,1,
+		2,1,
+		3,2};
+	double dCoreMatEntries[] = {1.0, 1.0, 1.0,
+		1.0, 1.0, 1.0,
+		1.0, 1.0, 1.0,
+		1.0, 1.0,
+		1.0, 1.0,
+		1.0, 1.0 };
+
+	double dCoreRlo[] = { 0.0, 1.0, 1.0, 1.0 };
+	
+	int nCoreStages = 2;
+	int iColStages[] = {0,0,0,1,1,1};
+	int iRowStages[] = {0,1,1,1};
+
+	//int nScenarios = 2;
+	int iBranchStage[] = {1,1};
+
+	int iAncestorScn[] = {0,0};
+	double dProbScn[] = {0.5, 0.5};
+
+	double drlo0[] = {1.0, 1.0, 0.0 };
+	int indices[]  = {1, 2, 3};
+	CoinPackedVector *rlo0 = new CoinPackedVector(3, indices,drlo0);
+	double drlo1[] = {0.0, 1.0, 0.0 };
+	CoinPackedVector *rlo1 = new CoinPackedVector(3, indices,drlo1);
+
+	// quadratic
+	int QPstarts[] = {0,0,0,0,1,2,3};
+	int QPindices[] = {3,4,5};
+	double QPels[] = {1.0,1.0,1.0};
+
+	// generate Core model
+
+
+
+
+	osi.loadProblem(nCoreCols,
+		nCoreRows,iCoreColStarts,iCoreRowIndice,dCoreMatEntries,dCoreClo,
+		dCoreCup,dCoreObj,
+		dCoreRlo,dCoreRup);
+
+	// test solve qp for core model (lifted from testQP.cpp in CLP/examples)
+	/*
+	ClpInterior clpqp;
+	clpqp.loadProblem(nCoreCols,nCoreRows,iCoreColStarts,iCoreRowIndice,dCoreMatEntries,
+		dCoreClo,dCoreCup,dCoreObj,dCoreRlo,dCoreRup);
+	clpqp.loadQuadraticObjective(nCoreCols,QPstarts,QPindices,QPels);
+	        ClpCholeskyBase * cholesky = new ClpCholeskyBase();
+          cholesky->setKKT(true);
+          clpqp.setCholesky(cholesky);
+          clpqp.primalDual();
+
+		  */
+
+	SmiCoreData *smiCore = new
+		SmiCoreData(&osi,nCoreStages,iColStages,iRowStages);
+
+
+	smiCore->addQuadraticObjectiveToCore(QPstarts,QPindices,QPels);
+
+	// initialize SmiScnModel
+	SmiScnModel *smiModel = new SmiScnModel();
+	smiModel->setCore(smiCore);
+
+	// Add Scenarios
+	int	is = smiModel->generateScenario(NULL,NULL,NULL,NULL,
+		rlo0,NULL,iBranchStage[0],
+		iAncestorScn[0],dProbScn[0]);
+
+	is = smiModel->generateScenario(NULL,NULL,NULL,NULL,
+		rlo1,NULL,iBranchStage[1],
+		iAncestorScn[1],dProbScn[1]);
+
+	// Set Quadratic Solver - we are using Clp
+	ClpInterior *clp = new ClpInterior();
+	smiModel->setQuadraticSolver(clp);
+
+	// Load Scenarios into Deterministic Equivalent
+	smiModel->loadQuadraticSolverData();
+
+	// Get Det Equiv quadratic solver
+	ClpInterior *clpStoch = static_cast<ClpInterior *>(smiModel->getQuadraticSolver());
+
+	// write MPS file
+	clpStoch->writeMps("bug_gen");
+
+	// prepare for solver
+	ClpCholeskyBase * cholesky = new ClpCholeskyBase();
+	cholesky->setKKT(true);
+	clpStoch->setCholesky(cholesky);
+
+	// Solve
+	clpStoch->primalDual();
+
+	// print results
+	printf("Solved stochastic program %s\n", "QPBUG");
+	printf("Number of rows: %d\n",clpStoch->getNumRows());
+	printf("Number of cols: %d\n",clpStoch->getNumCols());
+	printf("Optimal value: %g\n",clpStoch->getObjValue());
+
+	myAssert(__FILE__,__LINE__,clpStoch->getObjValue()== 0.83035714110801750);
+
+//	delete smiModel;
+	//delete smiCore;
+
+//	delete rlo0;
+//	delete rlo1;
+}
 
 // Display message on stdout and stderr
 void testingMessage( const char * const msg )
@@ -32,8 +232,7 @@ void myAssert(const char * file, const int line, bool c )
 		e+=file;
 		e+=", line ";
 		e+=l;
-		cout << e << endl;
-		exit(1);
+		throw(e);
 	}
 }
 
@@ -110,18 +309,18 @@ void DecompUnitTest()
 		nCoreRows,iCoreColStarts,iCoreRowIndice,dCoreMatEntries,dCoreClo,
 		dCoreCup,dCoreObj,
 		dCoreRlo,dCoreRup);
-	SmiCoreData *osiCore = new
+	SmiCoreData *smiCore = new
 		SmiCoreData(&osi,nCoreStages,iColStages,iRowStages);
 
 	// initialize SmiScnModel
 	SmiScnModel *smiModel = new SmiScnModel();
 
 	// Add Scenarios
-	int	is = smiModel->generateScenario(osiCore,NULL,NULL,NULL,NULL,
+	int	is = smiModel->generateScenario(smiCore,NULL,NULL,NULL,NULL,
 		rlo0,NULL,iBranchStage[0],
 		iAncestorScn[0],dProbScn[0]);
 
-	is = smiModel->generateScenario(osiCore,NULL,NULL,NULL,NULL,
+	is = smiModel->generateScenario(smiCore,NULL,NULL,NULL,NULL,
 		rlo1,NULL,iBranchStage[1],
 		iAncestorScn[1],dProbScn[1]);
 
@@ -242,7 +441,7 @@ void DecompUnitTest()
 	myAssert(__FILE__,__LINE__,osiSubmodel[1]->getNumRows()==3);
 
 	delete smiModel;
-	delete osiCore;
+	delete smiCore;
 
 	delete rlo0;
 	delete rlo1;
@@ -779,55 +978,55 @@ void SmiScnModelScenarioUnitTest()
 	OsiSolverInterface *ohoh= ocsi.clone();
 
 	// test Core Model
-	SmiCoreData *osiCore = new SmiCoreData(ohoh,3,cstg,rstg);
+	SmiCoreData *smiCore = new SmiCoreData(ohoh,3,cstg,rstg);
 
-	myAssert(__FILE__,__LINE__,osiCore->getNumCols(0) ==
+	myAssert(__FILE__,__LINE__,smiCore->getNumCols(0) ==
 		n_first_stg_cols);
-	myAssert(__FILE__,__LINE__,osiCore->getNumCols(1) ==
+	myAssert(__FILE__,__LINE__,smiCore->getNumCols(1) ==
 		n_second_stg_cols);
-	myAssert(__FILE__,__LINE__,osiCore->getNumCols(2) == ncol -
+	myAssert(__FILE__,__LINE__,smiCore->getNumCols(2) == ncol -
 		n_first_stg_cols - n_second_stg_cols);
 
-	myAssert(__FILE__,__LINE__,osiCore->getNumRows(0) ==
+	myAssert(__FILE__,__LINE__,smiCore->getNumRows(0) ==
 		n_first_stg_rows);
-	myAssert(__FILE__,__LINE__,osiCore->getNumRows(1) ==
+	myAssert(__FILE__,__LINE__,smiCore->getNumRows(1) ==
 		n_second_stg_rows);
-	myAssert(__FILE__,__LINE__,osiCore->getNumRows(2) == nrow -
+	myAssert(__FILE__,__LINE__,smiCore->getNumRows(2) == nrow -
 		n_first_stg_rows - n_second_stg_rows);
 
-	myAssert(__FILE__,__LINE__,osiCore->getColStart(0) == 0);
-	myAssert(__FILE__,__LINE__,osiCore->getColStart(1) ==
+	myAssert(__FILE__,__LINE__,smiCore->getColStart(0) == 0);
+	myAssert(__FILE__,__LINE__,smiCore->getColStart(1) ==
 		n_first_stg_cols );
-	myAssert(__FILE__,__LINE__,osiCore->getColStart(2) ==
+	myAssert(__FILE__,__LINE__,smiCore->getColStart(2) ==
 		n_first_stg_cols + n_second_stg_cols);
-	myAssert(__FILE__,__LINE__,osiCore->getColStart(3) == ncol);
+	myAssert(__FILE__,__LINE__,smiCore->getColStart(3) == ncol);
 
-	myAssert(__FILE__,__LINE__,osiCore->getRowStart(0) == 0);
-	myAssert(__FILE__,__LINE__,osiCore->getRowStart(1) ==
+	myAssert(__FILE__,__LINE__,smiCore->getRowStart(0) == 0);
+	myAssert(__FILE__,__LINE__,smiCore->getRowStart(1) ==
 		n_first_stg_rows );
-	myAssert(__FILE__,__LINE__,osiCore->getRowStart(2) ==
+	myAssert(__FILE__,__LINE__,smiCore->getRowStart(2) ==
 		n_first_stg_rows + n_second_stg_rows);
-	myAssert(__FILE__,__LINE__,osiCore->getRowStart(3) == nrow);
+	myAssert(__FILE__,__LINE__,smiCore->getRowStart(3) == nrow);
 
 	for (ii = 0; ii < n_first_stg_cols ; ii++)
-		myAssert(__FILE__,__LINE__,cstg[osiCore->getColExternalIndex(ii)] == 0);
+		myAssert(__FILE__,__LINE__,cstg[smiCore->getColExternalIndex(ii)] == 0);
 	for (ii = n_first_stg_cols; ii < n_first_stg_cols + n_second_stg_cols ; ii++)
-		myAssert(__FILE__,__LINE__,cstg[osiCore->getColExternalIndex(ii)] == 1);
+		myAssert(__FILE__,__LINE__,cstg[smiCore->getColExternalIndex(ii)] == 1);
 	for (ii = n_first_stg_cols + n_second_stg_cols; ii < ncol ; ii++)
-		myAssert(__FILE__,__LINE__,cstg[osiCore->getColExternalIndex(ii)] == 2);
+		myAssert(__FILE__,__LINE__,cstg[smiCore->getColExternalIndex(ii)] == 2);
 
 	for (ii = 0; ii < n_first_stg_rows ; ii++)
-		myAssert(__FILE__,__LINE__,rstg[osiCore->getRowExternalIndex(ii)] == 0);
+		myAssert(__FILE__,__LINE__,rstg[smiCore->getRowExternalIndex(ii)] == 0);
 	for (ii = n_first_stg_rows; ii < n_first_stg_rows +	n_second_stg_rows ; ii++)
-		myAssert(__FILE__,__LINE__,rstg[osiCore->getRowExternalIndex(ii)] == 1);
+		myAssert(__FILE__,__LINE__,rstg[smiCore->getRowExternalIndex(ii)] == 1);
 	for (ii = n_first_stg_rows + n_second_stg_rows; ii < nrow ; ii++)
-		myAssert(__FILE__,__LINE__,rstg[osiCore->getRowExternalIndex(ii)] == 2);
+		myAssert(__FILE__,__LINE__,rstg[smiCore->getRowExternalIndex(ii)] == 2);
 
 	const CoinPackedMatrix *origCore = ohoh->getMatrixByRow();
 	int t;
 	for ( t=0;t<3;t++)
 	{
-		SmiNodeData *n=osiCore->getNode(t);
+		SmiNodeData *n=smiCore->getNode(t);
 		CoinPackedVector cpvdrlo(n->getRowLowerLength(),n->getRowLowerIndices(),n->getRowLowerElements());
 		CoinPackedVector cpvdrup(n->getRowUpperLength(),n->getRowUpperIndices(),n->getRowUpperElements());
 		CoinPackedVector cpvdclo(n->getColLowerLength(),n->getColLowerIndices(),n->getColLowerElements());
@@ -835,14 +1034,14 @@ void SmiScnModelScenarioUnitTest()
 		CoinPackedVector cpvdobj(n->getObjectiveLength(),n->getObjectiveIndices(),n->getObjectiveElements());
 
 
-		double *core_drlo = new double[osiCore->getNumRows(t)];
-		osiCore->getNode(t)->copyRowLower(core_drlo);
+		double *core_drlo = new double[smiCore->getNumRows(t)];
+		smiCore->getNode(t)->copyRowLower(core_drlo);
 
 		double elt1,elt2;
 		int ic;
-		for(ii=osiCore->getColStart(t);ii<osiCore->getColStart(t+1);ii++)
+		for(ii=smiCore->getColStart(t);ii<smiCore->getColStart(t+1);ii++)
 		{
-			ic = osiCore->getColExternalIndex(ii);
+			ic = smiCore->getColExternalIndex(ii);
 			elt1 = cpvdclo[ii];
 			elt2 = dclo[ic];
 			myAssert(__FILE__,__LINE__,elt1==elt2);
@@ -853,21 +1052,21 @@ void SmiScnModelScenarioUnitTest()
 			elt2 = dobj[ic];
 			myAssert(__FILE__,__LINE__,elt1==elt2);
 		}
-		for(ii=osiCore->getRowStart(t);ii<osiCore->getRowStart(t+1);ii++)
+		for(ii=smiCore->getRowStart(t);ii<smiCore->getRowStart(t+1);ii++)
 		{
-			myAssert(__FILE__,__LINE__,cpvdrlo[ii]==drlo[osiCore->getRowExternalIndex(ii)]);
-			myAssert(__FILE__,__LINE__,cpvdrup[ii]==drup[osiCore->getRowExternalIndex(ii)]);
-			myAssert(__FILE__,__LINE__,core_drlo[ii-osiCore->getRowStart(t)] ==drlo[osiCore->getRowExternalIndex(ii)]);
+			myAssert(__FILE__,__LINE__,cpvdrlo[ii]==drlo[smiCore->getRowExternalIndex(ii)]);
+			myAssert(__FILE__,__LINE__,cpvdrup[ii]==drup[smiCore->getRowExternalIndex(ii)]);
+			myAssert(__FILE__,__LINE__,core_drlo[ii-smiCore->getRowStart(t)] ==drlo[smiCore->getRowExternalIndex(ii)]);
 
 			CoinPackedVector row1(n->getRowLength(ii),n->getRowIndices(ii),n->getRowElements(ii));
-			const CoinPackedVector row2 =origCore->getVector(osiCore->getRowExternalIndex(ii));
+			const CoinPackedVector row2 =origCore->getVector(smiCore->getRowExternalIndex(ii));
 			myAssert(__FILE__,__LINE__,row1.getNumElements() == row2.getNumElements());
 			int *indx = row1.getIndices();
 			double *els = row1.getElements();
 			for (int j=0; j<row1.getNumElements(); j++)
 			{
 				elt1 = els[j];
-				ic = osiCore->getColExternalIndex(indx[j]);
+				ic = smiCore->getColExternalIndex(indx[j]);
 				elt2 = row2[ic];
 				myAssert(__FILE__,__LINE__,elt1==elt2);
 			}
@@ -906,7 +1105,7 @@ void SmiScnModelScenarioUnitTest()
 	// first scenario
 	int anc = 0;
 	int branch = 1;
-	int	is = smiModel->generateScenario(osiCore,cpm_mat,NULL,NULL,NULL,
+	int	is = smiModel->generateScenario(smiCore,cpm_mat,NULL,NULL,NULL,
 				&cpv_rlo,&cpv_rup,branch,anc,dp);
 
 
@@ -936,9 +1135,9 @@ void SmiScnModelScenarioUnitTest()
 	{
 		double elt1,elt2;
 		int ic;
-		for(ii=osiCore->getColStart(t);ii<osiCore->getColStart(t+1);ii++)
+		for(ii=smiCore->getColStart(t);ii<smiCore->getColStart(t+1);ii++)
 		{
-			ic = osiCore->getColExternalIndex(ii);
+			ic = smiCore->getColExternalIndex(ii);
 			elt1 = stochdclo[ii];
 			elt2 = dclo[ic];
 			myAssert(__FILE__,__LINE__,elt1==elt2);
@@ -950,10 +1149,10 @@ void SmiScnModelScenarioUnitTest()
 			myAssert(__FILE__,__LINE__,elt1==elt2);
 		}
 		int ir;
-		for(ii=osiCore->getRowStart(t);ii<osiCore->getRowStart(t+1);ii++)
+		for(ii=smiCore->getRowStart(t);ii<smiCore->getRowStart(t+1);ii++)
 		{
 
-			ir = osiCore->getRowExternalIndex(ii);
+			ir = smiCore->getRowExternalIndex(ii);
 
 			myAssert(__FILE__,__LINE__,stochdrlo[ii]==drlo[ir]);
 			myAssert(__FILE__,__LINE__,stochdrup[ii]==drup[ir]);
@@ -966,7 +1165,7 @@ void SmiScnModelScenarioUnitTest()
 			for (int j=0; j<row1.getNumElements(); j++)
 			{
 				elt1 = els[j];
-				ic = osiCore->getColExternalIndex(indx[j]);
+				ic = smiCore->getColExternalIndex(indx[j]);
 				elt2 = row2[ic];
 				myAssert(__FILE__,__LINE__,elt1==elt2);
 			}
@@ -1009,7 +1208,7 @@ void SmiScnModelScenarioUnitTest()
 		cpv_rup.setElement(cpv_rup.findIndex(irow[n_first_stg_rows + jj]),demand[ indx[jj] ]);
 
 		// genScenario
-		is = smiModel->generateScenario(osiCore,cpm_mat,NULL,NULL,NULL,
+		is = smiModel->generateScenario(smiCore,cpm_mat,NULL,NULL,NULL,
 				&cpv_rlo,&cpv_rup,branch,anc,dp);
 
 
@@ -1038,10 +1237,10 @@ void SmiScnModelScenarioUnitTest()
 			{
 				double elt1,elt2;
 				int ic;
-				int colOff = osiCore->getColStart(1);
-				for(ii=osiCore->getColStart(t);ii<osiCore->getColStart(t+1);ii++)
+				int colOff = smiCore->getColStart(1);
+				for(ii=smiCore->getColStart(t);ii<smiCore->getColStart(t+1);ii++)
 				{
-					ic = osiCore->getColExternalIndex(ii);
+					ic = smiCore->getColExternalIndex(ii);
 					elt1 = stochdclo[ii-colOff];
 					elt2 = dclo[ic];
 					myAssert(__FILE__,__LINE__,elt1==elt2);
@@ -1053,11 +1252,11 @@ void SmiScnModelScenarioUnitTest()
 					myAssert(__FILE__,__LINE__,fabs(elt1 - (elt2*dp/totalProb)) < 1.0e-8);
 				}
 				int ir,rowOff;
-				rowOff = osiCore->getRowStart(1);
-				for(ii=osiCore->getRowStart(t);ii<osiCore->getRowStart(t+1);ii++)
+				rowOff = smiCore->getRowStart(1);
+				for(ii=smiCore->getRowStart(t);ii<smiCore->getRowStart(t+1);ii++)
 				{
 
-					ir = osiCore->getRowExternalIndex(ii);
+					ir = smiCore->getRowExternalIndex(ii);
 
 					myAssert(__FILE__,__LINE__,stochdrlo[ii-rowOff]==drlo[ir]);
 					myAssert(__FILE__,__LINE__,stochdrup[ii-rowOff]==drup[ir]);
@@ -1070,7 +1269,7 @@ void SmiScnModelScenarioUnitTest()
 					for (int j=0; j<row1.getNumElements(); j++)
 					{
 						elt1 = els[j];
-						ic = osiCore->getColExternalIndex(indx[j]);
+						ic = smiCore->getColExternalIndex(indx[j]);
 						elt2 = row2[ic];
 						myAssert(__FILE__,__LINE__,elt1==elt2);
 					}
@@ -1155,7 +1354,7 @@ void SmiScnModelScenarioUnitTest()
 	delete smiModel;
 
 	delete osiClp1;
-	delete osiCore;
+	delete smiCore;
 	delete origmat;
 	delete cpm_mat;
 }
@@ -1933,18 +2132,18 @@ void ModelBug()
 		nCoreRows,iCoreColStarts,iCoreRowIndice,dCoreMatEntries,dCoreClo,
 		dCoreCup,dCoreObj,
 		dCoreRlo,dCoreRup);
-	SmiCoreData *osiCore = new
+	SmiCoreData *smiCore = new
 		SmiCoreData(&osi,nCoreStages,iColStages,iRowStages);
 
 	// initialize SmiScnModel
 	SmiScnModel *smiModel = new SmiScnModel();
 
 	// Add Scenarios
-	int	is = smiModel->generateScenario(osiCore,NULL,NULL,NULL,NULL,
+	int	is = smiModel->generateScenario(smiCore,NULL,NULL,NULL,NULL,
 		rlo0,NULL,iBranchStage[0],
 		iAncestorScn[0],dProbScn[0]);
 
-	is = smiModel->generateScenario(osiCore,NULL,NULL,NULL,NULL,
+	is = smiModel->generateScenario(smiCore,NULL,NULL,NULL,NULL,
 		rlo1,NULL,iBranchStage[1],
 		iAncestorScn[1],dProbScn[1]);
 
@@ -1973,7 +2172,7 @@ void ModelBug()
 	myAssert(__FILE__,__LINE__,osiStoch->getObjValue()== 0.5);
 
 	delete smiModel;
-	//delete osiCore;
+	//delete smiCore;
 
 	delete rlo0;
 	delete rlo1;
@@ -2020,43 +2219,4 @@ void SmpsBug()
 }
 
 
-
-int main()
-{
-
-	//testingMessage( "Testing SmiTreeNode \n");
-	SmiTreeNodeUnitTest();
-
-	//testingMessage( "Testing SmiScenarioTree\n" );
-	SmiScenarioTreeUnitTest();
-
-	//testingMessage( "Testing SmiScnSmpsIO Replace\n" );
-	SmiScnSmpsIOUnitTestReplace();
-
-	//testingMessage( "Testing SmiScnSmpsIO Add\n" );
-	SmiScnSmpsIOUnitTestAdd();
-
-	//testingMessage( "Testing base data structures for SmiScnModel\n");
-    SmiScnModelScenarioUnitTest();
-
-	//testingMessage( "Testing SmiScnModel Discrete Distribution\n" );
-	SmiScnModelDiscreteUnitTest();
-
-	//testingMessage("Model generation for simple model Bug");
-	ModelBug();
-
-	testingMessage("Read SMPS version of simple model Bug");
-	SmpsBug();
-
-	//testingMessage("Unit test for decomposition.");
-	DecompUnitTest();
-
-	SmiCoreCombineReplace::ClearInstance();
-	SmiCoreCombineAdd::ClearInstance();
-
-    testingMessage( "*** Done! *** \n");
-
-
-	return 0;
-}
 
