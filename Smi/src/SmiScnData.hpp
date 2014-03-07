@@ -9,10 +9,13 @@
 #include "CoinPackedVector.hpp"
 #include "CoinMpsIO.hpp"
 #include "SmiCoreCombineRule.hpp"
+#include "SmiQuadratic.hpp"
+
 //#include "SmiLinearData.hpp"
 
 #include <map>
 #include <vector>
+#include <exception>
 
 
 typedef int SmiCoreIndex;
@@ -119,6 +122,13 @@ public:
 				 CoinPackedVector *drlo,
 				 CoinPackedVector *drup);
 
+	void addQuadraticObjective(int stage, SmiCoreData *smicore, SmiQuadraticData *sqdata);
+
+	bool hasQdata() {return hasQdata_;}
+	void setHasQdata(bool b) {hasQdata_=b;}
+		
+	SmiQuadraticData *getQdata(){ return nqdata_;}
+
 	int addPtr() { return ++ptr_count; }
 
 	~SmiNodeData();
@@ -183,6 +193,9 @@ private:
 	int    * strt_; //start array, where new row begins
 
 	int ptr_count; //Propably for memory management?!
+
+	bool hasQdata_;
+	SmiQuadraticDataDC *nqdata_;
 };
 
 
@@ -233,6 +246,14 @@ public:
 
     SmiCoreData(CoinMpsIO *cMps, int nstag, int *cstag, int *rstag,int *integerIndices = 0, int integerLength = 0, int *binaryIndices = 0, int binaryLength = 0);
     SmiCoreData(OsiSolverInterface *osi, int nstag, int *cstag, int *rstag,int *integerIndices = 0, int integerLength = 0, int *binaryIndices = 0, int binaryLength = 0);
+
+	///Adds QP data after the constructor has been called
+	void addQuadraticObjectiveToCore(int *starts,int *indx,double *dels);
+
+	void setHasQdata (bool b) {hasQdata_ = b;}
+	bool hasQdata() {return hasQdata_;}
+
+
 	
 	~SmiCoreData();
 
@@ -270,6 +291,8 @@ private:
 	double **cdobj_;
 	double **cdclo_;
 	double **cdcup_;
+	SmiQuadraticData *sqp_;
+	bool hasQdata_;
 	std::vector<SmiNodeData*> nodes_; //Nodes, that contain stage dependent constraints (with Bounds,Ranges,Objective,Matrix), so called CoreNodes
 	std::vector<double *> pDenseRow_; //dense probability vector
 	std::vector< std::vector<int> > intColsStagewise; // For each stage separately, it contains the position of every integer column

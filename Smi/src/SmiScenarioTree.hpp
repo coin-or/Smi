@@ -392,6 +392,7 @@ public:
 	/// Default Constructor creates an empty scenario tree
 	SmiScenarioTree<T> () :
 		leaf_(0), root_(NULL) {
+			this->node_data.reserve(2);
 	}
 
 	/// Destructor

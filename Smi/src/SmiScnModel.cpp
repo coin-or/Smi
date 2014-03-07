@@ -126,6 +126,15 @@ SmiScenarioIndex SmiScnModel::generateScenario(SmiCoreData *core,
         this->nrow_ = core->getNumRows(0);
         this->nels_ = node->getNumMatrixElements();
 
+		if (node->hasQdata())
+		{
+			this->nqels_=node->getQdata()->getNumEls();
+		}
+		else
+		{
+			this->nqels_=0;
+		}
+
         // prepare array for counting max nels per stage and scenario
         if (this->maxNelsPerScenInStage)
             delete[] maxNelsPerScenInStage;
@@ -163,6 +172,12 @@ SmiScenarioIndex SmiScnModel::generateScenario(SmiCoreData *core,
         this->nrow_ += core->getNumRows(t); //Reson seems to be intersection between Tree Generation and Preparations for Det. Eq. Generation in SmiScnModel.. 
         this->nels_ += core->getNode(t)->getNumMatrixElements() + node->getNumMatrixElements(); //Maybe we have to split that..
         this->maxNelsPerScenInStage[t] = max(this->maxNelsPerScenInStage[t], core->getNode(t)->getNumMatrixElements() + node->getNumMatrixElements());
+
+		//Qdata comes only from core nodes
+		if (core->getNode(t)->hasQdata())
+		{
+			this->nqels_+=core->getNode(t)->getQdata()->getNumEls();
+		}
     }
 
     //Christian: What is this method doing? Connects the newly created nodes above
@@ -209,60 +224,13 @@ SmiScenarioIndex SmiScnModel::generateScenario(SmiCoreData *core,
                               vector<int> labels, double prob,
                               SmiCoreCombineRule *r)
 {
-
-    // this code assumes that full path data (incl root node data)
-    // is passed in.
-
-    vector<SmiScnNode *> node_vec;
-
-    node_vec.reserve(core->getNumStages());
-
-
-    // TODO: what to do about duplicate matrix entries?
-    // ...can't do the following because eliminates zero entries...
-    // matrix->eliminateDuplicates(0.0);
-
-    int t;
-    for (t=0; t<core->getNumStages(); t++)
-    {
-        // generate new data node
-        SmiNodeData *node = new SmiNodeData(t,core,matrix,
-            v_dclo,v_dcup,v_dobj,v_drlo,v_drup);
-
-        node->setCoreCombineRule(r);
-        // generate new tree node
-        SmiScnNode *tnode = new SmiScnNode(node);
-        node_vec.push_back(tnode);
-
-        this->ncol_ += core->getNumCols(t);
-        this->nrow_ += core->getNumRows(t);
-        this->nels_ += core->getNode(t)->getNumMatrixElements() + node->getNumMatrixElements();
-    }
-
-    SmiTreeNode<SmiScnNode *> *node = smiTree_.find(labels);
-    int scen = smiTree_.addPathtoLeaf(node->scenario(),node->depth(),node_vec);
-    smiTree_.setChildLabels(node,labels);
-
-    // add probability to all scenario nodes in path
-    SmiTreeNode<SmiScnNode *> *child = smiTree_.getLeaf(scen);
-    SmiTreeNode<SmiScnNode *> *parent = child->getParent();
-    SmiTreeNode<SmiScnNode *> *root = smiTree_.getRoot();
-
-    while (child != root)
-    {
-        SmiScnNode *tnode = child->getDataPtr();
-        tnode->addProb(prob);
-        tnode->setParent(parent->getDataPtr());
-        child = parent;
-        parent = child->getParent();
-    }
-    root->getDataPtr()->addProb(prob);
-
-    this->totalProb_+=prob;
-
-    return scen;
-
+	
+	SmiTreeNode<SmiScnNode *> *node = smiTree_.find(labels);
+	SmiScenarioIndex s=generateScenario(core,matrix,v_dclo,v_dcup,v_dobj,v_drlo,v_drup,node->depth(),node->scenario(),prob,r);
+	smiTree_.setChildLabels(node,labels);
+	return s;
 }
+
 SmiScenarioIndex SmiScnModel::generateScenarioFromCore(SmiCoreData *core, double prob,
         SmiCoreCombineRule *r)
 {
@@ -607,11 +575,37 @@ std::vector< std::pair<double,double> > SmiScnModel::solveWS(OsiSolverInterface 
     return solutionValues;
 }
 
+ClpModel * SmiScnModel::loadQuadraticSolverData()
+{
+	generateSolverArrays();
+	clp_->loadProblem(*matrix_,dclo_,dcup_,dobj_,drlo_,drup_);
+	clp_->loadQuadraticObjective(matrix_->getNumCols(),this->qstart_,this->qindx_,this->qdels_);
+	// load integer values in solver
+    for (unsigned int i = 0; i < intIndices.size(); i++) {
+        clp_->setInteger(intIndices[i]);
+    }
+	return clp_;
+}
+
+
 //Christian: Generates Deterministic Equivalent (Big Matrix)
 OsiSolverInterface *
 SmiScnModel::loadOsiSolverData()
 {
     osiStoch_->reset();
+	generateSolverArrays();
+	    // pass data to osiStoch
+    osiStoch_->loadProblem(*matrix_,dclo_,dcup_,dobj_,drlo_,drup_);
+
+    // load integer values in solver
+    for (unsigned int i = 0; i < intIndices.size(); i++) {
+        osiStoch_->setInteger(intIndices[i]);
+    }
+	return osiStoch_;
+}
+
+void SmiScnModel::generateSolverArrays()
+{
 
     delete[] dclo_;
     delete[] dcup_;
@@ -634,6 +628,18 @@ SmiScnModel::loadOsiSolverData()
     this->rstrt_[0] = 0;
     this->nels_max = nels_;
 
+	int nqels_max;
+	if (this->nqels_)
+	{
+		this->qdels_= new double[this->nqels_];
+		this->qindx_= new int[this->nqels_];
+		this->qstart_= new int[this->ncol_+1];
+		nqels_max=this->nqels_;
+		this->nqels_=0;
+		memset(this->qstart_,0,(this->ncol_+1)*sizeof(int));
+		
+	}
+
     ncol_=0;
     nrow_=0;
     nels_=0;
@@ -647,13 +653,7 @@ SmiScnModel::loadOsiSolverData()
     matrix_->assignMatrix(false,ncol_,nrow_,nels_,
         dels_,indx_,rstrt_,len);
 
-    // pass data to osiStoch
-    osiStoch_->loadProblem(*matrix_,dclo_,dcup_,dobj_,drlo_,drup_);
 
-    // load integer values in solver
-    for (unsigned int i = 0; i < intIndices.size(); i++) {
-        osiStoch_->setInteger(intIndices[i]);
-    }
 
     //Print out Matrix.. if in Debug Mode
     //TODO: Define proper Debug Mode..
@@ -673,7 +673,6 @@ SmiScnModel::loadOsiSolverData()
     //}
     //printf("\n Matrix printed \n");
 #endif
-    return osiStoch_;
 }
 
 //Christian: Generate Submodel Specified by Stage and Scenario Number
@@ -922,6 +921,7 @@ SmiScnModel::addNode(SmiScnNode *tnode,bool notDetEq /* = false */)
     node->copyRowLower(drlo_+nrow_);
     node->copyRowUpper(drup_+nrow_);
 
+
     // multiply obj coeffs by node probability and normalize
     double prob = !notDetEq ? tnode->getProb()/this->totalProb_ : 1; //Christian: TODO: totalProb_ = Summer aller absoluten W'keiten (am Ende muesste die bei 1 sein..?!)
     tnode->setModelProb(prob);
@@ -929,6 +929,46 @@ SmiScnModel::addNode(SmiScnNode *tnode,bool notDetEq /* = false */)
     for(int j=ncol_; j<ncol_+core->getNumCols(stg); ++j)
         dobj_[j] *= prob;
 
+	if (cnode->hasQdata())
+	{
+		//sanity check
+		assert(this->qstart_[ncol_]==nqels_);
+
+		// column counter
+		int nqcol = ncol_;
+
+		//get quadratic data for core node
+		SmiQuadraticData *qdata = cnode->getQdata();
+
+		
+		//calculate the core node indices offset for this stage
+		int coff = ncol_-core->getColStart(stg);
+
+		//loop over core columns in the current stage
+		for (int j=core->getColStart(stg);j<core->getColStart(stg+1);++j)
+		{
+			//loop over the elements in the quadratic data array for core column j
+			for (int iels=qdata->getQDstarts()[j];iels<qdata->getQDstarts()[j+1];++iels)
+			{
+				// copy the element multiplied by the probability
+				this->qdels_[nqels_]=qdata->getQDels()[iels]*prob;
+
+				// copy the index with offset
+				this->qindx_[nqels_]=qdata->getQDindx()[iels] + coff;
+
+				// increment the qelement pointer
+				++nqels_;
+			}
+
+			//increment the qcolumn pointer and do a column counting sanity check
+			++nqcol;
+			assert(nqcol == coff+j+1);
+
+			//record the starting element for the next column 
+			this->qstart_[nqcol]=nqels_;
+		}
+	}
+		
     //Christian: Get Column Start Values for every stage less than current stage. This depends on the ordering of nodes in the nodes array..
     vector<int> stochColStart(stg+1);
     SmiScnNode *pnode=tnode;

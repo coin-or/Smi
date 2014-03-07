@@ -7,7 +7,7 @@
 
 using namespace std;
 
-
+#if 0
 int nrow_;
 int ncol_;
 int nz_; // We can count the total number of elements, but I do not if we need this at one point
@@ -34,6 +34,7 @@ double **cdcup_;
 vector<SmiNodeData*> nodes_; //Nodes, that contain stage dependent constraints (with Bounds,Ranges,Objective,Matrix), so called CoreNodes 
 vector<double *> pDenseRow_; //dense probability vector
 vector< vector<int> > intColsStagewise; // For each stage separately, it contains the position of every integer column
+#endif
 
 SmiCoreData::SmiCoreData(OsiSolverInterface *osi,int nstag,int *cstag,int *rstag, int* integerIndices,int integerLength, int* binaryIndices, int binaryLength):
 nrow_(0),ncol_(0),nz_(0),nstag_(nstag),nColInStage_(NULL),nRowInStage_(NULL),stageColPtr_(NULL),colStage_(NULL),rowStage_(NULL),colEx2In_(NULL),rowEx2In_(NULL),
@@ -53,6 +54,8 @@ cdrlo_(NULL),cdrup_(NULL),cdobj_(NULL),cdclo_(NULL),cdcup_(NULL),nodes_(),pDense
 
     gutsOfConstructor(nrow,ncol,nstag,cstag,rstag,matrix,dclo,dcup,dobj,drlo,drup,integerIndices,integerLength,binaryIndices,binaryLength);
     infinity_ = osi->getInfinity();
+
+	setHasQdata(false);
 
     delete matrix;
     delete drlo;
@@ -80,6 +83,8 @@ cdrlo_(NULL),cdrup_(NULL),cdobj_(NULL),cdclo_(NULL),cdcup_(NULL),nodes_(),pDense
     
     gutsOfConstructor(nrow,ncol,nstag,cstag,rstag,matrix,dclo,dcup,dobj,drlo,drup,integerIndices,integerLength,binaryIndices,binaryLength);
     infinity_ = osi->getInfinity();
+
+	setHasQdata(false);
 
     delete matrix;
     delete drlo;
@@ -265,6 +270,28 @@ void SmiCoreData::gutsOfConstructor( int nrow,int ncol,int nstag, int *cstag,int
 
 }
 
+void SmiCoreData::addQuadraticObjectiveToCore(int *starts,int *indx,double *dels){
+
+	int ncols = this->getNumCols();
+
+	sqp_ = new SmiQuadraticData(ncols,starts,indx,dels,0);	//zero offset in Core model
+															//note - this is a shallow copy
+
+	if (!sqp_->hasData())
+	{
+		cout<<"[SmiCoreData::addQuadraticObjectiveToCore] Warning: no quadratic data found.\n";
+		return;
+	}
+
+	//at this point we have quadratic data
+	this->setHasQdata(true);
+
+	for (int t=0;t<this->nstag_;++t)
+	{
+		nodes_[t]->addQuadraticObjective(t,this,sqp_);
+	}
+}
+
 void SmiCoreData::copyRowLower(double * d,SmiStageIndex t )
 {
 	CoinDisjointCopyN(cdrlo_[t],this->getNumRows(t),d);
@@ -362,6 +389,10 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 				 colbeg_(core->getColStart(stg_)),
 				 ptr_count(0)  // used for counted pointer
 {
+	//so far no QP data
+	this->setHasQdata(false);
+	this->nqdata_=NULL;
+
 	// count an upper bound for number elements
 	nels_ = 0;
 	if (matrix)
@@ -563,6 +594,102 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
     temp_ptr = realloc(this->inds_,offset_dst*sizeof(int));
     if (temp_ptr)
         this->inds_ = (int*)temp_ptr;
+}
+
+void SmiNodeData::addQuadraticObjective(int stg, SmiCoreData *smicore, SmiQuadraticData *sqdata)
+{
+	// should only get here if there is quadratic data
+	assert(sqdata->hasData());
+
+	// only core nodes have QP data.
+	assert(this->isCoreNode());
+
+	// add a deep copy of node's QP data to node object
+	// test to make sure that there are no node-node interactions in the Q data
+	
+	// Quadratic Objective
+	{
+		int * strts		= sqdata->getQDstarts();
+		int * ind		= sqdata->getQDindx();
+		double * els	= sqdata->getQDels();
+		int nels		= sqdata->getNumEls();
+		int ncols		= smicore->getNumCols();
+
+		nqdata_ = new SmiQuadraticDataDC(ncols,nels);			//node has deep copy of Qdata
+
+		int *nqstarts = nqdata_->getQDstarts();
+
+		//record where node Q data columns are in the new column ordering
+		int iels,icol;
+		nqstarts[0]=0;
+		for (int j=0; j<ncols; ++j)
+		{
+			if (smicore->getColStage(j) == stg)		
+			{
+				icol = smicore->getColInternalIndex(j);
+				assert(icol<ncols);
+				iels = strts[j+1] - strts[j];
+				nqstarts[icol+1]=iels;
+			}
+		}
+		//set column starts in the new new column ordering
+		for (int j=0;j<ncols; ++j)
+		{
+			nqstarts[j+1]+=nqstarts[j];
+		}
+
+		int nqels = nqstarts[ncols];
+
+		//return if no Qdata for this node
+		if (nqels == 0)
+		{
+			this->setHasQdata(false);
+			delete nqdata_;
+			return;
+		}
+
+
+		this->setHasQdata(true);
+		nqdata_->setHasData(true);
+
+		int *nqindx		= nqdata_->getQDindx();
+		double *nqdels	= nqdata_->getQDels();
+
+		//copy data
+		for (int j=0; j<ncols; ++j)
+		{
+			if (smicore->getColStage(j)==stg)
+			{
+													// get column id for new ordering
+				icol = smicore->getColInternalIndex(j);
+													// reset pointer to new entry
+				int ilocal=0;
+		
+				for (int jj = strts[j]; jj<strts[j+1];++jj)
+				{
+					if (smicore->getColStage(ind[jj]) != stg)
+													// throw exception if column index is not in the node's stage
+					{
+						string s="Exception: Quadratic data for timestage "+stg;
+						s+=" includes data from timestage "+smicore->getColStage(ind[jj]);
+						exception e(s.c_str());
+						throw(e);
+					}
+													// find location for new entry
+					int ii = nqstarts[icol]+ilocal;
+													// enter index and element information
+					nqindx[ii]  = smicore->getColInternalIndex(ind[jj]);
+					nqdels[ii]  = els[jj];
+													// update pointer to new entry
+					++ilocal;
+
+
+				}
+				//sanity check
+				assert(ilocal == nqstarts[icol+1] - nqstarts[icol]);
+			}
+		}
+	}
 }
 
 int SmiNodeData::combineWithDenseCoreRow(double *dr,const int nels,const int *inds, const double *dels, double *dest_dels,int *dest_indx)

@@ -12,6 +12,8 @@
 #include "OsiSolverInterface.hpp"
 #include "CoinPackedVector.hpp"
 #include "SmiMessage.hpp"
+#include "ClpModel.hpp"
+
 
 // STL declarations
 #include <vector>
@@ -275,6 +277,11 @@ public:
     inline void releaseSolver() {osiStoch_=NULL;}
     inline void releaseCore() { core_=NULL; }
 
+	//Quadratic
+	void setQuadraticSolver(ClpModel *clp){ clp_=clp; }
+	ClpModel * getQuadraticSolver() {return clp_;}
+	ClpModel * loadQuadraticSolverData();
+
 
     // constructor: Lesson from Effective C++: Initialize values in the same order as declared in .hpp file.
     SmiScnModel():
@@ -282,7 +289,9 @@ public:
         drlo_(NULL), drup_(NULL), dobj_(NULL), dclo_(NULL), dcup_(NULL), matrix_(NULL),
         dels_(NULL),indx_(NULL),rstrt_(NULL),minrow_(0),
         solve_synch_(false),totalProb_(0),core_(NULL),smiTree_(),integerInd(NULL),integerLen(0),binaryInd(NULL),binaryLen(0),intIndices(),maxNelsPerScenInStage(NULL)
-    { }
+    {
+		nqels_=0;
+	}
 
     // destructor
     ~SmiScnModel();
@@ -313,6 +322,13 @@ private:
     double *dels_;
     int    *indx_;
     int    *rstrt_;
+	//Quadratic
+	int nqels_;
+	int *qstart_;
+	int *qindx_;
+	double *qdels_;
+	ClpModel *clp_;
+
     // number of scenarios
     //	int scen_;
     // not sure if this is used
@@ -325,6 +341,9 @@ private:
 
 private:
     SmiCoreData * core_;
+
+	///constructs LP and QP data arrays for Deterministic Equivalent
+	void generateSolverArrays();
 
     // scenario tree 
     SmiScenarioTree<SmiScnNode *> smiTree_;
