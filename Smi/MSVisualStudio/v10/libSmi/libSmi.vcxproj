@@ -86,6 +86,7 @@
     <ClInclude Include="..\..\..\src\SmiDiscreteDistribution.hpp" />
     <ClInclude Include="..\..\..\src\SmiLinearData.hpp" />
     <ClInclude Include="..\..\..\src\SmiMessage.hpp" />
+    <ClInclude Include="..\..\..\src\SmiQuadratic.hpp" />
     <ClInclude Include="..\..\..\src\SmiScenarioTree.hpp" />
     <ClInclude Include="..\..\..\src\SmiScnData.hpp" />
     <ClInclude Include="..\..\..\src\SmiScnModel.hpp" />
