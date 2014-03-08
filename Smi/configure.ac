@@ -60,9 +60,9 @@ AC_COIN_CHECK_PACKAGE(Osi, [osi], [Smi])
 if test $coin_has_osi != yes ; then
   AC_MSG_ERROR([Required package Osi not found.])
 fi
-AC_COIN_CHECK_PACKAGE(Clp, [osi-clp])
-AC_COIN_CHECK_PACKAGE(DataStochastic, [coindatastochastic])
-AC_COIN_CHECK_PACKAGE(FlopCpp, [flopcpp])
+AC_COIN_CHECK_PACKAGE(Clp, [osi-clp], [Smi])
+AC_COIN_CHECK_PACKAGE(DataStochastic, [coindatastochastic], [Smi])
+AC_COIN_CHECK_PACKAGE(FlopCpp, [flopcpp], [Smi])
 
 ##############################################################################
 #                   VPATH links for example input files                      #

@@ -21271,6 +21271,14 @@ CLP_DATA=
 
 
 
+
+
+
+
+
+
+
+
 #check if user provided LIBS, CFLAGS, or DATA for package or disables use of package
 if test $coin_has_clp != skipping; then
 
@@ -21284,10 +21292,13 @@ if test "${with_clp_lib+set}" = set; then
        CLP_LIBS="$withval"
        CLP_PCLIBS="$withval"
 
+         SMI_PCLIBS="$withval $SMI_PCLIBS"
+         SMI_LIBS="$withval $SMI_LIBS"
+
        # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
        if test -z "$PKG_CONFIG" ; then
          CLP_LIBS_INSTALLED="$withval"
-
+         SMI_LIBS_INSTALLED="$withval $SMI_LIBS_INSTALLED"
        fi
      fi
 
@@ -21304,11 +21315,11 @@ if test "${with_clp_incdir+set}" = set; then
      else
        coin_has_clp=yes
        CLP_CFLAGS="-I`${CYGPATH_W} $withval`"
-
+       SMI_CFLAGS="-I`${CYGPATH_W} $withval` $SMI_CFLAGS"
        # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
        if test -z "$PKG_CONFIG" ; then
          CLP_CFLAGS_INSTALLED="$CLP_CFLAGS"
-
+         SMI_CFLAGS_INSTALLED="$CLP_CFLAGS $SMI_CFLAGS_INSTALLED"
        fi
      fi
 
@@ -21372,7 +21383,11 @@ echo "${ECHO_T}yes: $CLP_VERSIONS" >&6
         fi
         CLP_PCREQUIRES="osi-clp"
 
-        # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in
+        # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in Smi
+
+          SMI_PCREQUIRES="osi-clp $SMI_PCREQUIRES"
+          SMI_CFLAGS="$CLP_CFLAGS $SMI_CFLAGS"
+          SMI_LIBS="$CLP_LIBS $SMI_LIBS"
 
 
 
@@ -21617,6 +21632,12 @@ _ACEOF
 
   CLP_PCREQUIRES="osi-clp"
 
+    SMI_PCREQUIRES="osi-clp $SMI_PCREQUIRES"
+    SMI_CFLAGS="$CLP_CFLAGS $SMI_CFLAGS"
+    SMI_LIBS="$CLP_LIBS $SMI_LIBS"
+    SMI_CFLAGS_INSTALLED="$CLP_CFLAGS_INSTALLED $SMI_CFLAGS_INSTALLED"
+    SMI_LIBS_INSTALLED="$CLP_LIBS_INSTALLED $SMI_LIBS_INSTALLED"
+
 
 fi
 
@@ -21664,6 +21685,8 @@ fi;
      # also remove everything of the form `xxx`yyy (may have been added for cygwin/cl)
      CLP_DEPENDENCIES=`echo " $CLP_LIBS" | sed -e 's/ mkl[^ ]*//g' -e 's/ libiomp5[^ ]*//g' -e 's/ wsock32[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
 
+       SMI_DEPENDENCIES=`echo " $SMI_LIBS " | sed -e 's/ mkl[^ ]*//g' -e 's/ libiomp5[^ ]*//g' -e 's/ wsock32[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+
   fi
 
   if test 1 = 0 ; then  #change this test to enable a bit of debugging output
@@ -21691,6 +21714,13 @@ echo "$as_me: Clp PCLIBS are $CLP_PCLIBS" >&6;}
       { echo "$as_me:$LINENO: Clp PCREQUIRES are $CLP_PCREQUIRES" >&5
 echo "$as_me: Clp PCREQUIRES are $CLP_PCREQUIRES" >&6;}
     fi
+
+      { echo "$as_me:$LINENO: Smi CFLAGS are $SMI_CFLAGS" >&5
+echo "$as_me: Smi CFLAGS are $SMI_CFLAGS" >&6;}
+      { echo "$as_me:$LINENO: Smi LIBS   are $SMI_LIBS" >&5
+echo "$as_me: Smi LIBS   are $SMI_LIBS" >&6;}
+      { echo "$as_me:$LINENO: Smi DEPENDENCIES are $SMI_DEPENDENCIES" >&5
+echo "$as_me: Smi DEPENDENCIES are $SMI_DEPENDENCIES" >&6;}
 
   fi
 fi
@@ -21752,6 +21782,14 @@ DATASTOCHASTIC_DATA=
 
 
 
+
+
+
+
+
+
+
+
 #check if user provided LIBS, CFLAGS, or DATA for package or disables use of package
 if test $coin_has_datastochastic != skipping; then
 
@@ -21765,10 +21803,13 @@ if test "${with_datastochastic_lib+set}" = set; then
        DATASTOCHASTIC_LIBS="$withval"
        DATASTOCHASTIC_PCLIBS="$withval"
 
+         SMI_PCLIBS="$withval $SMI_PCLIBS"
+         SMI_LIBS="$withval $SMI_LIBS"
+
        # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
        if test -z "$PKG_CONFIG" ; then
          DATASTOCHASTIC_LIBS_INSTALLED="$withval"
-
+         SMI_LIBS_INSTALLED="$withval $SMI_LIBS_INSTALLED"
        fi
      fi
 
@@ -21785,11 +21826,11 @@ if test "${with_datastochastic_incdir+set}" = set; then
      else
        coin_has_datastochastic=yes
        DATASTOCHASTIC_CFLAGS="-I`${CYGPATH_W} $withval`"
-
+       SMI_CFLAGS="-I`${CYGPATH_W} $withval` $SMI_CFLAGS"
        # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
        if test -z "$PKG_CONFIG" ; then
          DATASTOCHASTIC_CFLAGS_INSTALLED="$DATASTOCHASTIC_CFLAGS"
-
+         SMI_CFLAGS_INSTALLED="$DATASTOCHASTIC_CFLAGS $SMI_CFLAGS_INSTALLED"
        fi
      fi
 
@@ -21853,7 +21894,11 @@ echo "${ECHO_T}yes: $DATASTOCHASTIC_VERSIONS" >&6
         fi
         DATASTOCHASTIC_PCREQUIRES="coindatastochastic"
 
-        # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in
+        # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in Smi
+
+          SMI_PCREQUIRES="coindatastochastic $SMI_PCREQUIRES"
+          SMI_CFLAGS="$DATASTOCHASTIC_CFLAGS $SMI_CFLAGS"
+          SMI_LIBS="$DATASTOCHASTIC_LIBS $SMI_LIBS"
 
 
 
@@ -22098,6 +22143,12 @@ _ACEOF
 
   DATASTOCHASTIC_PCREQUIRES="coindatastochastic"
 
+    SMI_PCREQUIRES="coindatastochastic $SMI_PCREQUIRES"
+    SMI_CFLAGS="$DATASTOCHASTIC_CFLAGS $SMI_CFLAGS"
+    SMI_LIBS="$DATASTOCHASTIC_LIBS $SMI_LIBS"
+    SMI_CFLAGS_INSTALLED="$DATASTOCHASTIC_CFLAGS_INSTALLED $SMI_CFLAGS_INSTALLED"
+    SMI_LIBS_INSTALLED="$DATASTOCHASTIC_LIBS_INSTALLED $SMI_LIBS_INSTALLED"
+
 
 fi
 
@@ -22145,6 +22196,8 @@ fi;
      # also remove everything of the form `xxx`yyy (may have been added for cygwin/cl)
      DATASTOCHASTIC_DEPENDENCIES=`echo " $DATASTOCHASTIC_LIBS" | sed -e 's/ mkl[^ ]*//g' -e 's/ libiomp5[^ ]*//g' -e 's/ wsock32[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
 
+       SMI_DEPENDENCIES=`echo " $SMI_LIBS " | sed -e 's/ mkl[^ ]*//g' -e 's/ libiomp5[^ ]*//g' -e 's/ wsock32[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+
   fi
 
   if test 1 = 0 ; then  #change this test to enable a bit of debugging output
@@ -22172,6 +22225,13 @@ echo "$as_me: DataStochastic PCLIBS are $DATASTOCHASTIC_PCLIBS" >&6;}
       { echo "$as_me:$LINENO: DataStochastic PCREQUIRES are $DATASTOCHASTIC_PCREQUIRES" >&5
 echo "$as_me: DataStochastic PCREQUIRES are $DATASTOCHASTIC_PCREQUIRES" >&6;}
     fi
+
+      { echo "$as_me:$LINENO: Smi CFLAGS are $SMI_CFLAGS" >&5
+echo "$as_me: Smi CFLAGS are $SMI_CFLAGS" >&6;}
+      { echo "$as_me:$LINENO: Smi LIBS   are $SMI_LIBS" >&5
+echo "$as_me: Smi LIBS   are $SMI_LIBS" >&6;}
+      { echo "$as_me:$LINENO: Smi DEPENDENCIES are $SMI_DEPENDENCIES" >&5
+echo "$as_me: Smi DEPENDENCIES are $SMI_DEPENDENCIES" >&6;}
 
   fi
 fi
@@ -22233,6 +22293,14 @@ FLOPCPP_DATA=
 
 
 
+
+
+
+
+
+
+
+
 #check if user provided LIBS, CFLAGS, or DATA for package or disables use of package
 if test $coin_has_flopcpp != skipping; then
 
@@ -22246,10 +22314,13 @@ if test "${with_flopcpp_lib+set}" = set; then
        FLOPCPP_LIBS="$withval"
        FLOPCPP_PCLIBS="$withval"
 
+         SMI_PCLIBS="$withval $SMI_PCLIBS"
+         SMI_LIBS="$withval $SMI_LIBS"
+
        # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
        if test -z "$PKG_CONFIG" ; then
          FLOPCPP_LIBS_INSTALLED="$withval"
-
+         SMI_LIBS_INSTALLED="$withval $SMI_LIBS_INSTALLED"
        fi
      fi
 
@@ -22266,11 +22337,11 @@ if test "${with_flopcpp_incdir+set}" = set; then
      else
        coin_has_flopcpp=yes
        FLOPCPP_CFLAGS="-I`${CYGPATH_W} $withval`"
-
+       SMI_CFLAGS="-I`${CYGPATH_W} $withval` $SMI_CFLAGS"
        # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
        if test -z "$PKG_CONFIG" ; then
          FLOPCPP_CFLAGS_INSTALLED="$FLOPCPP_CFLAGS"
-
+         SMI_CFLAGS_INSTALLED="$FLOPCPP_CFLAGS $SMI_CFLAGS_INSTALLED"
        fi
      fi
 
@@ -22334,7 +22405,11 @@ echo "${ECHO_T}yes: $FLOPCPP_VERSIONS" >&6
         fi
         FLOPCPP_PCREQUIRES="flopcpp"
 
-        # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in
+        # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in Smi
+
+          SMI_PCREQUIRES="flopcpp $SMI_PCREQUIRES"
+          SMI_CFLAGS="$FLOPCPP_CFLAGS $SMI_CFLAGS"
+          SMI_LIBS="$FLOPCPP_LIBS $SMI_LIBS"
 
 
 
@@ -22579,6 +22654,12 @@ _ACEOF
 
   FLOPCPP_PCREQUIRES="flopcpp"
 
+    SMI_PCREQUIRES="flopcpp $SMI_PCREQUIRES"
+    SMI_CFLAGS="$FLOPCPP_CFLAGS $SMI_CFLAGS"
+    SMI_LIBS="$FLOPCPP_LIBS $SMI_LIBS"
+    SMI_CFLAGS_INSTALLED="$FLOPCPP_CFLAGS_INSTALLED $SMI_CFLAGS_INSTALLED"
+    SMI_LIBS_INSTALLED="$FLOPCPP_LIBS_INSTALLED $SMI_LIBS_INSTALLED"
+
 
 fi
 
@@ -22626,6 +22707,8 @@ fi;
      # also remove everything of the form `xxx`yyy (may have been added for cygwin/cl)
      FLOPCPP_DEPENDENCIES=`echo " $FLOPCPP_LIBS" | sed -e 's/ mkl[^ ]*//g' -e 's/ libiomp5[^ ]*//g' -e 's/ wsock32[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
 
+       SMI_DEPENDENCIES=`echo " $SMI_LIBS " | sed -e 's/ mkl[^ ]*//g' -e 's/ libiomp5[^ ]*//g' -e 's/ wsock32[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+
   fi
 
   if test 1 = 0 ; then  #change this test to enable a bit of debugging output
@@ -22653,6 +22736,13 @@ echo "$as_me: FlopCpp PCLIBS are $FLOPCPP_PCLIBS" >&6;}
       { echo "$as_me:$LINENO: FlopCpp PCREQUIRES are $FLOPCPP_PCREQUIRES" >&5
 echo "$as_me: FlopCpp PCREQUIRES are $FLOPCPP_PCREQUIRES" >&6;}
     fi
+
+      { echo "$as_me:$LINENO: Smi CFLAGS are $SMI_CFLAGS" >&5
+echo "$as_me: Smi CFLAGS are $SMI_CFLAGS" >&6;}
+      { echo "$as_me:$LINENO: Smi LIBS   are $SMI_LIBS" >&5
+echo "$as_me: Smi LIBS   are $SMI_LIBS" >&6;}
+      { echo "$as_me:$LINENO: Smi DEPENDENCIES are $SMI_DEPENDENCIES" >&5
+echo "$as_me: Smi DEPENDENCIES are $SMI_DEPENDENCIES" >&6;}
 
   fi
 fi
