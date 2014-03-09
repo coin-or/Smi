@@ -672,8 +672,7 @@ void SmiNodeData::addQuadraticObjective(int stg, SmiCoreData *smicore, SmiQuadra
 					{
 						string s="Exception: Quadratic data for timestage "+stg;
 						s+=" includes data from timestage "+smicore->getColStage(ind[jj]);
-						exception e(s.c_str());
-						throw(e);
+						throw(s);
 					}
 													// find location for new entry
 					int ii = nqstarts[icol]+ilocal;
