@@ -205,7 +205,7 @@ void ModelBugQP()
 	printf("Number of cols: %d\n",clpStoch->getNumCols());
 	printf("Optimal value: %g\n",clpStoch->getObjValue());
 
-	myAssert(__FILE__,__LINE__,clpStoch->getObjValue()== 0.83035714110801750);
+	myAssert(__FILE__,__LINE__,clpStoch->getObjValue()< 0.830358 && clpStoch->getObjValue()> 0.830357);
 
 //	delete smiModel;
 	//delete smiCore;
