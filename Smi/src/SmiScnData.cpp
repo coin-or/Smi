@@ -761,20 +761,23 @@ SmiNodeData::~SmiNodeData()
 
 double *
 SmiNodeData::getDenseRow(int i) {
-		if ( dRowMap[i] == NULL )
+
+		int denseSize=this->getCore()->getNumCols();
+		double *dv = dRowMap[i];
+
+		if ( dv == NULL )
 		{
-			const int  len = this->getRowLength(i);
-			const int *ind = this->getRowIndices(i);
-			const double *els = this->getRowElements(i);
-
-			int denseSize=this->getCore()->getNumCols();
-			double * dv = new double[denseSize];
-			CoinFillN(dv, denseSize, 0.0);
-			for (int j = 0; j < len; ++j)
-			    dv[ind[j]] = els[j];
-
+			dv = new double[denseSize];  //this is deleted in the SmiNodeData destructor
 			dRowMap[i] = dv;
 		}
+		const int  len = this->getRowLength(i);
+		const int *ind = this->getRowIndices(i);
+		const double *els = this->getRowElements(i);
+
+		CoinFillN(dv, denseSize, 0.0);  //we have to regenerate this because dv entries can be over-written in SmiCoreCombineRule->Process()
+		for (int j = 0; j < len; ++j)
+		    dv[ind[j]] = els[j];
+
 		return dRowMap[i];
 }
 
