@@ -670,9 +670,11 @@ void SmiNodeData::addQuadraticObjective(int stg, SmiCoreData *smicore, SmiQuadra
 					if (smicore->getColStage(ind[jj]) != stg)
 													// throw exception if column index is not in the node's stage
 					{
-						string s="Exception: Quadratic data for timestage "+stg;
-						s+=" includes data from timestage "+smicore->getColStage(ind[jj]);
-						throw(s);
+					   string s="Exception: Quadratic data for timestage "+stg;
+					   s+=" includes data from timestage "+smicore->getColStage(ind[jj]);
+					   throw s;
+					   //std::exception e();
+					   //throw(e);
 					}
 													// find location for new entry
 					int ii = nqstarts[icol]+ilocal;
