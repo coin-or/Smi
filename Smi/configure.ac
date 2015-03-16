@@ -93,7 +93,8 @@ AC_CONFIG_FILES([Makefile
                  test/Makefile
                  flopcpp_examples/Makefile
                  smi.pc
-                 smi-uninstalled.pc])
+                 smi-uninstalled.pc
+		 doxydoc/doxygen.conf])
 
 # Here put the location and name of the configuration header file
 # Smi does not make use of the config header files, so the first is

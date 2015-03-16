@@ -61,6 +61,7 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(srcdir)/BuildTools/Makemain.inc $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/smi-uninstalled.pc.in \
 	$(srcdir)/smi.pc.in $(top_srcdir)/configure \
+	$(top_srcdir)/doxydoc/doxygen.conf.in \
 	$(top_srcdir)/examples/Makefile.in \
 	$(top_srcdir)/flopcpp_examples/Makefile.in AUTHORS \
 	config.guess config.sub depcomp install-sh ltmain.sh missing
@@ -78,7 +79,7 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/src/config.h \
 	$(top_builddir)/src/config_smi.h
 CONFIG_CLEAN_FILES = examples/Makefile flopcpp_examples/Makefile \
-	smi.pc smi-uninstalled.pc
+	smi.pc smi-uninstalled.pc doxydoc/doxygen.conf
 SOURCES =
 DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
@@ -376,6 +377,8 @@ smi.pc: $(top_builddir)/config.status $(srcdir)/smi.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 smi-uninstalled.pc: $(top_builddir)/config.status $(srcdir)/smi-uninstalled.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
+doxydoc/doxygen.conf: $(top_builddir)/config.status $(top_srcdir)/doxydoc/doxygen.conf.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -539,7 +542,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/BuildTools $(distdir)/examples $(distdir)/flopcpp_examples $(distdir)/test/SmiTestData
+	$(mkdir_p) $(distdir)/. $(distdir)/BuildTools $(distdir)/doxydoc $(distdir)/examples $(distdir)/flopcpp_examples $(distdir)/test/SmiTestData
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

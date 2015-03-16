@@ -20438,7 +20438,7 @@ fi;
 if test "$dependency_linking" = auto; then
   # On Cygwin and AIX, building DLLs doesn't work
   dependency_linking=no
-  if test x"$enable_shared" = xyes; then
+  if test x"$coin_disable_shared" = xno; then
     case $build in
       *-cygwin* | *-mingw*)
         case "$CC" in
@@ -22859,7 +22859,7 @@ fi
 
 # Here list all the files that configure should create (except for the
 # configuration header file)
-                                                                      ac_config_files="$ac_config_files Makefile examples/Makefile src/Makefile test/Makefile flopcpp_examples/Makefile smi.pc smi-uninstalled.pc"
+                                                                                ac_config_files="$ac_config_files Makefile examples/Makefile src/Makefile test/Makefile flopcpp_examples/Makefile smi.pc smi-uninstalled.pc doxydoc/doxygen.conf"
 
 
 # Here put the location and name of the configuration header file
@@ -23600,6 +23600,7 @@ do
   "flopcpp_examples/Makefile" ) CONFIG_FILES="$CONFIG_FILES flopcpp_examples/Makefile" ;;
   "smi.pc" ) CONFIG_FILES="$CONFIG_FILES smi.pc" ;;
   "smi-uninstalled.pc" ) CONFIG_FILES="$CONFIG_FILES smi-uninstalled.pc" ;;
+  "doxydoc/doxygen.conf" ) CONFIG_FILES="$CONFIG_FILES doxydoc/doxygen.conf" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "src/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS src/config.h" ;;
   "src/config_smi.h" ) CONFIG_HEADERS="$CONFIG_HEADERS src/config_smi.h" ;;
