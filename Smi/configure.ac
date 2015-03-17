@@ -81,6 +81,12 @@ AC_COIN_VPATH_LINK(test/SmiTestData/app0110R.time)
 # In case this is a VPATH configuration we need to make sure that the
 # input files for the examples are available in the VPATH directory.
 
+#############################################################################
+#                  Check for doxygen                                        #
+#############################################################################
+
+AC_COIN_DOXYGEN(CoinUtils Osi Clp Cgl FlopCpp)
+
 ##############################################################################
 #                   Finishing up by writing all the output                   #
 ##############################################################################
