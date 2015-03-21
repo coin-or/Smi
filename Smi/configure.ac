@@ -81,6 +81,12 @@ AC_COIN_VPATH_LINK(test/SmiTestData/app0110R.time)
 # In case this is a VPATH configuration we need to make sure that the
 # input files for the examples are available in the VPATH directory.
 
+#############################################################################
+#                  Check for doxygen                                        #
+#############################################################################
+
+AC_COIN_DOXYGEN(CoinUtils Osi Clp Cgl FlopCpp)
+
 ##############################################################################
 #                   Finishing up by writing all the output                   #
 ##############################################################################
@@ -93,7 +99,8 @@ AC_CONFIG_FILES([Makefile
                  test/Makefile
                  flopcpp_examples/Makefile
                  smi.pc
-                 smi-uninstalled.pc])
+                 smi-uninstalled.pc
+		 doxydoc/doxygen.conf])
 
 # Here put the location and name of the configuration header file
 # Smi does not make use of the config header files, so the first is
