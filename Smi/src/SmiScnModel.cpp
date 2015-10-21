@@ -1476,7 +1476,7 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
         if (m.getNumElements()) assert(!m.isColOrdered());
 
         if (matrix.getNumElements()) //Christian: What is this about?! This can not work, as matrix is not yet initialized..
-        {                            //Alan: I don't know.  Hopefully matrix.getNumElements() returns zero.
+        {                            //Alan: matrix is initialized with CoinPackedMatrix(), so getNumElements returns 0.
             for (int i=0; i<m.getNumRows(); ++i)
             {
                 CoinPackedVector row=m.getVector(i);
@@ -1594,7 +1594,7 @@ SmiScnModel::processDiscreteDistributionIntoScenarios(SmiDiscreteDistribution *s
         // find ancestor node
         SmiTreeNode<SmiScnNode *> *tnode = this->smiTree_.find(label);
         anc = tnode->scenario();
-        branch = tnode->depth();
+        branch = tnode->depth()+1;
         if (!test)
         {
             is = this->generateScenario(core,&matrix,&cpv_dclo,&cpv_dcup,&cpv_dobj,&cpv_drlo,&cpv_drup,branch,anc,dp);
