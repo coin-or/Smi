@@ -262,7 +262,7 @@ public:
 
 		assert(label.size()>0);
 		SmiTreeNode<T> *n = root_, *next;
-		unsigned int i = 0;
+		unsigned int i = 1;
 		while ((i < label.size()) && (next = n->getChildByLabel(label[i]))) {
 			++i;
 			n = next;
