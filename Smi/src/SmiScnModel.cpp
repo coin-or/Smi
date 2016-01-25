@@ -66,6 +66,13 @@ SmiScnModel::~SmiScnModel()
 
     if (maxNelsPerScenInStage)
         delete [] maxNelsPerScenInStage;
+
+	if (this->columnNode)
+		delete [] columnNode;
+
+	if (this->rowNode)
+		delete [] rowNode;
+
 }
 
 //Generates Tree Nodes with Data for given scenario
@@ -876,10 +883,31 @@ SmiScnModel::addNode(SmiScnNode *tnode,bool notDetEq /* = false */)
 {
 
     SmiNodeData *node = tnode->getNode();
+		
+    // OsiSolverInterface *osi = this->osiStoch_;
+    SmiCoreData *core = node->getCore();
+
+	// get stage and associated core node 
+    int stg = node->getStage();
+    SmiNodeData *cnode = core->getNode(stg);
+
+	this->numNodes++;
+	node->setNodeIndex(this->numNodes);
+	this->columnNode = (int *)realloc(this->columnNode,sizeof(int)*(ncol_+core->getNumCols(stg)));
+	this->rowNode = (int*) realloc(this->rowNode,sizeof(int)*(nrow_+core->getNumRows(stg)));
+
+	
+    for(int j=ncol_; j<ncol_+core->getNumCols(stg); ++j)
+        columnNode[j] = node->getNodeIndex();
+		
+    for(int j=nrow_; j<nrow_+core->getNumRows(stg); ++j)
+        rowNode[j] = node->getNodeIndex();
+
 
     // set offsets for current node
     tnode->setColOffset(ncol_);
     tnode->setRowOffset(nrow_);
+	
 
     if (tnode->isVirtualNode())
     {
@@ -888,12 +916,8 @@ SmiScnModel::addNode(SmiScnNode *tnode,bool notDetEq /* = false */)
         return;
     }
 
-    // OsiSolverInterface *osi = this->osiStoch_;
-    SmiCoreData *core = node->getCore();
 
-    // get stage and associated core node 
-    int stg = node->getStage();
-    SmiNodeData *cnode = core->getNode(stg);
+
 
     //TODO: Generate integer information from information given in core node (offset manipulation)
     // Get index list of integers for current stage

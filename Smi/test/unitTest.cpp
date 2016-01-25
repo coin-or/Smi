@@ -2126,6 +2126,8 @@ void ModelBug()
 	double drlo1[] = {0.0, 1.0, 0.0 };
 	CoinPackedVector *rlo1 = new CoinPackedVector(3, indices,drlo1);
 
+	int scenNumber[] = {0,0};
+
 	// generate Core model
 
 	osi.loadProblem(nCoreCols,
@@ -2139,11 +2141,12 @@ void ModelBug()
 	SmiScnModel *smiModel = new SmiScnModel();
 
 	// Add Scenarios
-	int	is = smiModel->generateScenario(smiCore,NULL,NULL,NULL,NULL,
+	scenNumber[0] = smiModel->generateScenario(smiCore,NULL,NULL,NULL,NULL,
 		rlo0,NULL,iBranchStage[0],
 		iAncestorScn[0],dProbScn[0]);
 
-	is = smiModel->generateScenario(smiCore,NULL,NULL,NULL,NULL,
+
+	scenNumber[1] = smiModel->generateScenario(smiCore,NULL,NULL,NULL,NULL,
 		rlo1,NULL,iBranchStage[1],
 		iAncestorScn[1],dProbScn[1]);
 
@@ -2170,6 +2173,23 @@ void ModelBug()
 	printf("Optimal value: %g\n",osiStoch->getObjValue());
 
 	myAssert(__FILE__,__LINE__,osiStoch->getObjValue()== 0.5);
+
+	for (int s=0; s<2; s++)
+	{
+		SmiScnNode *node = smiModel->getLeafNode(scenNumber[s]);
+		do{
+		int numNode = node->getNode()->getNodeIndex();
+		for (int j=node->getColStart();j<node->getColStart()+node->getNode()->getCore()->getNumCols(node->getStage());j++) {
+			printf("\tColumn %d is in node %d\n",j,numNode);
+			myAssert(__FILE__,__LINE__,numNode == smiModel->getColumnNode(j));
+		}
+		for (int i=node->getRowStart();i<node->getRowStart()+node->getNode()->getCore()->getNumRows(node->getStage());i++) {
+			printf("\tRow %d is in node %d\n",i,numNode);
+			myAssert(__FILE__,__LINE__,numNode == smiModel->getRowNode(i));
+		}
+		}
+		while (node = node->getParent());
+	}
 
 	delete smiModel;
 	//delete smiCore;

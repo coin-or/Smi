@@ -196,6 +196,13 @@ private:
 
 	bool hasQdata_;
 	SmiQuadraticDataDC *nqdata_;
+
+	
+	int nodeIndex;
+
+public:
+	void setNodeIndex(int indx) {nodeIndex = indx;}
+	int getNodeIndex() {return nodeIndex;}
 };
 
 

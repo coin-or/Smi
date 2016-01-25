@@ -291,6 +291,9 @@ public:
         solve_synch_(false),totalProb_(0),core_(NULL),smiTree_(),integerInd(NULL),integerLen(0),binaryInd(NULL),binaryLen(0),intIndices(),maxNelsPerScenInStage(NULL)
     {
 		nqels_=0;
+		numNodes =0;
+		columnNode = NULL;
+		rowNode = NULL;
 	}
 
     // destructor
@@ -338,6 +341,14 @@ private:
     // total probability of added scenarios; used to normalize probability to one
     double totalProb_;
     //core model --- used for discrete distributions
+
+	int *columnNode;
+	int *rowNode;
+	int numNodes;
+
+public:
+	int getColumnNode(int colIndex) { return columnNode[colIndex]; }
+	int getRowNode(int rowIndex) {return rowNode[rowIndex]; }
 
 private:
     SmiCoreData * core_;
