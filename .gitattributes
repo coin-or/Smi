@@ -84,6 +84,7 @@ Smi/test/SmiTestData/app0110R.time -text
 Smi/test/SmiTestData/bug.cor -text
 Smi/test/SmiTestData/bug.stoch -text
 Smi/test/SmiTestData/bug.time -text
+/appveyor.yml -text
 /config.guess -text
 /config.sub -text
 /configure -text
