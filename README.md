@@ -1,4 +1,6 @@
-Smi - Stochastic Modeling Interface
+# Smi - Stochastic Modeling Interface
+
+**This Fork removed the dependency of `Clp` package, which disables quadratic programs.**
 
 To install this package, please look at the INSTALL file.
 
