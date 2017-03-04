@@ -314,6 +314,7 @@ libSmi_la_SOURCES = \
 	SmiScnData.cpp SmiScnData.hpp \
 	SmiScnModel.cpp SmiScnModel.hpp \
 	SmiMessage.cpp SmiMessage.hpp \
+	SmiQuadratic.hpp \
 	SmiSmpsIO.cpp SmiSmpsIO.hpp
 
 
@@ -350,6 +351,8 @@ includecoin_HEADERS = \
 	SmiScenarioTree.hpp \
 	SmiScnData.hpp \
 	SmiMessage.hpp \
+	SmiQuadratic.hpp \
+	SmiSmpsIO.hpp \
 	SmiScnModel.hpp
 
 all: config.h config_smi.h

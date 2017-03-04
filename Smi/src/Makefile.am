@@ -25,6 +25,7 @@ libSmi_la_SOURCES = \
 	SmiScnData.cpp SmiScnData.hpp \
 	SmiScnModel.cpp SmiScnModel.hpp \
 	SmiMessage.cpp SmiMessage.hpp \
+	SmiQuadratic.hpp \
 	SmiSmpsIO.cpp SmiSmpsIO.hpp
 
 # List all additionally required libraries
@@ -62,6 +63,8 @@ includecoin_HEADERS = \
 	SmiScenarioTree.hpp \
 	SmiScnData.hpp \
 	SmiMessage.hpp \
+	SmiQuadratic.hpp \
+	SmiSmpsIO.hpp \
 	SmiScnModel.hpp
 
 install-exec-local:

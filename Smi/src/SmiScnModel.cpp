@@ -582,6 +582,7 @@ std::vector< std::pair<double,double> > SmiScnModel::solveWS(OsiSolverInterface 
     return solutionValues;
 }
 
+#if 0
 ClpModel * SmiScnModel::loadQuadraticSolverData()
 {
 	generateSolverArrays();
@@ -593,7 +594,7 @@ ClpModel * SmiScnModel::loadQuadraticSolverData()
     }
 	return clp_;
 }
-
+#endif
 
 //Christian: Generates Deterministic Equivalent (Big Matrix)
 OsiSolverInterface *
