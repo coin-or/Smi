@@ -27,7 +27,7 @@ before_script:
   - git clone https://github.com/coin-or/COIN-OR-OptimizationSuite COIN
   - cd COIN
   - export PROJECT=`echo $TRAVIS_REPO_SLUG | cut -d "/" -f 2`
-  - bash ./coin.install.sh fetch --no-prompt --main-proj=$PROJECT > /dev/null
+  - bash ./coin.install.sh fetch --no-prompt --main-proj=$PROJECT --skip="FlopCpp" > /dev/null
 
 script:
-  - bash ./coin.install.sh build --no-prompt --main-proj=$PROJECT --verbosity=2 --test
+  - bash ./coin.install.sh build --no-prompt --main-proj=$PROJECT --skip="FlopCpp" --verbosity=3 --test
