@@ -68,10 +68,12 @@ SmiScnModel::~SmiScnModel()
         delete [] maxNelsPerScenInStage;
 
 	if (this->columnNode)
-		delete [] columnNode;
+		free(columnNode);
+		//delete [] columnNode;
 
 	if (this->rowNode)
-		delete [] rowNode;
+		free(rowNode);
+		//delete [] rowNode;
 
 }
 
@@ -893,8 +895,18 @@ SmiScnModel::addNode(SmiScnNode *tnode,bool notDetEq /* = false */)
 
 	this->numNodes++;
 	node->setNodeIndex(this->numNodes);
-	this->columnNode = (int *)realloc(this->columnNode,sizeof(int)*(ncol_+core->getNumCols(stg)));
-	this->rowNode = (int*) realloc(this->rowNode,sizeof(int)*(nrow_+core->getNumRows(stg)));
+    if (this->columnNode==NULL) {
+	    this->columnNode = (int *)malloc(sizeof(int)*(ncol_+core->getNumCols(stg)));
+    }
+    else {
+	    this->columnNode = (int *)realloc(this->columnNode,sizeof(int)*(ncol_+core->getNumCols(stg)));
+    }
+    if (this->rowNode==NULL) {
+	    this->rowNode = (int *)malloc(sizeof(int)*(nrow_+core->getNumRows(stg)));
+    }
+    else {
+	    this->rowNode = (int *)realloc(this->rowNode,sizeof(int)*(nrow_+core->getNumRows(stg)));
+    }
 
 	
     for(int j=ncol_; j<ncol_+core->getNumCols(stg); ++j)
