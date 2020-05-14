@@ -62,7 +62,8 @@ includecoin_HEADERS = \
 	SmiScenarioTree.hpp \
 	SmiScnData.hpp \
 	SmiMessage.hpp \
-	SmiScnModel.hpp
+	SmiScnModel.hpp \
+	SmiQuadratic.hpp
 
 install-exec-local:
 	$(install_sh_DATA) config_smi.h $(DESTDIR)$(includecoindir)/SmiConfig.h
