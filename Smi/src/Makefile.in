@@ -350,7 +350,8 @@ includecoin_HEADERS = \
 	SmiScenarioTree.hpp \
 	SmiScnData.hpp \
 	SmiMessage.hpp \
-	SmiScnModel.hpp
+	SmiScnModel.hpp \
+	SmiQuadratic.hpp
 
 all: config.h config_smi.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
