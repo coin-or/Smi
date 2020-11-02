@@ -1,4 +1,7 @@
 * text=auto !eol
+.ci/.travis.pre -text
+.ci/appveyor.pre -text
+.coin-or/projDesc.xml -text
 /.travis.yml -text
 /Dependencies -text
 /INSTALL -text svneol=unset#application/octet-stream
