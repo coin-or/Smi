@@ -584,7 +584,7 @@ std::vector< std::pair<double,double> > SmiScnModel::solveWS(OsiSolverInterface 
     return solutionValues;
 }
 
-#ifdef COIN_HAS_CLP
+#if COIN_HAS_CLP == 1
 ClpModel * SmiScnModel::loadQuadraticSolverData()
 {
 	generateSolverArrays();
