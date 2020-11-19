@@ -13,7 +13,7 @@
 #include "CoinPackedVector.hpp"
 #include "SmiMessage.hpp"
 
-#ifdef COIN_HAS_CLP
+#if COIN_HAS_CLP == 1
 #include "ClpModel.hpp"
 #endif
 
@@ -280,7 +280,7 @@ public:
     inline void releaseCore() { core_=NULL; }
 
 	//Quadratic
-#ifdef COIN_HAS_CLP
+#if COIN_HAS_CLP == 1
     void setQuadraticSolver(ClpModel *clp)
     {
         clp_ = clp;
@@ -336,7 +336,7 @@ private:
 	int *qstart_;
 	int *qindx_;
 	double *qdels_;
-#ifdef COIN_HAS_CLP
+#if COIN_HAS_CLP == 1
     ClpModel *clp_;
 #endif
 
