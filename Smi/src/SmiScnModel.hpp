@@ -12,8 +12,10 @@
 #include "OsiSolverInterface.hpp"
 #include "CoinPackedVector.hpp"
 #include "SmiMessage.hpp"
-#include "ClpModel.hpp"
 
+#ifdef COIN_HAS_CLP
+#include "ClpModel.hpp"
+#endif
 
 // STL declarations
 #include <vector>
@@ -278,10 +280,14 @@ public:
     inline void releaseCore() { core_=NULL; }
 
 	//Quadratic
-	void setQuadraticSolver(ClpModel *clp){ clp_=clp; }
-	ClpModel * getQuadraticSolver() {return clp_;}
-	ClpModel * loadQuadraticSolverData();
-
+#ifdef COIN_HAS_CLP
+    void setQuadraticSolver(ClpModel *clp)
+    {
+        clp_ = clp;
+    }
+    ClpModel *getQuadraticSolver() { return clp_; }
+    ClpModel *loadQuadraticSolverData();
+#endif
 
     // constructor: Lesson from Effective C++: Initialize values in the same order as declared in .hpp file.
     SmiScnModel():
@@ -330,7 +336,9 @@ private:
 	int *qstart_;
 	int *qindx_;
 	double *qdels_;
-	ClpModel *clp_;
+#ifdef COIN_HAS_CLP
+    ClpModel *clp_;
+#endif
 
     // number of scenarios
     //	int scen_;
