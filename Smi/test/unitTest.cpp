@@ -177,7 +177,7 @@ void ModelBugQP()
 	is = smiModel->generateScenario(NULL,NULL,NULL,NULL,
 		rlo1,NULL,iBranchStage[1],
 		iAncestorScn[1],dProbScn[1]);
-
+#if COIN_HAS_CLP == 1
 	// Set Quadratic Solver - we are using Clp
 	ClpInterior *clp = new ClpInterior();
 	smiModel->setQuadraticSolver(clp);
@@ -209,6 +209,7 @@ void ModelBugQP()
 
 	delete cholesky; cholesky = NULL;
 	delete clp; clp = NULL;
+#endif
 
 	delete smiModel; smiModel = NULL;
 	delete smiCore; smiCore = NULL;
