@@ -207,12 +207,20 @@ void ModelBugQP()
 
 	myAssert(__FILE__,__LINE__,clpStoch->getObjValue()< 0.830358 && clpStoch->getObjValue()> 0.830357);
 
-	delete cholesky; cholesky = NULL;
-	delete clp; clp = NULL;
+	// NOTE: cholesky is freed by ClpInterior.
+	// delete cholesky; cholesky = NULL;
+
+	// NOTE: This is not freed by SmiScnModel, but could better be freed by it?
+	if (clp != NULL)
+	{
+		delete clp;
+		clp = NULL;
+	}
 #endif
 
 	delete smiModel; smiModel = NULL;
-	delete smiCore; smiCore = NULL;
+	// NOTE: smiCore is freed by SmiScnModel.
+	// delete smiCore; smiCore = NULL;
 	delete rlo0; rlo0 = NULL;
 	delete rlo1; rlo1 = NULL;
 }
