@@ -351,6 +351,7 @@ includecoin_HEADERS = \
 	SmiScnData.hpp \
 	SmiMessage.hpp \
 	SmiScnModel.hpp \
+	SmiSmpsIO.hpp \
 	SmiQuadratic.hpp
 
 all: config.h config_smi.h
