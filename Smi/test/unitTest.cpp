@@ -177,7 +177,7 @@ void ModelBugQP()
 	is = smiModel->generateScenario(NULL,NULL,NULL,NULL,
 		rlo1,NULL,iBranchStage[1],
 		iAncestorScn[1],dProbScn[1]);
-
+#if COIN_HAS_CLP == 1
 	// Set Quadratic Solver - we are using Clp
 	ClpInterior *clp = new ClpInterior();
 	smiModel->setQuadraticSolver(clp);
@@ -207,11 +207,22 @@ void ModelBugQP()
 
 	myAssert(__FILE__,__LINE__,clpStoch->getObjValue()< 0.830358 && clpStoch->getObjValue()> 0.830357);
 
-//	delete smiModel;
-	//delete smiCore;
+	// NOTE: cholesky is freed by ClpInterior.
+	// delete cholesky; cholesky = NULL;
 
-//	delete rlo0;
-//	delete rlo1;
+	// NOTE: This is not freed by SmiScnModel, but could better be freed by it?
+	if (clp != NULL)
+	{
+		delete clp;
+		clp = NULL;
+	}
+#endif
+
+	delete smiModel; smiModel = NULL;
+	// NOTE: smiCore is freed by SmiScnModel.
+	// delete smiCore; smiCore = NULL;
+	delete rlo0; rlo0 = NULL;
+	delete rlo1; rlo1 = NULL;
 }
 
 // Display message on stdout and stderr

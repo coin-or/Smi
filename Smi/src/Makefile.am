@@ -63,6 +63,7 @@ includecoin_HEADERS = \
 	SmiScnData.hpp \
 	SmiMessage.hpp \
 	SmiScnModel.hpp \
+	SmiSmpsIO.hpp \
 	SmiQuadratic.hpp
 
 install-exec-local:
