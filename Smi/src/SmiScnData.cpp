@@ -588,12 +588,15 @@ SmiNodeData::SmiNodeData(SmiStageIndex stg, SmiCoreData *core,
 	this->strt_[i_start] = offset_dst;
 
 	// return excess memory to the heap
-    void *temp_ptr = realloc(this->dels_,offset_dst*sizeof(double));
-    if (temp_ptr) 
-        this->dels_ = (double*)temp_ptr;
-    temp_ptr = realloc(this->inds_,offset_dst*sizeof(int));
-    if (temp_ptr)
-        this->inds_ = (int*)temp_ptr;
+	if (offset_dst)
+	{
+		void *temp_ptr = realloc(this->dels_,offset_dst*sizeof(double));
+		if (temp_ptr) 
+			this->dels_ = (double*)temp_ptr;
+		temp_ptr = realloc(this->inds_,offset_dst*sizeof(int));
+		if (temp_ptr)
+			this->inds_ = (int*)temp_ptr;
+	}
 }
 
 void SmiNodeData::addQuadraticObjective(int stg, SmiCoreData *smicore, SmiQuadraticData *sqdata)
