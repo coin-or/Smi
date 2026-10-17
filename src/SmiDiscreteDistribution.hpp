@@ -3,6 +3,8 @@
 #ifndef SmiDiscreteRV_H
 #define SmiDiscreteRV_H
 
+#include "SmiConfig.h"
+
 /** Smi Discrete Distribution
 
   This class is used for storing and accessing a discrete probability distribution.
@@ -21,7 +23,7 @@
 //forward declarations
 class SmiDiscreteRV;
 
-class SmiDiscreteDistribution
+class SMILIB_EXPORT SmiDiscreteDistribution
 {
 	friend void SmiDiscreteUnitTest();
 public:
@@ -66,7 +68,7 @@ private:
 };
 
 
-class SmiDiscreteEvent : public SmiLinearData
+class SMILIB_EXPORT SmiDiscreteEvent : public SmiLinearData
 {
 	friend void SmiDiscreteUnitTest();
 public:
@@ -79,7 +81,7 @@ private:
 };
 
 
-class SmiDiscreteRV
+class SMILIB_EXPORT SmiDiscreteRV
 {
 	friend void SmiDiscreteUnitTest();
 public:

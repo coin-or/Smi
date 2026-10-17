@@ -3,6 +3,8 @@
 #ifndef SmiMessage_H
 #define SmiMessage_H
 
+#include "SmiConfig.h"
+
 
 #include "CoinPragma.hpp"
 
@@ -17,7 +19,7 @@ enum SMI_Message
 
 /** This deals with Clp messages (as against Osi messages etc)
  */
-class SmiMessage : public CoinMessages {
+class SMILIB_EXPORT SmiMessage : public CoinMessages {
 
 public:
 

@@ -4,6 +4,8 @@
 #ifndef SmiSmpsIO_HPP
 #define SmiSmpsIO_HPP
 
+#include "SmiConfig.h"
+
 #if defined(_MSC_VER)
 // Turn off compiler warning about long names
 #  pragma warning(disable:4786)
@@ -38,7 +40,7 @@ enum SmiSmpsType { SMI_SC_CARD, SMI_BL_CARD, SMI_COLUMN_CARD, SMI_DISCRETE_DIST,
 	SMI_TIME_UNORDERED_CORE_TYPE, SMI_TIME_ORDERED_CORE_TYPE
 };
 
-class SmiSmpsCardReader:
+class SMILIB_EXPORT SmiSmpsCardReader:
 public CoinMpsCardReader
 {
 public:
@@ -73,7 +75,7 @@ private:
 	double prob_;
 };
 
-class SmiSmpsIO: 
+class SMILIB_EXPORT SmiSmpsIO: 
 public CoinMpsIO
 {
 public:

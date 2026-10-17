@@ -4,6 +4,8 @@
 #ifndef SmiScnData_HPP
 #define SmiScnData_HPP
 
+#include "SmiConfig.h"
+
 #include "CoinPragma.hpp"
 #include "OsiSolverInterface.hpp"
 #include "CoinPackedVector.hpp"
@@ -24,7 +26,7 @@ typedef int SmiStageIndex;
 
 class SmiCoreData;
 
-class SmiNodeData
+class SMILIB_EXPORT SmiNodeData
 	//: public SmiLinearData
 {
 public:
@@ -206,7 +208,7 @@ public:
 };
 
 
-class SmiCoreData
+class SMILIB_EXPORT SmiCoreData
 {
 public:
 	inline int getNumCols(){ return ncol_;} //Gesamtzahl Variablen f�r das CoreModell
