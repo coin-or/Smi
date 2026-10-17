@@ -4,6 +4,8 @@
 #ifndef SmiQuadratic_HPP
 #define SmiQuadratic_HPP
 
+#include "SmiConfig.h"
+
 #include "CoinPragma.hpp"
 #include "OsiSolverInterface.hpp"
 #include "CoinPackedVector.hpp"
@@ -18,7 +20,7 @@ using namespace std;
 //
 //Classes to implement quadratic SP
 
-class SmiQuadraticData {
+class SMILIB_EXPORT SmiQuadraticData {
 protected:
 	int _n;
 	int *_starts;
@@ -52,7 +54,7 @@ public:
 
 };
 
-class SmiQuadraticDataDC: public SmiQuadraticData{
+class SMILIB_EXPORT SmiQuadraticDataDC: public SmiQuadraticData{
 public:
 	SmiQuadraticDataDC(int ncols, int nels){
 		this->setQDstarts(new int[ncols+1]);

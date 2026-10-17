@@ -4,6 +4,8 @@
 #ifndef SmiScnModel_HPP
 #define SmiScnModel_HPP
 
+#include "SmiConfig.h"
+
 // Include files
 #include "CoinPragma.hpp"
 #include "SmiDiscreteDistribution.hpp"
@@ -46,7 +48,7 @@ The setOsiSolverHandle method allows the user to pass in any OSI
 compatible solver.
 
 */
-class SmiScnModel
+class SMILIB_EXPORT SmiScnModel
 {
     friend void SmiScnModelDiscreteUnitTest();
     friend void DecompUnitTest();
@@ -368,7 +370,7 @@ private:
     int* maxNelsPerScenInStage;
 };
 
-class SmiScnNode
+class SMILIB_EXPORT SmiScnNode
 {
     friend class SmiScnModel;
     friend void DecompUnitTest();
@@ -448,7 +450,7 @@ private:
 };
 
 // function object for addnode loop
-class SmiScnModelAddNode{
+class SMILIB_EXPORT SmiScnModelAddNode{
 public:
     void operator() (SmiScnNode *node)
     {
@@ -463,7 +465,7 @@ private:
 };
 
 // function object for deleteNode loop
-class SmiScnModelDeleteNode{
+class SMILIB_EXPORT SmiScnModelDeleteNode{
 public:
     void operator() (SmiScnNode *node)
     {

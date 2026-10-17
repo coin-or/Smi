@@ -11,6 +11,8 @@
 #if !defined(SmiCoreCombineRule_HPP)
 #define SmiCoreCombineRule_HPP
 
+#include "SmiConfig.h"
+
 #include "CoinPragma.hpp"
 #include "CoinPackedVector.hpp"
 
@@ -33,7 +35,7 @@
 	There only needs to be one of these classes. so they're
 	singletons.
 	*/
-class SmiCoreCombineRule
+class SMILIB_EXPORT SmiCoreCombineRule
 {
 public:
   /**@name Virtual Functions: Process and Diff */
@@ -51,7 +53,7 @@ public:
 // SmiCoreCombineReplace
 // -- concrete "replace" rule -- singleton pattern
 //////////////////////////////////////////////////////////////////////
-class SmiCoreCombineReplace : public SmiCoreCombineRule
+class SMILIB_EXPORT SmiCoreCombineReplace : public SmiCoreCombineRule
 {
 public:
 	static SmiCoreCombineReplace * Instance();
@@ -72,7 +74,7 @@ private:
 // SmiCoreCombineAdd
 // -- concrete "add" rule -- singleton pattern
 //////////////////////////////////////////////////////////////////////
-class SmiCoreCombineAdd : public SmiCoreCombineRule
+class SMILIB_EXPORT SmiCoreCombineAdd : public SmiCoreCombineRule
 {
 public:
 	static SmiCoreCombineAdd * Instance();

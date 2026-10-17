@@ -11,6 +11,8 @@
 #ifndef SmiLinearData_HPP
 #define SmiLinearData_HPP
 
+#include "SmiConfig.h"
+
 #if defined(_MSC_VER)
 // Turn off compiler warning about long names
 #  pragma warning(disable:4786)
@@ -20,7 +22,7 @@
 #include "CoinPackedMatrix.hpp"
 #include "OsiSolverInterface.hpp"
 
-class SmiLinearData
+class SMILIB_EXPORT SmiLinearData
 {
 public:
 	inline const CoinPackedMatrix &getMatrix()   {return matrix_; }
