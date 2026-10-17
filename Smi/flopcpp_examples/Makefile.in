@@ -37,9 +37,6 @@ VPATH = @srcdir@
 #  COIN package.                                                         #
 ##########################################################################
 
-COIN_HAS_PKGCONFIG = @COIN_HAS_PKGCONFIG_TRUE@TRUE
-COIN_CXX_IS_CL = @COIN_CXX_IS_CL_TRUE@TRUE
-COIN_HAS_DATASTOCHASTIC = @COIN_HAS_DATASTOCHASTIC_TRUE@TRUE
 
 # C++ Compiler command
 CXX = @CXX@
@@ -51,23 +48,16 @@ CXXFLAGS = @CXXFLAGS@
 CXXLINKFLAGS = @RPATH_FLAGS@
 
 # Include directories (we use the CYGPATH_W variables to allow compilation with Windows compilers)
-ifeq ($(COIN_HAS_PKGCONFIG), TRUE)
-  INCL = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --cflags smi osi-clp flopcpp`
-else
-  INCL = @SMI_CFLAGS_INSTALLED@ @CLP_CFLAGS_INSTALLED@ @FLOPCPP_CFLAGS_INSTALLED@
-endif
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+@COIN_HAS_PKGCONFIG_TRUE@INCL = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --cflags smi osi-clp flopcpp`
+@COIN_HAS_PKGCONFIG_FALSE@INCL = -I@includedir@/coin-or @SMILIB_CFLAGS_NOPC@
 INCL += $(ADDINCFLAGS)
 
-# Linker flags
-ifeq ($(COIN_HAS_PKGCONFIG), TRUE)
-  LIBS = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs smi osi-clp flopcpp`
-else
-  ifeq ($(COIN_CXX_IS_CL), TRUE)
-    LIBS = -link -libpath:`$(CYGPATH_W) @abs_lib_dir@` libSmi.lib @SMI_LIBS_INSTALLED@ @CLP_LIBS_INSTALLED@ @FLOPCPP_LIBS_INSTALLED@
-  else
-    LIBS = -L@abs_lib_dir@ -lSmi @SMI_LIBS_INSTALLED@ @CLP_LIBS_INSTALLED@ @FLOPCPP_LIBS_INSTALLED@
-  endif
-endif
+# Linker flags; the examples use Osi, Clp, and CoinUtils directly, so they are
+# linked, too
+@COIN_HAS_PKGCONFIG_TRUE@LIBS = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs smi @SMILIB_PCFILES@ osi-clp clp coinutils flopcpp`
+@COIN_HAS_PKGCONFIG_FALSE@LIBS = -L@libdir@ -lSmi -lFlopCpp -lOsiClp -lClp -lOsi -lCoinUtils @SMILIB_LFLAGS_NOPC@
 
 # The following is necessary under cygwin, if native compilers are used
 CYGPATH_W = @CYGPATH_W@

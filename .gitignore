@@ -1,5 +1,8 @@
-/CYGWIN-O2
-/dep
-/unitTest
-/unitTest.exe
-/unitTest.exe.stackdump
+*~
+aclocal.m4*
+autom4te*
+Makefile
+config.cache
+config.log
+config.status
+libtool

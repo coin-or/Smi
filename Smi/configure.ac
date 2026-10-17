@@ -1,71 +1,66 @@
-# Copyright (C) 2006 International Business Machines.
+# Copyright (C) 2006 International Business Machines and others.
 # All Rights Reserved.
-# This file is distributed under the Common Public License.
-
-## $Id$
-
-# Author:  Andreas Waechter            IBM    2006-04-13
+# This file is distributed under the Eclipse Public License.
 
 #############################################################################
 #                       Names and other basic things                        #
 #############################################################################
 
-AC_PREREQ(2.59)
-
-AC_INIT([Smi],[trunk],[smi@list.coin-or.org])
+AC_INIT([Smi],[devel],[https://github.com/coin-or/Smi/issues/new],[coin-or-smi],[https://github.com/coin-or/Smi])
 
 AC_COPYRIGHT([
 Copyright 2006 International Business Machines and others.
 All Rights Reserved.
 This file is part of the open source package Smi which is distributed
-under the Common Public License.])
+under the Eclipse Public License.])
 
 # List one file in the package so that the configure script can test
 # whether the package is actually there
 AC_CONFIG_SRCDIR(src/SmiScnModel.hpp)
 
-# Where should everything be installed by default?  Here, we want it
-# to be installed directly in 'bin', 'lib', 'include' subdirectories
-# of the directory where configure is run.  The default would be
-# /usr/local.
-AC_PREFIX_DEFAULT([`pwd`])
+# Do some initialization work (version numbers, change prefix default, ...)
+AC_COIN_INITIALIZE
 
 #############################################################################
 #                         Standard build tool stuff                         #
 #############################################################################
 
-# Get the system type
-AC_CANONICAL_BUILD
-
-# If this project depends on external projects, the Externals file in
-# the source root directory contains definition of where to find those
-# externals.  The following macro ensures that those externals are
-# retrieved by svn if they are not there yet.
-AC_COIN_PROJECTDIR_INIT(Smi)
-
-# Check if user wants to produce debugging code
-AC_COIN_DEBUG_COMPILE(Smi)
-
 # Get the name of the C++ compiler and appropriate compiler options
 AC_COIN_PROG_CXX
 
-# Initialize automake and libtool
-AC_COIN_INIT_AUTO_TOOLS
+# This is a C++ package, set the language accordingly.
+AC_LANG_PUSH(C++)
+
+# Initialize libtool
+AC_COIN_PROG_LIBTOOL
+
+# set RPATH_FLAGS to the compiler link flags required to hardcode location
+# of the shared objects (expanded_libdir is set somewhere in configure before)
+# (used in the examples)
+AC_COIN_RPATH_FLAGS([$expanded_libdir])
 
 #############################################################################
-#                              COIN components                              #
+#                              COIN-OR components                           #
 #############################################################################
 
-AC_COIN_CHECK_PACKAGE(Osi, [osi], [Smi])
+AC_COIN_CHK_PKG(Osi,[SmiLib SmiTest])
 if test $coin_has_osi != yes ; then
   AC_MSG_ERROR([Required package Osi not found.])
 fi
-AC_COIN_CHECK_PACKAGE(Clp, [osi-clp], [Smi])
-AC_COIN_CHECK_PACKAGE(DataStochastic, [coindatastochastic], [Smi])
-AC_COIN_CHECK_PACKAGE(FlopCpp, [flopcpp], [Smi])
+
+# The test and the examples use Clp (one .pc file per check, as some
+# pkg-config versions do not accept several modules in one argument)
+AC_COIN_CHK_PKG(Clp,[SmiTest])
+AC_COIN_CHK_PKG(OsiClp,[SmiTest],[osi-clp])
+
+# FlopC++ is used by the examples in flopcpp_examples
+AC_COIN_CHK_PKG(FlopCpp,,[flopcpp])
+
+# Stochastic programming instances for the examples
+AC_COIN_CHK_PKG(DataStochastic,,[coindatastochastic],,dataonly)
 
 ##############################################################################
-#                   VPATH links for example input files                      #
+#                   VPATH links for test input files                         #
 ##############################################################################
 
 AC_COIN_VPATH_LINK(test/SmiTestData/bug.cor)
@@ -78,18 +73,15 @@ AC_COIN_VPATH_LINK(test/SmiTestData/app0110R.cor)
 AC_COIN_VPATH_LINK(test/SmiTestData/app0110R.stoch)
 AC_COIN_VPATH_LINK(test/SmiTestData/app0110R.time)
 
-# In case this is a VPATH configuration we need to make sure that the
-# input files for the examples are available in the VPATH directory.
-
-#############################################################################
-#                  Check for doxygen                                        #
-#############################################################################
-
-AC_COIN_DOXYGEN(CoinUtils Osi Clp Cgl FlopCpp)
-
 ##############################################################################
 #                   Finishing up by writing all the output                   #
 ##############################################################################
+
+# Doxygen documentation
+AC_COIN_DOXYGEN([CoinUtils Osi Clp Cgl FlopCpp])
+
+# Finalize libs and cflags.
+AC_COIN_FINALIZE_FLAGS([SmiLib SmiTest])
 
 # Here list all the files that configure should create (except for the
 # configuration header file)
@@ -98,15 +90,12 @@ AC_CONFIG_FILES([Makefile
                  src/Makefile
                  test/Makefile
                  flopcpp_examples/Makefile
-                 smi.pc
-                 smi-uninstalled.pc
-		 doxydoc/doxygen.conf])
+                 smi.pc])
+
+AC_CONFIG_FILES([doxydoc/doxygen.conf])
 
 # Here put the location and name of the configuration header file
-# Smi does not make use of the config header files, so the first is
-# just a dummy file. The second is for a user who wants to get the
-# Smi version number.
-AC_CONFIG_HEADER([src/config.h src/config_smi.h])
+AC_CONFIG_HEADERS([src/config.h src/config_smi.h])
 
 # Finally, we let configure write all the output...
 AC_COIN_FINALIZE

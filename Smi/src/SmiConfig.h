@@ -2,8 +2,6 @@
  * All Rights Reserved.
  * This code is published under the Eclipse Public License.
  *
- * $Id: OsiConfig.h 1735 2011-06-08 17:00:08Z stefan $
- *
  * Include file for the configuration of Smi.
  *
  * On systems where the code is configured with the configure script
@@ -11,16 +9,48 @@
  * header file includes the automatically generated header file.
  *
  * On systems that are compiled in other ways (e.g., with the
- * Developer Studio), a default header files is included.
+ * Developer Studio), a header file is included to define those
+ * macros that depend on the operating system and the compiler.  The
+ * macros that define the configuration of the particular user setting
+ * (e.g., presence of other COIN-OR packages or third party code) are set
+ * by the files config_*default.h. The project maintainer needs to remember
+ * to update these files and choose reasonable defines.
+ * A user can modify the default setting by editing the config_*default.h
+ * files.
  */
 
 #ifndef __SMICONFIG_H__
 #define __SMICONFIG_H__
 
 #ifdef HAVE_CONFIG_H
+#ifdef SMILIB_BUILD
+#include "config.h"
+
+/* overwrite SMILIB_EXPORT from config.h when building Smi
+ * we want it to be __declspec(dllexport) when building a DLL on Windows
+ * we want it to be __attribute__((__visibility__("default"))) when building with GCC,
+ *   so user can compile with -fvisibility=hidden
+ */
+#ifdef DLL_EXPORT
+#undef SMILIB_EXPORT
+#define SMILIB_EXPORT __declspec(dllexport)
+#elif defined(__GNUC__) && __GNUC__ >= 4
+#undef SMILIB_EXPORT
+#define SMILIB_EXPORT __attribute__((__visibility__("default")))
+#endif
+
+#else
 #include "config_smi.h"
+#endif
+
+#else /* HAVE_CONFIG_H */
+
+#ifdef SMILIB_BUILD
+#include "config_default.h"
 #else
 #include "config_smi_default.h"
 #endif
+
+#endif /* HAVE_CONFIG_H */
 
 #endif /*__SMICONFIG_H__*/
