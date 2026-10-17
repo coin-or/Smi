@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+# Exit when command fails
+set -e
+#Attempt to use undefined variable outputs error message, and forces an exit
+set -u
+#Causes a pipeline to return the exit status of the last command in the pipe
+#that returned a non-zero return value.
+set -o pipefail
+#set -x
+
+source $COINBREW_HOME/scripts/generate_readme
+
+pushd . > /dev/null
+cd $(dirname $0)
+SCRIPT_DIR=$PWD
+popd > /dev/null
+
+create_variables $SCRIPT_DIR/config.yml
+
+make_header
+
+echo "Smi (Stochastic Modeling Interface) is an interface for problems in which
+uncertainty and optimization appear together. It is intended to be like
+[Osi](https://github.com/coin-or/Osi) in the sense that an \`SmiXX\` object is
+derived from a base class that takes care of a number of commonly encountered
+programming issues, like handling probability distributions, managing problem
+generation, and interacting with solvers to obtain solution information.
+
+Smi implements a multiperiod scenario stochastic programming object called
+\`SmiScnModel\`. It supports
+ * a reader for Stochastic MPS (SMPS) files,
+ * generating scenario trees directly from paths and from discrete random
+   variables,
+ * generating the deterministic equivalent problem, which can be solved by
+   any Osi-compatible solver, and
+ * getting solution data by stage and scenario."
+
+# There are no binary packages of Smi.
+make_build_info_no_packages
+
+echo "### Examples
+
+The \`examples\` directory has a number of use cases. \`stoch.cpp\` contains
+several distinct examples of input styles; it reads instances from
+[Data-Stochastic](https://github.com/coin-or-tools/Data-Stochastic) if that is
+available. The \`flopcpp_examples\` directory has examples that use
+[FlopC++](https://github.com/coin-or/FlopCpp). After building and installing
+Smi, they can be built by running \`make\` in the corresponding subdirectory of
+the build directory, e.g.,
+\`\`\`
+cd build/Smi/0.96/examples
+make
+./stoch
+\`\`\`
+"
+
+make_doxygen_info
+
+make_links

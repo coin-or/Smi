@@ -1,0 +1,61 @@
+Description:
+  Slug: Smi
+  ShortName: Smi
+  LongName: Stochastic Modeling Interface
+  ShortDescription: A stochastic modeling interface for optimization under uncertainty.
+  LongDescription: |2
+    Smi (Stochastic Modeling Interface) is an open-source interface for
+    modeling stochastic linear programming problems. It supports a scenario
+    tree structure for multiperiod stochastic data, a reader for Stochastic
+    MPS (SMPS) files, direct interfaces for generating scenario trees from
+    paths and from discrete random variables, generating the deterministic
+    equivalent problem for Osi-compatible solvers, and parsing the solutions
+    by stage and scenario.
+  Manager: Alan King
+  Homepage: https://github.com/coin-or/Smi
+  License: Eclipse Public License 2.0
+  LicenseURL: http://www.opensource.org/licenses/EPL-2.0
+  Zenodo:
+  IncludedIn:
+    Package: Smi
+  Language:
+    - C++
+  Categories:
+    - Optimization stochastic
+
+Dependencies:
+  - Description: Stochastic programming instances
+    URL: https://github.com/coin-or-tools/Data-Stochastic
+    Version: 1.1
+    Required: Recommended
+  - Description: COIN-OR Utilities
+    URL: https://github.com/coin-or/CoinUtils
+    Version: 2.11
+    Required: Required
+  - Description: Open Solver Interface
+    URL: https://github.com/coin-or/Osi
+    Version: 0.108
+    Required: Required
+  - Description: COIN-OR Linear Programming Solver
+    URL: https://github.com/coin-or/Clp
+    Version: 1.17
+    Required: Recommended
+  - Description: Algebraic modeling language embedded in C++
+    URL: https://github.com/coin-or/FlopCpp
+    Version: 1.2
+    Required: Optional
+
+DevelopmentStatus:
+  activityStatus: Active
+  maturityLevel: 4
+  testedPlatforms:
+  - operatingSystem: Linux
+    compiler: gcc
+  - operatingSystem: Mac OS X
+    compiler:
+    - gcc
+    - clang
+  - operatingSystem: Microsoft Windows with MSys2
+    compiler:
+    - gcc
+    - cl
