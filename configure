@@ -19547,8 +19547,7 @@ if test $coin_has_osi != yes ; then
   as_fn_error $? "Required package Osi not found." "$LINENO" 5
 fi
 
-# The test and the examples use Clp (one .pc file per check, as some
-# pkg-config versions do not accept several modules in one argument)
+# The library uses ClpModel (for quadratic problems), so Clp is required.
 
 
 
@@ -19558,6 +19557,9 @@ fi
 
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for package Clp" >&5
 printf %s "checking for package Clp... " >&6; }
+
+
+
 
 
 
@@ -19783,7 +19785,10 @@ fi
 
 printf "%s\n" "#define SMI_HAS_CLP 1" >>confdefs.h
 
-    SMITEST_PCFILES="$clp_pcfiles $SMITEST_PCFILES"
+    SMILIB_PCFILES="$clp_pcfiles $SMILIB_PCFILES"
+       SMILIB_LFLAGS="$clp_lflags $SMILIB_LFLAGS"
+       SMILIB_CFLAGS="$clp_cflags $SMILIB_CFLAGS"
+      SMITEST_PCFILES="$clp_pcfiles $SMITEST_PCFILES"
        SMITEST_LFLAGS="$clp_lflags $SMITEST_LFLAGS"
        SMITEST_CFLAGS="$clp_cflags $SMITEST_CFLAGS"
 
@@ -19791,6 +19796,13 @@ printf "%s\n" "#define SMI_HAS_CLP 1" >>confdefs.h
 
   fi
 
+if test $coin_has_clp != yes ; then
+  as_fn_error $? "Required package Clp not found." "$LINENO" 5
+fi
+
+# The test and the examples also use Clp's Osi interface (one .pc file per
+# check, as some pkg-config versions do not accept several modules in one
+# argument)
 
 
 

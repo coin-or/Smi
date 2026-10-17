@@ -48,9 +48,15 @@ if test $coin_has_osi != yes ; then
   AC_MSG_ERROR([Required package Osi not found.])
 fi
 
-# The test and the examples use Clp (one .pc file per check, as some
-# pkg-config versions do not accept several modules in one argument)
-AC_COIN_CHK_PKG(Clp,[SmiTest])
+# The library uses ClpModel (for quadratic problems), so Clp is required.
+AC_COIN_CHK_PKG(Clp,[SmiLib SmiTest])
+if test $coin_has_clp != yes ; then
+  AC_MSG_ERROR([Required package Clp not found.])
+fi
+
+# The test and the examples also use Clp's Osi interface (one .pc file per
+# check, as some pkg-config versions do not accept several modules in one
+# argument)
 AC_COIN_CHK_PKG(OsiClp,[SmiTest],[osi-clp])
 
 # FlopC++ is used by the examples in flopcpp_examples
