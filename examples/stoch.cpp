@@ -12,7 +12,11 @@ using namespace std;
 #include "SmiScnData.hpp"
 #include "OsiClpSolverInterface.hpp"
 
-#define DATASTOCHASTICDIR 
+// The Makefile defines DATASTOCHASTICDIR as the directory of the Data-Stochastic
+// instances if that package is available
+#ifndef DATASTOCHASTICDIR
+#define DATASTOCHASTICDIR "."
+#endif
 
 //forward declarations
 
