@@ -479,4 +479,9 @@ private:
 
 };
 
+/** Replaces the elements of dfirst by those of dsecond with the same indices
+    (used by SmiScnModel::processDiscreteDistributionIntoScenarios() and the
+    unit test). */
+SMILIB_EXPORT void replaceFirstWithSecond(CoinPackedVector &dfirst, const CoinPackedVector &dsecond);
+
 #endif //#define SmiScnModel_HPP
