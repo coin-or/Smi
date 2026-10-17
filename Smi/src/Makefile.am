@@ -1,23 +1,19 @@
 # Copyright (C) 2006 International Business Machines and others.
 # All Rights Reserved.
-# This file is distributed under the Common Public License.
+# This file is distributed under the Eclipse Public License.
 
-## $Id$
-
-# Author:  Andreas Waechter           IBM    2006-04-13
-
-AUTOMAKE_OPTIONS = foreign
+include $(top_srcdir)/BuildTools/Makemain.inc
 
 ########################################################################
 #                               libSmi                                 #
 ########################################################################
 
-# Name of the library compiled in this directory.  We want it to be installed
-# in the 'lib' directory
+# Name of the library compiled in this directory.
 lib_LTLIBRARIES = libSmi.la
 
 # List all source files for this library, including headers
 libSmi_la_SOURCES = \
+	SmiConfig.h \
 	SmiCoreCombineRule.cpp SmiCoreCombineRule.hpp \
 	SmiDiscreteDistribution.cpp SmiDiscreteDistribution.hpp \
 	SmiLinearData.hpp \
@@ -28,33 +24,19 @@ libSmi_la_SOURCES = \
 	SmiSmpsIO.cpp SmiSmpsIO.hpp
 
 # List all additionally required libraries
-if DEPENDENCY_LINKING
-libSmi_la_LIBADD = $(SMI_LIBS)
-endif
+libSmi_la_LIBADD = $(SMILIB_LFLAGS)
 
-# This is for libtool (on Windows)
-libSmi_la_LDFLAGS = $(LT_LDFLAGS)
-
-########################################################################
-#                            Additional flags                          #
-########################################################################
-
-# Here list all include flags, relative to this "srcdir" directory.  This
-# "cygpath" stuff is necessary to compile with native compilers on Windows.
-# "top_srcdir" refers to the basic directory for the main package that is
-# being compiled.
-AM_CPPFLAGS = $(SMI_CFLAGS)
-
-# This line is necessary to allow VPATH compilation
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)`
+# Flags for the linker and preprocessor
+AM_LDFLAGS = $(LT_LDFLAGS)
+AM_CPPFLAGS = $(SMILIB_CFLAGS)
 
 ########################################################################
 #                Headers that need to be installed                     #
 ########################################################################
 
 # Here list all the header files that are required by a user of the library,
-# and that therefore should be installed in 'include/coin'
-includecoindir = $(includedir)/coin
+# and that therefore should be installed in 'include/coin-or'
+includecoindir = $(pkgincludedir)
 includecoin_HEADERS = \
 	SmiCoreCombineRule.hpp \
 	SmiDiscreteDistribution.hpp \
@@ -70,4 +52,3 @@ install-exec-local:
 
 uninstall-local:
 	rm -f $(DESTDIR)$(includecoindir)/SmiConfig.h
-	

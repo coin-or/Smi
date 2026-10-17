@@ -1,16 +1,21 @@
+/* src/config_smi.h.in.  */
+
 #ifndef __CONFIG_SMI_H__
 #define __CONFIG_SMI_H__
+
+/* Library Visibility Attribute */
+#undef SMILIB_EXPORT
 
 /* Version number of project */
 #undef SMI_VERSION
 
-/* Major Version number of project */
+/* Major version number of project. */
 #undef SMI_VERSION_MAJOR
 
-/* Minor Version number of project */
+/* Minor version number of project. */
 #undef SMI_VERSION_MINOR
 
-/* Release Version number of project */
+/* Release version number of project. */
 #undef SMI_VERSION_RELEASE
 
 #endif

@@ -1,12 +1,15 @@
-prefix=@prefix@
+@COIN_RELOCATABLE_FALSE@prefix=@prefix@
+@COIN_RELOCATABLE_TRUE@prefix=${pcfiledir}/../..
 exec_prefix=@exec_prefix@
 libdir=@libdir@
-includedir=@includedir@/coin
+includedir=@includedir@/coin-or
 
-Name: SMI
+Name: Smi
 Description: Stochastic Modeling Interface
-URL: https://projects.coin-or.org/Smi
+URL: @PACKAGE_URL@
 Version: @PACKAGE_VERSION@
-Libs: -L${libdir} -lSmi @SMI_PCLIBS@
 Cflags: -I${includedir}
-Requires: @SMI_PCREQUIRES@
+@COIN_STATIC_BUILD_FALSE@Libs: -L${libdir} -lSmi
+@COIN_STATIC_BUILD_FALSE@Requires.private: @SMILIB_PCFILES@
+@COIN_STATIC_BUILD_TRUE@Libs: -L${libdir} -lSmi @SMILIB_LFLAGS_NOPC@
+@COIN_STATIC_BUILD_TRUE@Requires: @SMILIB_PCFILES@
